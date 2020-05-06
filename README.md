@@ -6,16 +6,16 @@
 `gah`  provides tooling for working with decentralized, modular angular applications.
 
 ## Features
-✅ Intuitive CLI for configuring modules, hosts, dependencies, plugins and more
-✅ Works with angular-CLI but is not strictly dependent on it
-✅ Generates a generic host for you
-✅ CI Support
-✅ Reload on save features fully supported for all dependencies
-✅ Pluggable: Write your own plugins to add project-specific functionality
+✅ Intuitive CLI for configuring modules, hosts, dependencies, plugins and more  
+✅ Works with angular-CLI but is not strictly dependent on it  
+✅ Generates a generic host for you  
+✅ CI Support  
+✅ Reload on save features fully supported for all dependencies  
+✅ Pluggable: Write your own plugins to add project-specific functionality  
 
 ## Upcoming
-🆕 Multi-Repository Support
-🆕 Code-API for usage in NodeJS scripts or build systems like grunt
+🆕 Multi-Repository Support  
+🆕 Code-API for usage in NodeJS scripts or build systems like grunt  
 
 ## Features
 `gah` can be used both as a CLI tool and integrated into your node scripts or JS build systems [WIP].
