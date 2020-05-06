@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 
-import { GahEventHandler, GahPlugin, GahEventPayload, GahEvent, IPluginService, GahPluginDependencyConfig, PackageJson, IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService, ILoggerService, IFileSystemService } from '@awdware/gah';
+import { GahEventHandler, GahPlugin, GahEventPayload, GahEvent, IPluginService, GahPluginDependencyConfig, PackageJson, IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService, ILoggerService, IFileSystemService } from '@awdware/gah-shared';
 
 import { FileSystemService } from './file-system.service';
 import { LoggerService } from './logger.service';
@@ -9,7 +9,7 @@ import { TemplateService } from './template.service';
 import { PromptService } from './prompt.service';
 import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
-import { PlguinUpdate } from '@awdware/gah';
+import { PlguinUpdate } from '@awdware/gah-shared';
 
 
 @injectable()

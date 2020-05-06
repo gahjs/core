@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import fs from 'fs-extra';
 import path_ from 'path';
-import { IFileSystemService, ILoggerService, IExecutionService } from '@awdware/gah';
+import { IFileSystemService, ILoggerService, IExecutionService } from '@awdware/gah-shared';
 import globby from 'globby';
 import { platform } from 'os';
 import { ExecutionService } from './execution.service';

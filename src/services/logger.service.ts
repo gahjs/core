@@ -1,5 +1,5 @@
 import { injectable } from 'inversify';
-import { ILoggerService } from '@awdware/gah';
+import { ILoggerService } from '@awdware/gah-shared';
 import ora, { Ora } from 'ora';
 import chalk from 'chalk';
 

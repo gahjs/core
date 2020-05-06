@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import path_ from 'path';
 
-import { GahConfig, TsConfig, IConfigurationService, IFileSystemService } from '@awdware/gah';
+import { GahConfig, TsConfig, IConfigurationService, IFileSystemService } from '@awdware/gah-shared';
 
 import { FileSystemService } from './file-system.service';
 

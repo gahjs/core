@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { FileSystemService } from './file-system.service';
-import { IWorkspaceService, IFileSystemService } from '@awdware/gah';
+import { IWorkspaceService, IFileSystemService } from '@awdware/gah-shared';
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {

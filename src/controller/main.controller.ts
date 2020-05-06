@@ -6,7 +6,7 @@ import { program } from 'commander';
 import { InitController } from './init.controller';
 import { DependencyController } from './dependency.controller';
 import { InstallController } from './install.controller';
-import { GahPlugin, GahPluginDependencyConfig } from '@awdware/gah';
+import { GahPlugin, GahPluginDependencyConfig } from '@awdware/gah-shared';
 import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
 

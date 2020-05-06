@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { exec } from 'child_process';
-import { IExecutionService } from '@awdware/gah';
+import { IExecutionService } from '@awdware/gah-shared';
 
 @injectable()
 export class ExecutionService implements IExecutionService {

@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { GahConfig, GahEvent, InstallFinishedEvent, ModuleDefinition, ModuleReference, ModulesTemplateData, ModuleTemplateData, PackageJson, TsConfig, TsConfigCompilerOptionsPaths } from '@awdware/gah';
+import { GahConfig, GahEvent, InstallFinishedEvent, ModuleDefinition, ModuleReference, ModulesTemplateData, ModuleTemplateData, PackageJson, TsConfig, TsConfigCompilerOptionsPaths } from '@awdware/gah-shared';
 
 import { Controller } from './controller';
 

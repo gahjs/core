@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import inquirer from 'inquirer';
-import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig } from '@awdware/gah';
+import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig } from '@awdware/gah-shared';
 
 @injectable()
 export class PromptService implements IPromptService {

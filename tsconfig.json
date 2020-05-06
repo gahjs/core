@@ -25,5 +25,8 @@
     "moduleResolution": "node",
     "preserveSymlinks": true,
     "newLine": "lf"
-  }
+  },
+  "exclude": [
+    "examples"
+  ]
 }
