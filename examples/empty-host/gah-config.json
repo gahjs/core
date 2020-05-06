@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/awdware/gah/master/assets/gah-config-schema.json",
+  "isHost": true,
+  "modules": [
+    {
+      "name": "Awdware.Host.Presentation"
+    }
+  ]
+}

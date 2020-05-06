@@ -1,0 +1,34 @@
+{
+  "name": "empty-gah",
+  "version": "0.0.0",
+  "scripts": {
+    "pre-build": "yarn && gah i",
+    "build": "yarn pre-build && yarn ng build",
+    "build-prod": "yarn pre-build && yarn ng build --prod",
+    "start": "yarn pre-build && ng serve"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "~9.0.0",
+    "@angular/common": "~9.0.0",
+    "@angular/compiler": "~9.0.0",
+    "@angular/core": "~9.0.0",
+    "@angular/forms": "~9.0.0",
+    "@angular/platform-browser": "~9.0.0",
+    "@angular/platform-browser-dynamic": "~9.0.0",
+    "@angular/router": "~9.0.0",
+    "rxjs": "~6.5.4",
+    "tslib": "^1.10.0",
+    "zone.js": "~0.10.2"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "~0.900.2",
+    "@angular/cli": "~9.0.1",
+    "@angular/compiler-cli": "~9.0.0",
+    "@angular/language-service": "~9.0.0",
+    "@types/node": "^12.11.1",
+    "codelyzer": "^5.1.2",
+    "ts-node": "~8.3.0",
+    "typescript": "~3.7.5"
+  }
+}

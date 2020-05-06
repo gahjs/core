@@ -1,0 +1,55 @@
+{
+  "name": "@awdware/gah-cli",
+  "version": "0.0.12",
+  "description": "Generic Angular Host CLI",
+  "main": "./lib/index.js",
+  "bin": {
+    "gah": "./lib/index.js"
+  },
+  "scripts": {
+    "prebuild": "del-cli lib",
+    "postbuild": "cpy src/templates lib/templates",
+    "start": "yarn run build && yarn run global",
+    "global": "yarn global add file:F:/git/gah/cli",
+    "lint": "tslint -p . --fix",
+    "build": "yarn run prebuild && tsc -p . && yarn run postbuild",
+    "drop": "yarn run build && yarn publish --access public --no-git-tag-version "
+  },
+  "author": "LoaderB0T",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "@awdware/gah": "^0.0.13",
+    "chalk": "^4.0.0",
+    "commander": "^5.1.0",
+    "ejs": "^3.1.2",
+    "figlet": "^1.3.0",
+    "fs-extra": "^9.0.0",
+    "glob": "^7.1.6",
+    "globby": "^11.0.0",
+    "inquirer": "^7.1.0",
+    "inquirer-autosubmit-prompt": "^0.2.0",
+    "inquirer-fuzzy-path": "^2.2.0",
+    "inversify": "^5.0.1",
+    "nodemon": "^2.0.3",
+    "ora": "^4.0.4",
+    "reflect-metadata": "~0.1.13"
+  },
+  "devDependencies": {
+    "@types/clear": "^0.1.0",
+    "@types/ejs": "^3.0.2",
+    "@types/figlet": "^1.2.0",
+    "@types/fs-extra": "^8.1.0",
+    "@types/inquirer": "^6.5.0",
+    "@types/node": "^13.13.2",
+    "@types/rimraf": "^3.0.0",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "cpy-cli": "^3.1.0",
+    "del-cli": "^3.0.0",
+    "eslint": "^6.8.0",
+    "legally": "^3.5.2",
+    "ts-node": "^8.10.1",
+    "typescript": "~3.8.3"
+  }
+}
