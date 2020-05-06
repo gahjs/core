@@ -17,7 +17,7 @@
 🆕 Multi-Repository Support  
 🆕 Code-API for usage in NodeJS scripts or build systems like grunt  
 
-## Features
+## Getting started
 `gah` can be used both as a CLI tool and integrated into your node scripts or JS build systems [WIP].
 
 ### CLI
