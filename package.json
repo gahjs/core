@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Generic Angular Host Tooling",
   "main": "./lib/index.js",
   "bin": {
