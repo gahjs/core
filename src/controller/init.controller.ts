@@ -2,7 +2,8 @@ import { injectable } from 'inversify';
 
 import { ModuleDefinition, GahConfig } from '@awdware/gah-shared';
 import { Controller } from './controller';
-
+import path from 'path';
+import { paramCase } from 'change-case';
 
 @injectable()
 export class InitController extends Controller {
@@ -97,6 +98,9 @@ export class InitController extends Controller {
     let gahCfg: GahConfig;
 
     if (isHost) {
+      const success = this.tryCopyHostToCwd(newModule.name);
+      if (!success)
+        return;
       if (this._configService.gahConfigExists()) {
         this._configService.deleteGahConfig();
       }
@@ -129,5 +133,43 @@ export class InitController extends Controller {
     if (!match)
       return undefined;
     return match[1];
+  }
+
+  private tryCopyHostToCwd(hostName: string): boolean {
+    let allFilesToCopy: string[];
+    allFilesToCopy = this._fileSystemService.getFilesFromGlob(this._fileSystemService.join(__dirname, '../../assets/host-template') + '/**', undefined, true);
+    const conflictingFiles = allFilesToCopy.filter(x => {
+      const relativePathToAssetsFolder = this._fileSystemService.ensureRelativePath(x, this._fileSystemService.join(__dirname, '../../assets/host-template'));
+      return this._fileSystemService.fileExists(relativePathToAssetsFolder);
+    });
+    if (conflictingFiles.length > 0) {
+      this._loggerService.warn('The following paths already exist in the current working directory:');
+      for (let i = 0; i < Math.min(conflictingFiles.length, 5); i++) {
+        const conflictingFilePath = conflictingFiles[i];
+        this._loggerService.warn(`'${path.basename(conflictingFilePath)}'`);
+      }
+      if (conflictingFiles.length > 5)
+        this._loggerService.warn(` ... And ${conflictingFiles.length - 5} more.`);
+      this._loggerService.warn('Cancelling host creation to prevent loss of data / changes. Either start the host initialization in a different directory or use --force to enforce overwriting the generated files.');
+      return false;
+    }
+
+
+    this._fileSystemService.copyFilesInDirectory(this._fileSystemService.join(__dirname, '../../assets/host-template'), '.');
+
+    // Manipulating the project-name placeholder
+    const originalAngularJson = this._fileSystemService.readFile('angular.json');
+    const originalPackageJson = this._fileSystemService.readFile('package.json');
+    const originalIndexHtml = this._fileSystemService.readFile('src/index.html');
+
+    const adjustedAngularJson = originalAngularJson.replace(/<%dashed-name%>/g, paramCase(hostName));
+    const adjustedPackageJson = originalPackageJson.replace(/<%dashed-name%>/g, paramCase(hostName));
+    const adjustedIndexHtml = originalIndexHtml.replace(/<%name%>/g, hostName);
+
+    this._fileSystemService.saveFile('angular.json', adjustedAngularJson);
+    this._fileSystemService.saveFile('package.json', adjustedPackageJson);
+    this._fileSystemService.saveFile('src/index.html', adjustedIndexHtml);
+
+    return true;
   }
 }

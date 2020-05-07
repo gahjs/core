@@ -1,5 +1,5 @@
 {
-  "name": "empty-gah",
+  "name": "<%dashed-name%>",
   "version": "0.0.0",
   "scripts": {
     "pre-build": "yarn && gah i",

@@ -93,11 +93,13 @@ export class FileSystemService implements IFileSystemService {
     fs.copySync(fromDirectory, toDirectory);
   }
 
-  getFilesFromGlob(glob_: string, ignore?: string | string[]): string[] {
+  getFilesFromGlob(glob_: string, ignore?: string | string[], noDefaultIgnore?: boolean): string[] {
     const ignore_ = new Array<string>();
-    ignore_.push('**/node_modules/**');
-    ignore_.push('/node_modules/**');
-    ignore_.push('**/.gah/**');
+    if (!noDefaultIgnore) {
+      ignore_.push('**/node_modules/**');
+      ignore_.push('/node_modules/**');
+      ignore_.push('**/.gah/**');
+    }
     if (ignore && typeof (ignore) === 'string')
       ignore_.push(ignore);
     if (ignore && Array.isArray(ignore))

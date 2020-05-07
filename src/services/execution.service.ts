@@ -8,7 +8,7 @@ export class ExecutionService implements IExecutionService {
   public executionErrorResult: string = '';
 
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string): Promise<boolean> {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const childProcess = exec(cmd);
 
       childProcess.stdout?.on('data', buffer => {
