@@ -14,6 +14,7 @@ import { WorkspaceService } from './services/workspace.service';
 import { PluginService } from './services/plugin.service';
 import { PluginController } from './controller/plugin.controller';
 import { ExecutionService } from './services/execution.service';
+import { ContextService } from './services/context-service';
 
 
 const DIContainer = new Container();
@@ -25,6 +26,7 @@ DIContainer.bind<PluginController>(PluginController).toSelf().inSingletonScope()
 
 DIContainer.bind<FileSystemService>(FileSystemService).toSelf().inSingletonScope();
 DIContainer.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();
+DIContainer.bind<ContextService>(ContextService).toSelf().inSingletonScope();
 DIContainer.bind<ConfigService>(ConfigService).toSelf().inSingletonScope();
 DIContainer.bind<TemplateService>(TemplateService).toSelf().inSingletonScope();
 DIContainer.bind<PromptService>(PromptService).toSelf().inSingletonScope();
