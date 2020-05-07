@@ -12,10 +12,10 @@
 ✅ CI Support  
 ✅ Reload on save features fully supported for all dependencies  
 ✅ Pluggable: Write your own plugins to add project-specific functionality  
+✅ Use from code: Run all the commands from nodeJS scripts or from build tools like grunt  
 
 ## Upcoming
 🆕 Multi-Repository Support  
-🆕 Code-API for usage in NodeJS scripts or build systems like grunt  
 
 ## Getting started
 `gah` can be used both as a CLI tool and integrated into your node scripts or JS build systems [WIP].
