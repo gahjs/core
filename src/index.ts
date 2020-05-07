@@ -4,9 +4,10 @@ import DIContainer from './di-container';
 
 import { MainController } from './controller/main.controller';
 import chalk from 'chalk';
+import path from 'path';
 import { ContextService } from './services/context-service';
 
-const pjson = require('../package.json');
+var pjson = require(path.join(__dirname, '../package.json'));
 console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
 
 (async () => {

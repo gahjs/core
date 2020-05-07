@@ -44,7 +44,43 @@ export class PluginService implements IPluginService {
     plugin['pluginService'] = this;
   }
 
-  public registerPlugin(plugin: GahPlugin, pluginDepCfg: GahPluginDependencyConfig) {
+  public async loadInstalledPlugins() {
+    if (this._configService.gahConfigExists()) {
+      const cfg = this._configService.getGahConfig();
+      if (cfg.plugins && cfg.plugins.length > 0) {
+        for (const plugin of cfg.plugins) {
+          await this.loadInstalledPlugin(plugin);
+        }
+      }
+    }
+  }
+
+  private async loadInstalledPlugin(pluginDepCfg: GahPluginDependencyConfig) {
+    const success = this.tryLoadInstalledPlugin(pluginDepCfg);
+    if (!success) {
+      this._loggerService.log('Plugin ' + pluginDepCfg.name + ' has not been installed');
+      await this.installPlugin(pluginDepCfg.name).then(success => {
+        if (!success) {
+          throw new Error(`Could not load plugin ${pluginDepCfg.name}`);
+        }
+      });
+    }
+    this._loggerService.log(`Plugin '${pluginDepCfg.name}' loaded.`);
+  }
+
+  private tryLoadInstalledPlugin(pluginDepCfg: GahPluginDependencyConfig): boolean {
+    try {
+      const pluginDefinition = require(this._fileSystemService.join(process.cwd(), 'node_modules', pluginDepCfg.name));
+      const plugin = new pluginDefinition.default();
+      this.registerPlugin(plugin as GahPlugin, pluginDepCfg);
+    } catch (error) {
+      this._loggerService.debug(error);
+      return false;
+    }
+    return true;
+  }
+
+  private registerPlugin(plugin: GahPlugin, pluginDepCfg: GahPluginDependencyConfig) {
     plugin['config'] = pluginDepCfg.settings;
     this.initPluginServices(plugin);
     plugin['onInit']();
@@ -96,8 +132,18 @@ export class PluginService implements IPluginService {
       }
       return false;
     }
-    if (!plugin['onInit'] || !plugin['registerEventListener'] || !plugin['onInstall']) {
+    if (!plugin['onInit'] || !plugin['registerEventListener'] || !plugin['onInstall'] || !plugin['name']) {
       this._loggerService.stopLoadingAnimation(false, false, 'This package is not a valid GahPlugin!');
+
+      if (!plugin['onInit'])
+        this._loggerService.debug('Plugin doesn\'t implement onInit method');
+      if (!plugin['registerEventListener'])
+        this._loggerService.debug('Plugin doesn\'t implement registerEventListener method');
+      if (!plugin['onInstall'])
+        this._loggerService.debug('Plugin doesn\'t implement onInstall method');
+      if (!plugin['name'])
+        this._loggerService.debug('Plugin doesn\'t call super constructor with the plugin name');
+
       if (!alreadyInstalled) {
         await this.removePackage(pluginName);
       }

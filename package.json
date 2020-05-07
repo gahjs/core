@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "Generic Angular Host Tooling",
   "main": "./lib/public-api.js",
   "bin": {
@@ -19,7 +19,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@awdware/gah-shared": "^0.0.4",
+    "@awdware/gah-shared": "^0.0.7",
     "chalk": "^4.0.0",
     "change-case": "^4.1.1",
     "commander": "^5.1.0",
