@@ -4,6 +4,7 @@ import DIContainer from './di-container';
 
 import { MainController } from './controller/main.controller';
 import chalk from 'chalk';
+import { ContextService } from './services/context-service';
 
 const pjson = require('../package.json');
 console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
@@ -11,6 +12,9 @@ console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
 (async () => {
   DIContainer.load();
   const mainController: MainController = DIContainer.resolve<MainController>(MainController);
+
+  DIContainer.get(ContextService).setContext({ calledFromCli: true });
+
   try {
     // Cal main method
     await mainController.main();
