@@ -6,6 +6,7 @@ import chalk from 'chalk';
 @injectable()
 export class LoggerService implements ILoggerService {
   private ora_: Ora;
+  public debugLoggingEnabled: boolean;
 
   public log(text: string) {
     console.log(chalk.blue(' ■ ') + text);
@@ -17,10 +18,15 @@ export class LoggerService implements ILoggerService {
     console.error(chalk.red(' ■ ') + text);
   }
   public debug(text: string) {
-    console.log(chalk.magenta(' ■ ') + text);
+    if (this.debugLoggingEnabled)
+      console.log(chalk.magenta(' ■ ') + text);
   }
   public success(text: string) {
     console.log(chalk.green(' ■ ') + text);
+  }
+
+  public enableDebugLogging(): void {
+    this.debugLoggingEnabled = true;
   }
 
   public startLoadingAnimation(text: string) {

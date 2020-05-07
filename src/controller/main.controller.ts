@@ -6,7 +6,6 @@ import { program } from 'commander';
 import { InitController } from './init.controller';
 import { DependencyController } from './dependency.controller';
 import { InstallController } from './install.controller';
-import { GahPlugin, GahPluginDependencyConfig } from '@awdware/gah-shared';
 import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
 
@@ -24,30 +23,25 @@ export class MainController extends Controller {
 
   public async main() {
 
-    if (this._configService.gahConfigExists()) {
-      const cfg = this._configService.getGahConfig();
-      if (cfg.plugins && cfg.plugins.length > 0) {
-        for (const plugin of cfg.plugins) {
-          await this.loadPlugin(plugin);
-        }
-      }
-    }
+    // TODO add flag or config or somehting
+    this._loggerService.enableDebugLogging();
 
-    // const cmdDependency = new Command("dependency");
-    // const cmdAdd = new Command("add");
-    // const cmdAdd = new Command("add");
+    await this._pluginService.loadInstalledPlugins();
 
-    // var pjson = require('../package.json');
-    const version = '0.0.1';
-    // const version = pjson.version;
+    var pjson = require(this._fileSystemService.join(__dirname, '../../package.json'));
+    const version = pjson.version;
+
+    // This is so highly useless, I love it.
+    const fontWidth = process.stdout.columns > 111 ? 'full' : process.stdout.columns > 96 ? 'fitted' : 'controlled smushing';
 
     program.on('--help', () => {
       console.log(
-        chalk.blue(
-          figlet.textSync('gah-cli v ' + version, { horizontalLayout: 'full' })
+        chalk.yellow(
+          figlet.textSync('gah-cli v' + version, { horizontalLayout: fontWidth, font: 'Cricket', verticalLayout: 'full' })
         )
       );
     });
+    console.log();
 
     program
       .version(version);
@@ -94,28 +88,5 @@ export class MainController extends Controller {
     program.parse(process.argv);
   }
 
-  async loadPlugin(pluginDepCfg: GahPluginDependencyConfig) {
-    const success = this.tryLoadPlugin(pluginDepCfg);
-    if (!success) {
-      this._loggerService.log('Plugin ' + pluginDepCfg.name + ' has not been installed');
-      await this._pluginService.installPlugin(pluginDepCfg.name).then(success => {
-        if (!success) {
-          throw new Error(`Could not load plugin ${pluginDepCfg.name}`);
-        }
-      });
-    }
-    this._loggerService.log(`Plugin '${pluginDepCfg.name}' loaded.`);
-  }
 
-  private tryLoadPlugin(pluginDepCfg: GahPluginDependencyConfig): boolean {
-    try {
-      const pluginDefinition = require(this._fileSystemService.join(process.cwd(), 'node_modules', pluginDepCfg.name));
-      const plugin = new pluginDefinition.default();
-      this._pluginService.registerPlugin(plugin as GahPlugin, pluginDepCfg);
-    } catch (error) {
-      this._loggerService.debug(error);
-      return false;
-    }
-    return true;
-  }
 }
