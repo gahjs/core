@@ -1,0 +1,27 @@
+{
+  "name": "@awdware/gah-shared",
+  "version": "0.0.7",
+  "description": "Provides types and interfaces for gah",
+  "main": "./lib/index.js",
+  "scripts": {
+    "prebuild": "del-cli lib",
+    "lint": "eslint src/** --fix",
+    "build": "yarn run prebuild && tsc -p .",
+    "drop": "yarn run build && yarn publish --access public --no-git-tag-version",
+    "schema": "yarn typescript-json-schema ./tsconfig.json GahConfig -o assets/gah-config-schema.json"
+  },
+  "author": "LoaderB0T",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^13.13.2",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "del-cli": "^3.0.0",
+    "eslint": "^6.8.0",
+    "ts-node": "^8.9.1",
+    "typescript": "^3.8.3",
+    "typescript-json-schema": "^0.42.0"
+  }
+}

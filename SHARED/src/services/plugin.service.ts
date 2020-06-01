@@ -1,0 +1,13 @@
+import { GahEventPayload } from '../models/gah-event-payload.model';
+import { GahEvent } from '../models/gah-event';
+import { PlguinUpdate } from '../models/plugin-update';
+
+export interface IPluginService {
+  loadInstalledPlugins(): Promise<void>;
+  triggerEvent(event: GahEvent, payload: GahEventPayload): void;
+  registerEventHandler(pluginName: string, event: GahEvent, handler: (payload: GahEventPayload) => void): void;
+  installPlugin(pluginName: string): Promise<boolean>;
+  removePlugin(pluginName: string): Promise<boolean>;
+  getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null>;
+  updatePlugins(pluginNames: string[]): void;
+}
