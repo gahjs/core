@@ -22,13 +22,15 @@ steps:
 - task: Yarn@3
   inputs:
     arguments: 'install'
+    projectDirectory: 'CLI'
 
 - task: Yarn@3
   inputs:
     arguments: 'run build'
+    projectDirectory: 'CLI'
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Build.SourcesDirectory)'
+    targetPath: '$(Build.SourcesDirectory)/CLI'
     artifact: 'gah'
     publishLocation: 'pipeline'
