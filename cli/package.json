@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "description": "Generic Angular Host Tooling",
   "main": "./lib/public-api.js",
   "bin": {

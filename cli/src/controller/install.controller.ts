@@ -138,7 +138,6 @@ export class InstallController extends Controller {
     this._fileSystemService.saveObjectToFile(tsConfigPath, tsConfig);
   }
 
-  //TODO: CHECK IF WE ALSO NEED GahHost here!
   private getAllReferencedModulesForModule(cfg: GahModule | GahHost): Array<[ModuleDefinition | null, ModuleReference]> {
     const allModGroupRefs = new Array<[ModuleDefinition, ModuleReference]>();
 
@@ -186,7 +185,7 @@ export class InstallController extends Controller {
       const externalFacadePath = externalModuleDef.facadePath ? this._fileSystemService.join(moduleGroupBaseDir, externalModuleDef.facadePath) : null;
 
       // getting the base folder (containing the public-api.ts file) path relative to the baseDir
-      const relativeExternalBasePath = this._fileSystemService.ensureRelativePath(this._fileSystemService.getDirectoryPathFromFilePath(externalPublicApiPath), baseDir);
+      const relativeExternalBasePath = this._fileSystemService.ensureRelativePath(this._fileSystemService.getDirectoryPathFromFilePath(externalPublicApiPath), workingDir);
 
       // Get the destonation for the symlinks depending on module-type
       const dependencyFolder = this.getDependencyFolder(workingDir, ownModule);
