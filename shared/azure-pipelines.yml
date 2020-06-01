@@ -22,15 +22,15 @@ steps:
 - task: Yarn@3
   inputs:
     arguments: 'install'
-    projectDirectory: 'CLI'
+    projectDirectory: 'shared'
 
 - task: Yarn@3
   inputs:
     arguments: 'run build'
-    projectDirectory: 'CLI'
+    projectDirectory: 'shared'
 
 - task: PublishPipelineArtifact@1
   inputs:
-    targetPath: '$(Build.SourcesDirectory)/CLI'
-    artifact: 'gah'
+    targetPath: '$(Build.SourcesDirectory)/shared'
+    artifact: 'gah-shared'
     publishLocation: 'pipeline'

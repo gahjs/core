@@ -1,0 +1,8 @@
+node_modules
+.git
+src
+.vscode
+.eslintignore
+.eslintrc.json
+tsconfig.json
+azure-pipelines.yml

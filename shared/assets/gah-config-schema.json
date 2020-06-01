@@ -1,0 +1,103 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "GahPluginConfig": {
+            "additionalProperties": true,
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "GahPluginDependencyConfig": {
+            "description": "Describes a plugin dependency",
+            "properties": {
+                "name": {
+                    "description": "The name of the plugin that should be used. This has to be the name of a npm package.",
+                    "type": "string"
+                },
+                "settings": {
+                    "$ref": "#/definitions/GahPluginConfig",
+                    "description": "The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available."
+                }
+            },
+            "type": "object"
+        },
+        "ModuleDefinition": {
+            "properties": {
+                "baseNgModuleName": {
+                    "description": "The typescript class name of the base NgModule for this module. This is optional for modules that just act as a library without providing page-like functionality or routing.",
+                    "type": "string"
+                },
+                "dependencies": {
+                    "description": "The array of modules that are the dependencies for this module. This is optional.",
+                    "items": {
+                        "$ref": "#/definitions/ModuleReference"
+                    },
+                    "type": "array"
+                },
+                "facadePath": {
+                    "description": "The path to the folder containing facade files. This is optional and the path is relative to the folder this config file is in.",
+                    "type": "string"
+                },
+                "isEntry": {
+                    "description": "Describes whether a module is the entry module for the host. This has to be set to true for exactly one module that is referenced by a host.",
+                    "type": "boolean"
+                },
+                "name": {
+                    "description": "The name of the module. This has to be unique withing the scope of all modules that are used within the same host.",
+                    "type": "string"
+                },
+                "publicApiPath": {
+                    "description": "The path to the public-api.ts file. The path is relative to the folder this config file is in.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "ModuleReference": {
+            "description": "Contains information about a external referenced module",
+            "properties": {
+                "names": {
+                    "description": "The names of the referenced modules within the project",
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "path": {
+                    "description": "The path to the gah-config.json of the external module. Relative to the folder containing this config file.",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    },
+    "properties": {
+        "$schema": {
+            "default": "https://raw.githubusercontent.com/awdware/gah/master/assets/gah-config-schema.json",
+            "type": "string"
+        },
+        "isHost": {
+            "description": "Defines whether this project is a host module or not",
+            "type": "boolean"
+        },
+        "modules": {
+            "description": "The array of the modules defined in this project.",
+            "items": {
+                "$ref": "#/definitions/ModuleDefinition"
+            },
+            "type": "array"
+        },
+        "plugins": {
+            "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
+            "items": {
+                "$ref": "#/definitions/GahPluginDependencyConfig"
+            },
+            "type": "array"
+        }
+    },
+    "type": "object"
+}
+
