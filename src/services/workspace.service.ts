@@ -9,6 +9,11 @@ export class WorkspaceService implements IWorkspaceService {
 
   ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string) {
     const gitIgnorePath = baseDir ? this._fileSystemService.join(baseDir, '.gitignore') : '.gitignore';
+
+    if (!this._fileSystemService.fileExists(gitIgnorePath)) {
+      this._fileSystemService.saveFile(gitIgnorePath, '## Added by gah\n\n');
+    }
+
     const gitIgnoreLines = this._fileSystemService.readFileLineByLine(gitIgnorePath);
     if (!gitIgnoreLines.includes(gitIgnorePattern)) {
       if (gitIgnoreLines[gitIgnoreLines.length - 1]) {
