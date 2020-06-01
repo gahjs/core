@@ -25,7 +25,7 @@ export class PluginController extends Controller {
       cfg.plugins = new Array<GahPluginDependencyConfig>();
 
     if (cfg.plugins.some(x => x.name.toLowerCase() === pluginName?.toLowerCase())) {
-      this._loggerService.warn('This plugin has already been added, if it is not working try to run \'yarn\' or \'npm i\' in your workspace');
+      this._loggerService.warn('This plugin has already been added.');
       return;
     }
 

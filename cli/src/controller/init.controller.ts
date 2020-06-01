@@ -1,9 +1,11 @@
 import { injectable } from 'inversify';
 
-import { ModuleDefinition, GahConfig } from '@awdware/gah-shared';
+import { ModuleDefinition } from '@awdware/gah-shared';
 import { Controller } from './controller';
 import path from 'path';
 import { paramCase } from 'change-case';
+import { GahModule } from '@awdware/gah-shared/lib/models/gah-module';
+import { GahHost } from '@awdware/gah-shared/lib/models/gah-host';
 
 @injectable()
 export class InitController extends Controller {
@@ -43,7 +45,7 @@ export class InitController extends Controller {
         msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
         cancelled: canceled,
         enabled: () => {
-          this.doesNameExist(this._configService.getGahConfig(), newModuleName!);
+          this.doesNameExist(this._configService.getGahModule(), newModuleName!);
           return this.nameExists;
         }
       });
@@ -107,7 +109,7 @@ export class InitController extends Controller {
 
     newModule.name = newModuleName;
 
-    let gahCfg: GahConfig;
+    let gahCfg: GahModule | GahHost;
 
     if (isHost) {
       const success = this.tryCopyHostToCwd(newModule.name);
@@ -116,23 +118,22 @@ export class InitController extends Controller {
       if (this._configService.gahConfigExists()) {
         this._configService.deleteGahConfig();
       }
-      gahCfg = this._configService.getGahConfig(true, true);
+      gahCfg = this._configService.getGahHost(true);
     } else {
-      gahCfg = this._configService.getGahConfig();
+      gahCfg = this._configService.getGahModule();
       if (facadeFolderPath) {
         newModule.facadePath = this._fileSystemService.ensureRelativePath(facadeFolderPath);
       }
       newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
       newModule.baseNgModuleName = baseModuleName;
       newModule.isEntry = isEntry;
+      (gahCfg as GahModule).modules.push(newModule);
     }
 
-    gahCfg.modules.push(newModule);
-
-    this._configService.saveGahConfig();
+    this._configService.saveGahModuleConfig();
   }
 
-  private doesNameExist(cfg: GahConfig, newName: string) {
+  private doesNameExist(cfg: GahModule, newName: string) {
     this.nameExists = cfg.modules.some(x => x.name === newName);
     return this.nameExists;
   }

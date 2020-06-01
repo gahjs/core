@@ -1,8 +1,11 @@
 import { injectable } from 'inversify';
 
-import { GahConfig, GahEvent, InstallFinishedEvent, ModuleDefinition, ModuleReference, ModulesTemplateData, ModuleTemplateData, PackageJson, TsConfig, TsConfigCompilerOptionsPaths } from '@awdware/gah-shared';
+import { GahEvent, InstallFinishedEvent, ModuleDefinition, ModuleReference, ModulesTemplateData, ModuleTemplateData, PackageJson, TsConfig, TsConfigCompilerOptionsPaths } from '@awdware/gah-shared';
 
 import { Controller } from './controller';
+import { GahHost } from '@awdware/gah-shared/lib/models/gah-host';
+import { GahModule } from '@awdware/gah-shared/lib/models/gah-module';
+import { GahModuleType } from '@awdware/gah-shared/lib/models/gah-module-type';
 
 const hostDependencyPath = './src/app/.gah/dependencies';
 const hostGeneratedPath = './src/app/.gah/generated';
@@ -19,10 +22,13 @@ export class InstallController extends Controller {
   private isHost: boolean;
 
   public async install() {
-    const cfg = this._configService.getGahConfig();
+    let cfg: GahHost | GahModule;
+    const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
+    cfg = isHost ? this._configService.getGahHost() : this._configService.getGahModule();
+
     const paths = new Array<string>();
-    paths.push('gah-config.json');
-    this.findAllInstallPaths('gah-config.json', cfg, paths);
+    paths.push(isHost ? 'gah-host.json' : 'gah-module.json');
+    this.findAllInstallPaths(isHost ? 'gah-host.json' : 'gah-module.json', cfg, paths);
     for (let i = 0; i < paths.length; i++) {
       const mPath = paths[i];
       const baseDir = this._fileSystemService.getDirectoryPathFromFilePath(mPath);
@@ -30,28 +36,35 @@ export class InstallController extends Controller {
     }
   }
 
-  private findAllInstallPaths(gahCfgPath: string, cfg: GahConfig, paths: string[]) {
-    for (const m of cfg.modules) {
-      if (!m.dependencies)
-        return;
-      for (const md of m.dependencies) {
-        const mPath = this._fileSystemService.join(this._fileSystemService.getDirectoryPathFromFilePath(gahCfgPath), md.path);
-        if (!paths.includes(mPath)) {
-          paths.push(mPath);
-          const nCfg = this._fileSystemService.parseFile<GahConfig>(mPath);
-          this.findAllInstallPaths(mPath, nCfg, paths);
-        }
+  private findAllInstallPaths(gahCfgPath: string, cfg: GahHost | GahModule, paths: string[]) {
+    if (cfg.isHost) {
+      this.findAllInstallPathsForReference((cfg as GahHost).modules, gahCfgPath, paths);
+    } else {
+      for (const m of (cfg as GahModule).modules) {
+        if (!m.dependencies)
+          return;
+        this.findAllInstallPathsForReference(m.dependencies, gahCfgPath, paths);
+      }
+    }
+  }
+
+  private findAllInstallPathsForReference(moduleRefs: ModuleReference[], gahCfgPath: string, paths: string[]) {
+    for (const moduleRef of moduleRefs) {
+      const mPath = this._fileSystemService.join(this._fileSystemService.getDirectoryPathFromFilePath(gahCfgPath), moduleRef.path);
+      if (!paths.includes(mPath)) {
+        paths.push(mPath);
+        const nCfg = this._fileSystemService.parseFile<GahModule>(mPath);
+        this.findAllInstallPaths(mPath, nCfg, paths);
       }
     }
   }
 
   private async doInstall(baseDir: string, index: number, moduleCount: number): Promise<void> {
-    const cfg = this._fileSystemService.parseFile<GahConfig>(this._fileSystemService.join(baseDir, 'gah-config.json'));
+    this.isHost = this._configService.getGahModuleType(baseDir) === GahModuleType.HOST;
 
+    const cfg = this._configService.getGahAnyType(baseDir);
 
-    this.isHost = cfg.isHost || false;
     this.didCleanup = false;
-    this.foundEntry = false;
     this.installedModules = new Array<string>();
     this.cleanTsCfgFile(baseDir);
 
@@ -126,29 +139,41 @@ export class InstallController extends Controller {
     this._fileSystemService.saveObjectToFile(tsConfigPath, tsConfig);
   }
 
-  private getAllReferencedModulesForModule(cfg: GahConfig): Array<[ModuleDefinition, ModuleReference]> {
+  //TODO: CHECK IF WE ALSO NEED GahHost here!
+  private getAllReferencedModulesForModule(cfg: GahModule | GahHost): Array<[ModuleDefinition | null, ModuleReference]> {
     const allModGroupRefs = new Array<[ModuleDefinition, ModuleReference]>();
 
-    cfg.modules.forEach((m) => {
-      m.dependencies?.forEach((md) => {
-        const samePath = allModGroupRefs.find((x) => x[1].path === md.path);
-        if (!samePath) {
-          allModGroupRefs.push([m, md]);
-        } else {
-          md.names.forEach((mdn) => {
-            if (!samePath[1].names.includes(mdn)) {
-              samePath[1].names.push(mdn);
-            }
-          });
+    if (cfg.isHost) {
+      this.getAllReferencedModulesForModuleReference((cfg as GahHost).modules, allModGroupRefs);
+    } else {
+      (cfg as GahModule).modules.forEach((m) => {
+        if (m.dependencies) {
+          this.getAllReferencedModulesForModuleReference(m.dependencies, allModGroupRefs, m);
         }
       });
-    });
+    }
     return allModGroupRefs;
   }
 
-  private createReferenceToModuleGroup(ownModule: ModuleDefinition, moduleGroup: ModuleReference, baseDir: string, workingDir: string): void {
+  private getAllReferencedModulesForModuleReference(moduleRefs: ModuleReference[], allModGroupRefs: [ModuleDefinition | null, ModuleReference][], moduleDefinition?: ModuleDefinition) {
+    moduleRefs.forEach((md) => {
+      const samePath = allModGroupRefs.find((x) => x[1].path === md.path);
+      if (!samePath) {
+        allModGroupRefs.push([moduleDefinition ?? null, md]);
+      } else {
+        md.names.forEach((mdn) => {
+          if (!samePath[1].names.includes(mdn)) {
+            samePath[1].names.push(mdn);
+          }
+        });
+      }
+    });
+
+  }
+
+  private createReferenceToModuleGroup(ownModule: ModuleDefinition | null, moduleGroup: ModuleReference, baseDir: string, workingDir: string): void {
     for (const moduleName of moduleGroup.names) {
-      const externalModuleCfg = this._fileSystemService.parseFile<GahConfig>(this._fileSystemService.join(baseDir, moduleGroup.path));
+      const externalModuleCfg = this._fileSystemService.parseFile<GahModule>(this._fileSystemService.join(baseDir, moduleGroup.path));
       const moduleGroupBaseDir = this._fileSystemService.getDirectoryPathFromFilePath(this._fileSystemService.join(baseDir, moduleGroup.path));
       const hasToBeInstalled = this.checkIfModuleHasToBeInstalled(moduleName);
       if (!hasToBeInstalled) {
@@ -192,7 +217,7 @@ export class InstallController extends Controller {
     return true;
   }
 
-  private getExternalModuleDef(externalModuleCfg: GahConfig, moduleName: string, moduleGroupBaseDir: string) {
+  private getExternalModuleDef(externalModuleCfg: GahModule, moduleName: string, moduleGroupBaseDir: string) {
     const externalModuleDef = externalModuleCfg.modules.find((x) => x.name === moduleName);
     if (!externalModuleDef) {
       throw new Error('could not find module \'' + moduleName + '\' in \'' + moduleGroupBaseDir + '\'');
@@ -342,19 +367,19 @@ export class InstallController extends Controller {
     this._fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
   }
 
-  private getDependencyFolder(baseDir: string, ownModule: ModuleDefinition): string {
+  private getDependencyFolder(baseDir: string, ownModule: ModuleDefinition | null): string {
     if (this.isHost) {
       return this._fileSystemService.join(baseDir, hostDependencyPath);
     } else {
-      return this._fileSystemService.join(baseDir, this._fileSystemService.getDirectoryPathFromFilePath(ownModule.publicApiPath), '.gah/dependencies');
+      return this._fileSystemService.join(baseDir, this._fileSystemService.getDirectoryPathFromFilePath(ownModule!.publicApiPath), '.gah/dependencies');
     }
   }
 
-  private getStylesFolder(baseDir: string, ownModule: ModuleDefinition): string {
+  private getStylesFolder(baseDir: string, ownModule: ModuleDefinition | null): string {
     if (this.isHost) {
       return this._fileSystemService.join(baseDir, hostStylesPath);
     } else {
-      return this._fileSystemService.join(baseDir, this._fileSystemService.getDirectoryPathFromFilePath(ownModule.publicApiPath), '.gah/styles');
+      return this._fileSystemService.join(baseDir, this._fileSystemService.getDirectoryPathFromFilePath(ownModule!.publicApiPath), '.gah/styles');
     }
   }
 }

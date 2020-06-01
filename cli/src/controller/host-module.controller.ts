@@ -5,40 +5,24 @@ import { ModuleReference } from '@awdware/gah-shared';
 import { Controller } from './controller';
 
 @injectable()
-export class DependencyController extends Controller {
+export class HostModuleController extends Controller {
 
   public async remove(args: string[]): Promise<void> {
     throw new Error('Not yet implemented\n' + args);
   }
 
-  public async add(moduleName?: string, dependencyConfigPath?: string, dependencyModuleNames?: string[]): Promise<void> {
+  public async add(dependencyConfigPath?: string, dependencyModuleNames?: string[]): Promise<void> {
     let cancelled = false;
+    const cfg = this._configService.getGahHost();
 
-    this._loggerService.log('Adding new dependency to module');
-    const availableModules = this._configService.getGahModule().modules.map(x => x.name);
-    if (moduleName && !availableModules.includes(moduleName)) {
-      throw new Error('Cannot find module ' + moduleName);
-    }
+    this._loggerService.log('Adding new dependency to host');
 
-    const moduleName_ = await this._promptService
-      .list({
-        msg: 'Select a module to add a dependency to',
-        cancelled: cancelled,
-        enabled: () => !moduleName && availableModules.length > 1,
-        choices: () => availableModules
-      });
-
-    if (availableModules.length === 1)
-      moduleName = availableModules[0];
-
-    cancelled = cancelled || !(moduleName || moduleName_);
-    moduleName = moduleName ?? moduleName_;
     const dependencyConfigPath_ = await this._promptService.input({
-      msg: 'Path to the gah-config.json of the new dependency',
+      msg: 'Path to the gah-module.json of the new dependency',
       enabled: () => !dependencyConfigPath,
       cancelled: cancelled,
       validator: (val: string) => {
-        if (!val.endsWith('gah-config.json'))
+        if (!val.endsWith('gah-module.json'))
           return false;
         return this._fileSystemService.fileExists(val);
       }
@@ -68,14 +52,8 @@ export class DependencyController extends Controller {
     if (!dependencyModuleNames || dependencyModuleNames.length === 0)
       dependencyModuleNames = dependencyModuleNames_;
 
-    const module = this._configService.getGahModule().modules.find(x => x.name === moduleName);
-    if (!module)
-      throw new Error('Module \'' + moduleName + '\' could not be found');
-
     const newDep = new ModuleReference();
-
     newDep.path = this._configService.externalConfigPath;
-
     const selectedModules = this._configService.externalConfig.modules.filter(x => dependencyModuleNames!.includes(x.name));
 
     if (!selectedModules || selectedModules.length !== dependencyModuleNames.length)
@@ -83,10 +61,11 @@ export class DependencyController extends Controller {
 
     newDep.names = selectedModules.map(x => x.name);
 
-    if (!module.dependencies)
-      module.dependencies = new Array<ModuleReference>();
 
-    module.dependencies.push(newDep);
+    if (!cfg.modules)
+      cfg.modules = new Array<ModuleReference>();
+
+    cfg.modules.push(newDep);
 
     this._configService.saveGahModuleConfig();
     this._loggerService.success('Dependency added successfully.');
