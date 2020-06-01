@@ -163,8 +163,6 @@ export class InstallController extends Controller {
 
       // getting the base folder (containing the public-api.ts file) path relative to the baseDir
       const relativeExternalBasePath = this._fileSystemService.ensureRelativePath(this._fileSystemService.getDirectoryPathFromFilePath(externalPublicApiPath), baseDir);
-      // getting public-api path relative to the .gah/generated path of the host/module
-      const relativeToGeneratedExternalBasePath = this._fileSystemService.ensureRelativePath(this._fileSystemService.join(baseDir, hostDependencyPath, moduleName), this._fileSystemService.join(baseDir, hostGeneratedPath), true);
 
       // Get the destonation for the symlinks depending on module-type
       const dependencyFolder = this.getDependencyFolder(workingDir, ownModule);
@@ -172,8 +170,8 @@ export class InstallController extends Controller {
       const stylesFolder = this.getStylesFolder(workingDir, ownModule);
 
       this.cleanUpFolders(baseDir, dependencyFolder, stylesFolder);
-      this.createDependencySymlinkAndEditTsConfig(baseDir, workingDir, dependencyFolder, moduleName, relativeExternalBasePath);
-      this.isHost && this.generateDataForEjsTemplate(moduleName, externalModuleDef, relativeToGeneratedExternalBasePath);
+      this.createDependencySymlinkAndEditTsConfig(baseDir, workingDir, dependencyFolder, moduleName, relativeExternalBasePath, externalPublicApiPath);
+      this.isHost && this.generateDataForEjsTemplate(moduleName, externalModuleDef);
       this.isHost && this.copyAssetsAndBaseStyles(baseDir, externalFacadePath, moduleName, relativeExternalBasePath, moduleGroupBaseDir);
       this.generateStyleImports(workingDir, moduleGroupBaseDir, moduleName, relativeExternalBasePath, stylesFolder);
 
@@ -226,11 +224,17 @@ export class InstallController extends Controller {
     }
   }
 
-  private createDependencySymlinkAndEditTsConfig(baseDir: string, workingDir: string, dependencyFolder: string, moduleName: string, relativeExternalBasePath: string) {
+  private createDependencySymlinkAndEditTsConfig(baseDir: string, workingDir: string, dependencyFolder: string, moduleName: string, relativeExternalBasePath: string, publicApiPath: string) {
     // Creating the actual link to the module inside of the .gah/dependencies folder
     const linkPath = this._fileSystemService.join(dependencyFolder, moduleName);
     const realPath = this._fileSystemService.join(baseDir, relativeExternalBasePath);
     this._fileSystemService.createDirLink(linkPath, realPath);
+
+    // Calculate the public-api file path from the linked src folder
+    const publicApiRelativePath = this._fileSystemService.ensureRelativePath(publicApiPath, realPath, true);
+
+    // Calculate the public-api file path from the linked src folder
+    const publicApiRelativePathWithoutExtention = publicApiRelativePath.substr(0, publicApiRelativePath.length - 3);
 
     // Getting the relative path that is written to TS Config paths section
     const gahDependencyPathForModule = this._fileSystemService.ensureRelativePath(linkPath, workingDir, true);
@@ -238,12 +242,12 @@ export class InstallController extends Controller {
     // Adding entries to the tsconfig paths section
     const tsConfigPath = this._fileSystemService.join(workingDir, 'tsconfig.json');
     const tsConfig = this._fileSystemService.parseFile<TsConfig>(tsConfigPath);
-    tsConfig.compilerOptions.paths['@gah/' + moduleName + '/*'] = [gahDependencyPathForModule + '/*'];
+    tsConfig.compilerOptions.paths['@gah/' + moduleName + '/*'] = [gahDependencyPathForModule + '/' + publicApiRelativePathWithoutExtention];
 
     this._fileSystemService.saveObjectToFile(tsConfigPath, tsConfig);
   }
 
-  private generateDataForEjsTemplate(moduleName: string, externalModuleDef: ModuleDefinition, relativeToGeneratedExternalBasePath: string) {
+  private generateDataForEjsTemplate(moduleName: string, externalModuleDef: ModuleDefinition) {
     // Get a save name of a module removing some special chars. Mainly dots are probably used in names and have to be replaced.
     const saveModuleName = moduleName.replace(/[.*:$]/g, '_');
     // Generationg data for the ejs template generation generating the gah-modules.ts
@@ -253,7 +257,6 @@ export class InstallController extends Controller {
     newTemplateData.isLibraryOnly = !externalModuleDef.baseNgModuleName;
     newTemplateData.baseModuleName = externalModuleDef.baseNgModuleName;
     newTemplateData.saveName = saveModuleName;
-    newTemplateData.publicApiImportPath = relativeToGeneratedExternalBasePath;
     this.modulesTemplateData.modules.push(newTemplateData);
   }
 

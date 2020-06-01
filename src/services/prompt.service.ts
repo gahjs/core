@@ -55,7 +55,8 @@ export class PromptService implements IPromptService {
         itemType: cfg.itemType,
         depthLimit: 5,
         excludePath: (nodePath: string) => nodePath.startsWith('node_modules'),
-        excludeFilter: (nodePath: string) => excludePath(nodePath)
+        excludeFilter: (nodePath: string) => excludePath(nodePath),
+        default: cfg.default,
       } as any)
         .then(_ => resolve(_._))
         .catch(_ => reject(_));

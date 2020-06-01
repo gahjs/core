@@ -8,7 +8,7 @@ import { paramCase } from 'change-case';
 @injectable()
 export class InitController extends Controller {
   private nameExists: boolean;
-  public async init(isHost: boolean, isEntry: boolean) {
+  public async init(isHost?: boolean, isEntry?: boolean, newModuleName?: string, facadeFolderPath?: string, publicApiPath?: string, baseModuleName?: string) {
     this.nameExists = false;
 
     if (isEntry && isHost) {
@@ -17,20 +17,16 @@ export class InitController extends Controller {
 
     const alreadyInitialized = this._configService.gahConfigExists();
     let canceled = false;
-    let newModuleName: string;
-    let facadeFolderPath: string;
-    let publicApiPath: string;
-    let baseModuleName: string | undefined = undefined;
 
     const overwriteHost = await this._promptService
       .confirm({
         msg: 'This folder already contains a GAH configuration. A host has to be in its own workspace. Do you want to overwrite the existing configuration for this workspace?',
         cancelled: canceled,
         enabled: () => {
-          return isHost && alreadyInitialized;
+          return (isHost ?? false) && alreadyInitialized;
         }
       });
-    canceled = canceled || isHost && alreadyInitialized && !overwriteHost;
+    canceled = canceled || (isHost ?? false) && alreadyInitialized && !overwriteHost;
 
     const moduleName = await this._promptService
       .input({
@@ -39,31 +35,46 @@ export class InitController extends Controller {
         enabled: () => !newModuleName,
         default: this._fileSystemService.getCwdName()
       });
-    canceled = canceled || !moduleName;
-    newModuleName = moduleName;
+    newModuleName = newModuleName ?? moduleName;
+    canceled = canceled || !newModuleName;
 
     const overwrite = await this._promptService
       .confirm({
         msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
         cancelled: canceled,
         enabled: () => {
-          this.doesNameExist(this._configService.getGahConfig(), newModuleName);
+          this.doesNameExist(this._configService.getGahConfig(), newModuleName!);
           return this.nameExists;
         }
       });
     canceled = canceled || (this.nameExists && !overwrite);
 
+
+    const hasFacadeFolderPath = await this._promptService
+      .confirm({
+        msg: 'Does this module contain a folder for facade files?',
+        cancelled: canceled,
+        enabled: () => !isHost && !facadeFolderPath,
+      });
+
+
     const facadeFolderPath_ = await this._promptService
       .fuzzyPath({
-        msg: 'Enter the path to the folder containing the public facade files',
+        msg: 'Enter the path to the folder containing the facade files',
         cancelled: canceled,
-        enabled: () => !isHost,
+        enabled: () => !isHost && hasFacadeFolderPath && !facadeFolderPath,
         itemType: 'directory',
         excludePath: (val) => val.includes('.gah'),
       });
 
-    canceled = canceled || (!facadeFolderPath_ && !isHost);
-    facadeFolderPath = facadeFolderPath_;
+    facadeFolderPath = facadeFolderPath ?? facadeFolderPath_;
+
+    let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts')?.[0]
+      ?? this._fileSystemService.getFilesFromGlob('**/index.ts')?.[0];
+
+    if (process.platform === 'win32') {
+      defaultPublicApiPath = defaultPublicApiPath.replace(/\//g, '\\');
+    }
 
     const publicApiPath_ = await this._promptService
       .fuzzyPath({
@@ -71,11 +82,12 @@ export class InitController extends Controller {
         cancelled: canceled,
         enabled: () => !isHost && !publicApiPath,
         itemType: 'file',
-        excludePath: (val) => !val.endsWith('public-api.ts') || val.includes('.gah'),
+        excludePath: (val) => val.includes('.gah') || !val.endsWith('.ts') || val.endsWith('.d.ts'),
+        default: defaultPublicApiPath
       });
 
-    canceled = canceled || (!publicApiPath_ && !isHost);
-    publicApiPath = publicApiPath_;
+    publicApiPath = publicApiPath ?? publicApiPath_;
+    canceled = canceled || (!publicApiPath && !isHost);
 
     const baseModuleName_ = await this._promptService
       .input({
@@ -85,7 +97,7 @@ export class InitController extends Controller {
         default: this.tryGuessbaseModuleName()
       });
 
-    baseModuleName = baseModuleName_;
+    baseModuleName = baseModuleName ?? baseModuleName_;
 
     if (canceled) {
       return;
@@ -107,7 +119,9 @@ export class InitController extends Controller {
       gahCfg = this._configService.getGahConfig(true, true);
     } else {
       gahCfg = this._configService.getGahConfig();
-      newModule.facadePath = this._fileSystemService.ensureRelativePath(facadeFolderPath);
+      if (facadeFolderPath) {
+        newModule.facadePath = this._fileSystemService.ensureRelativePath(facadeFolderPath);
+      }
       newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
       newModule.baseNgModuleName = baseModuleName;
       newModule.isEntry = isEntry;

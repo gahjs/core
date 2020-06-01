@@ -62,6 +62,8 @@ export class PluginService implements IPluginService {
       await this.installPlugin(pluginDepCfg.name).then(success => {
         if (!success) {
           throw new Error(`Could not load plugin ${pluginDepCfg.name}`);
+        } else {
+          this.tryLoadInstalledPlugin(pluginDepCfg);
         }
       });
     }
