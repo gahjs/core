@@ -90,7 +90,7 @@ export class FileSystemService implements IFileSystemService {
     if (!this.directoryExists(fromDirectory))
       throw new Error('Directory to copy from not found');
     this.ensureDirectory(toDirectory);
-    fs.copySync(fromDirectory, toDirectory);
+    fs.copySync(fromDirectory, toDirectory, { recursive: true });
   }
 
   getFilesFromGlob(glob_: string, ignore?: string | string[], noDefaultIgnore?: boolean): string[] {
