@@ -51,7 +51,11 @@ export class MainController extends Controller {
       .description('Initiates a new  module (or host).')
       .option('-h, --host', 'Initiates a host instead of a module')
       .option('-e, --entry', 'Initiates a module as the entry module')
-      .action((cmdObj) => this._initController.init(cmdObj.host, cmdObj.entry));
+      .option('--moduleName <name>', 'The name for the new module')
+      .option('--facadeFolderPath <path>', 'The relative path to the facade files')
+      .option('--publicApiPath <path>', 'The relative path public api file (public-api.ts / index.ts / etc.)')
+      .option('--baseModuleName <name>', 'The name of the base NgModule of the new module')
+      .action((cmdObj) => this._initController.init(cmdObj.host, cmdObj.entry, cmdObj.moduleName, cmdObj.facadeFolderPath, cmdObj.publicApiPath, cmdObj.baseModuleName));
 
     const cmdDependency = program
       .command('dependency <add|remove> [options]');
