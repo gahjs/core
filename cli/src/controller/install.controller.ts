@@ -184,8 +184,11 @@ export class InstallController extends Controller {
       const externalPublicApiPath = this._fileSystemService.join(moduleGroupBaseDir, externalModuleDef.publicApiPath);
       const externalFacadePath = externalModuleDef.facadePath ? this._fileSystemService.join(moduleGroupBaseDir, externalModuleDef.facadePath) : null;
 
+      // getting the base folder (containing the public-api.ts file) path relative to the workingDir
+      const relativeExternalBasePathFromWorkingDir = this._fileSystemService.ensureRelativePath(this._fileSystemService.getDirectoryPathFromFilePath(externalPublicApiPath), workingDir);
+
       // getting the base folder (containing the public-api.ts file) path relative to the baseDir
-      const relativeExternalBasePath = this._fileSystemService.ensureRelativePath(this._fileSystemService.getDirectoryPathFromFilePath(externalPublicApiPath), workingDir);
+      const relativeExternalBasePathFromBaseDir = this._fileSystemService.ensureRelativePath(this._fileSystemService.getDirectoryPathFromFilePath(externalPublicApiPath), baseDir);
 
       // Get the destonation for the symlinks depending on module-type
       const dependencyFolder = this.getDependencyFolder(workingDir, ownModule);
@@ -193,10 +196,10 @@ export class InstallController extends Controller {
       const stylesFolder = this.getStylesFolder(workingDir, ownModule);
 
       this.cleanUpFolders(baseDir, dependencyFolder, stylesFolder);
-      this.createDependencySymlinkAndEditTsConfig(baseDir, workingDir, dependencyFolder, moduleName, relativeExternalBasePath, externalPublicApiPath);
+      this.createDependencySymlinkAndEditTsConfig(baseDir, workingDir, dependencyFolder, moduleName, relativeExternalBasePathFromBaseDir, externalPublicApiPath);
       this.isHost && this.generateDataForEjsTemplate(moduleName, externalModuleDef);
-      this.isHost && this.copyAssetsAndBaseStyles(baseDir, externalFacadePath, moduleName, relativeExternalBasePath, moduleGroupBaseDir);
-      this.generateStyleImports(workingDir, moduleGroupBaseDir, moduleName, relativeExternalBasePath, stylesFolder);
+      this.isHost && this.copyAssetsAndBaseStyles(baseDir, externalFacadePath, moduleName, relativeExternalBasePathFromWorkingDir, moduleGroupBaseDir);
+      this.generateStyleImports(workingDir, moduleGroupBaseDir, moduleName, relativeExternalBasePathFromWorkingDir, stylesFolder);
 
       // Do everything again for child dependencies
       if (externalModuleDef.dependencies) {
