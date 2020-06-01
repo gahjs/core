@@ -8,6 +8,7 @@ import { DependencyController } from './dependency.controller';
 import { InstallController } from './install.controller';
 import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
+import { HostModuleController } from './host-module.controller';
 
 @injectable()
 export class MainController extends Controller {
@@ -15,6 +16,8 @@ export class MainController extends Controller {
   private _initController: InitController;
   @inject(DependencyController)
   private _dependencyController: DependencyController;
+  @inject(HostModuleController)
+  private _hostModuleController: HostModuleController;
   @inject(InstallController)
   private _installController: InstallController;
   @inject(PluginController)
@@ -65,8 +68,20 @@ export class MainController extends Controller {
       .action(async (moduleName, dependencyConfigPath, dependencyModuleNames) => await this._dependencyController.add(moduleName, dependencyConfigPath, dependencyModuleNames));
     cmdDependency
       .command('remove [moduleName]')
-      .description('Adds new dependencies to a specified module.')
+      .description('Removes dependencies from a specified module.')
       .action(async (moduleName) => await this._dependencyController.remove(moduleName));
+
+    const cmdHostModule = program
+      .command('module <add|remove> [options]')
+      .description('Manages modules for the host');
+    cmdHostModule
+      .command('add [dependencyConfigPath] [dependencyModuleNames...]')
+      .description('Adds a new module to the host.')
+      .action(async (dependencyConfigPath, dependencyModuleNames) => await this._hostModuleController.add(dependencyConfigPath, dependencyModuleNames));
+    cmdHostModule
+      .command('remove [moduleName]')
+      .description('Removes modules from the host.')
+      .action(async (moduleName) => await this._hostModuleController.remove(moduleName));
 
     const cmdPlugin = program
       .command('plugin <add|remove|update> [options]');

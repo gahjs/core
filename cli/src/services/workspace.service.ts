@@ -19,8 +19,9 @@ export class WorkspaceService implements IWorkspaceService {
       if (gitIgnoreLines[gitIgnoreLines.length - 1]) {
         gitIgnoreLines.push('');
       }
-      if (description)
+      if (description) {
         gitIgnoreLines.push(`# ${description}`);
+      }
       gitIgnoreLines.push(gitIgnorePattern);
     }
     this._fileSystemService.saveFile(gitIgnorePath, gitIgnoreLines.join('\n'));

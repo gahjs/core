@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.19",
+  "version": "0.0.21",
   "description": "Generic Angular Host Tooling",
   "main": "./lib/public-api.js",
   "bin": {
@@ -10,7 +10,7 @@
     "prebuild": "del-cli lib",
     "postbuild": "cpy src/templates lib/templates && cpy assets lib/assets",
     "start": "yarn run build && yarn run global",
-    "global": "yarn global add file:F:/git/@awdware/gah",
+    "global": "yarn global add file:F:/git/@awdware/gah/cli",
     "lint": "tslint -p . --fix",
     "build": "yarn run prebuild && tsc -p . && yarn run postbuild",
     "drop": "yarn run build && yarn publish --access public --no-git-tag-version "
@@ -19,7 +19,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@awdware/gah-shared": "^0.0.7",
+    "@awdware/gah-shared": "^0.0.8",
     "chalk": "^4.0.0",
     "change-case": "^4.1.1",
     "commander": "^5.1.0",

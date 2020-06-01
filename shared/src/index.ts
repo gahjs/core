@@ -1,4 +1,7 @@
 export * from './models/gah-config';
+export * from './models/gah-host';
+export * from './models/gah-module';
+export * from './models/gah-module-type';
 export * from './models/gah-event';
 export * from './models/gah-event-handler';
 export * from './models/gah-event-payload.model';

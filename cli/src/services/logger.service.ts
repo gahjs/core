@@ -18,8 +18,7 @@ export class LoggerService implements ILoggerService {
     console.error(chalk.red(' ■ ') + text);
   }
   public debug(text: string) {
-    if (this.debugLoggingEnabled)
-      console.log(chalk.magenta(' ■ ') + text);
+    if (this.debugLoggingEnabled) { console.log(chalk.magenta(' ■ ') + text); }
   }
   public success(text: string) {
     console.log(chalk.green(' ■ ') + text);

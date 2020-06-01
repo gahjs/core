@@ -91,13 +91,14 @@ export class PluginService implements IPluginService {
 
   public triggerEvent(event: GahEvent, payload: GahEventPayload) {
     this._handlers.forEach(handler => {
-      if (handler.event === event)
+      if (handler.event === event) {
         try {
           handler.handler(payload);
         } catch (error) {
           this._loggerService.error('Error in plugin ' + handler.pluginName + '.\nCallstack from plugin:');
           throw error;
         }
+      }
     });
   }
 
@@ -137,14 +138,10 @@ export class PluginService implements IPluginService {
     if (!plugin['onInit'] || !plugin['registerEventListener'] || !plugin['onInstall'] || !plugin['name']) {
       this._loggerService.stopLoadingAnimation(false, false, 'This package is not a valid GahPlugin!');
 
-      if (!plugin['onInit'])
-        this._loggerService.debug('Plugin doesn\'t implement onInit method');
-      if (!plugin['registerEventListener'])
-        this._loggerService.debug('Plugin doesn\'t implement registerEventListener method');
-      if (!plugin['onInstall'])
-        this._loggerService.debug('Plugin doesn\'t implement onInstall method');
-      if (!plugin['name'])
-        this._loggerService.debug('Plugin doesn\'t call super constructor with the plugin name');
+      if (!plugin['onInit']) { this._loggerService.debug('Plugin doesn\'t implement onInit method'); }
+      if (!plugin['registerEventListener']) { this._loggerService.debug('Plugin doesn\'t implement registerEventListener method'); }
+      if (!plugin['onInstall']) { this._loggerService.debug('Plugin doesn\'t implement onInstall method'); }
+      if (!plugin['name']) { this._loggerService.debug('Plugin doesn\'t call super constructor with the plugin name'); }
 
       if (!alreadyInstalled) {
         await this.removePackage(pluginName);
@@ -214,8 +211,7 @@ export class PluginService implements IPluginService {
     const updates = new Array<PlguinUpdate>();
     yarnOutput.split('\n').forEach(yarnOutputLine => {
       const updateMatches = yarnOutputLine.match(/^(\S+)\s(\d+.\d+.\d+)\s+(\d+.\d+.\d+)\s+(\d+.\d+.\d+)\s+/);
-      if (!updateMatches)
-        return;
+      if (!updateMatches) { return; }
       updates.push({ name: updateMatches[1], fromVersion: updateMatches[2], toVersion: updateMatches[4] });
     });
     if (updates.length === 0) {

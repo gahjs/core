@@ -54,11 +54,9 @@ export class FileSystemService implements IFileSystemService {
   }
 
   ensureRelativePath(path: string, relativeFrom?: string, dontCheck = false) {
-    if (!dontCheck && !this.directoryExists(path))
-      throw new Error('Could not find path ' + path);
+    if (!dontCheck && !this.directoryExists(path)) { throw new Error('Could not find path ' + path); }
     relativeFrom = relativeFrom ?? process.cwd();
-    if (!dontCheck && !this.directoryExists(relativeFrom))
-      throw new Error('Could not find path ' + relativeFrom);
+    if (!dontCheck && !this.directoryExists(relativeFrom)) { throw new Error('Could not find path ' + relativeFrom); }
 
     path = path_.relative(relativeFrom, path).replace(/\\/g, '/');
     return path;
@@ -78,8 +76,7 @@ export class FileSystemService implements IFileSystemService {
   }
 
   deleteFile(path: string): void {
-    if (this.fileExists(path))
-      fs.unlinkSync(path);
+    if (this.fileExists(path)) { fs.unlinkSync(path); }
   }
 
   deleteFilesInDirectory(path: string): void {
@@ -87,8 +84,7 @@ export class FileSystemService implements IFileSystemService {
   }
 
   copyFilesInDirectory(fromDirectory: string, toDirectory: string) {
-    if (!this.directoryExists(fromDirectory))
-      throw new Error('Directory to copy from not found');
+    if (!this.directoryExists(fromDirectory)) { throw new Error('Directory to copy from not found'); }
     this.ensureDirectory(toDirectory);
     fs.copySync(fromDirectory, toDirectory, { recursive: true });
   }
@@ -100,10 +96,8 @@ export class FileSystemService implements IFileSystemService {
       ignore_.push('/node_modules/**');
       ignore_.push('**/.gah/**');
     }
-    if (ignore && typeof (ignore) === 'string')
-      ignore_.push(ignore);
-    if (ignore && Array.isArray(ignore))
-      ignore.forEach(x => ignore_.push(x));
+    if (ignore && typeof (ignore) === 'string') { ignore_.push(ignore); }
+    if (ignore && Array.isArray(ignore)) { ignore.forEach(x => ignore_.push(x)); }
 
     return globby.sync(glob_, { ignore: ignore_ });
   }
@@ -117,8 +111,7 @@ export class FileSystemService implements IFileSystemService {
     if (platform() === 'win32') {
       cmd = 'mklink /j "' + linkPath + '" "' + realPath + '"';
       this._executionService.execute(cmd, false).then(success => {
-        if (!success)
-          throw new Error(this._executionService.executionErrorResult);
+        if (!success) { throw new Error(this._executionService.executionErrorResult); }
       });
     } else {
       fs.ensureSymlinkSync(realPath, linkPath, 'dir');
@@ -143,8 +136,7 @@ export class FileSystemService implements IFileSystemService {
   }
 
   ensureAbsolutePath(path: string) {
-    if (path_.isAbsolute(path))
-      return path.replace(/\\/g, '/');
+    if (path_.isAbsolute(path)) { return path.replace(/\\/g, '/'); }
     return path_.resolve(path).replace(/\\/g, '/');
   }
 }

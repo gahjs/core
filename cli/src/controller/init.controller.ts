@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { ModuleDefinition, GahConfig } from '@awdware/gah-shared';
+import { ModuleDefinition, GahHost, GahModule } from '@awdware/gah-shared';
 import { Controller } from './controller';
 import path from 'path';
 import { paramCase } from 'change-case';
@@ -43,7 +43,7 @@ export class InitController extends Controller {
         msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
         cancelled: canceled,
         enabled: () => {
-          this.doesNameExist(this._configService.getGahConfig(), newModuleName!);
+          this.doesNameExist(this._configService.getGahModule(), newModuleName!);
           return this.nameExists;
         }
       });
@@ -107,45 +107,41 @@ export class InitController extends Controller {
 
     newModule.name = newModuleName;
 
-    let gahCfg: GahConfig;
+    let gahCfg: GahModule | GahHost;
 
     if (isHost) {
       const success = this.tryCopyHostToCwd(newModule.name);
-      if (!success)
-        return;
+      if (!success) { return; }
       if (this._configService.gahConfigExists()) {
         this._configService.deleteGahConfig();
       }
-      gahCfg = this._configService.getGahConfig(true, true);
+      gahCfg = this._configService.getGahHost(true);
     } else {
-      gahCfg = this._configService.getGahConfig();
+      gahCfg = this._configService.getGahModule();
       if (facadeFolderPath) {
         newModule.facadePath = this._fileSystemService.ensureRelativePath(facadeFolderPath);
       }
       newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
       newModule.baseNgModuleName = baseModuleName;
       newModule.isEntry = isEntry;
+      (gahCfg as GahModule).modules.push(newModule);
     }
 
-    gahCfg.modules.push(newModule);
-
-    this._configService.saveGahConfig();
+    this._configService.saveGahModuleConfig();
   }
 
-  private doesNameExist(cfg: GahConfig, newName: string) {
+  private doesNameExist(cfg: GahModule, newName: string) {
     this.nameExists = cfg.modules.some(x => x.name === newName);
     return this.nameExists;
   }
 
   private tryGuessbaseModuleName(): string | undefined {
     const possibleModuleFiles = this._fileSystemService.getFilesFromGlob('projects/**/src/lib/!(*routing*).module.ts');
-    if (!possibleModuleFiles || possibleModuleFiles.length === 0)
-      return undefined;
+    if (!possibleModuleFiles || possibleModuleFiles.length === 0) { return undefined; }
 
     const firtsPossibleModuleContent = this._fileSystemService.readFile(possibleModuleFiles[0]);
     const match = firtsPossibleModuleContent.match(/export class (\S+) {/);
-    if (!match)
-      return undefined;
+    if (!match) { return undefined; }
     return match[1];
   }
 
@@ -162,8 +158,7 @@ export class InitController extends Controller {
         const conflictingFilePath = conflictingFiles[i];
         this._loggerService.warn(`'${path.basename(conflictingFilePath)}'`);
       }
-      if (conflictingFiles.length > 5)
-        this._loggerService.warn(` ... And ${conflictingFiles.length - 5} more.`);
+      if (conflictingFiles.length > 5) { this._loggerService.warn(` ... And ${conflictingFiles.length - 5} more.`); }
       this._loggerService.warn('Cancelling host creation to prevent loss of data / changes. Either start the host initialization in a different directory or use --force to enforce overwriting the generated files.');
       return false;
     }

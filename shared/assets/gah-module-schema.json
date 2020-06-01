@@ -3,14 +3,17 @@
     "properties": {
         "$schema": {
             "type": "string",
-            "default": "https://raw.githubusercontent.com/awdware/gah/master/assets/gah-config-schema.json"
+            "default": "https://raw.githubusercontent.com/awdware/gah/master/assets/gah-module-schema.json"
         },
-        "plugins": {
-            "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
+        "modules": {
+            "description": "The array of the modules defined in this project.",
             "type": "array",
             "items": {
-                "$ref": "#/definitions/GahPluginDependencyConfig"
+                "$ref": "#/definitions/ModuleDefinition"
             }
+        },
+        "isHost": {
+            "type": "boolean"
         }
     },
     "definitions": {

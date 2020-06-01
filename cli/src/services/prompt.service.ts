@@ -41,8 +41,7 @@ export class PromptService implements IPromptService {
   public fuzzyPath(cfg: FuzzyPathPromptConfig) {
 
     const excludePath = (val: string) => {
-      if (cfg.excludePath)
-        return cfg.excludePath(val);
+      if (cfg.excludePath) { return cfg.excludePath(val); }
       return false;
     };
 

@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah-shared",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Provides types and interfaces for gah",
   "main": "./lib/index.js",
   "scripts": {
@@ -8,7 +8,7 @@
     "lint": "eslint src/** --fix",
     "build": "yarn run prebuild && tsc -p .",
     "drop": "yarn run build && yarn publish --access public --no-git-tag-version",
-    "schema": "yarn typescript-json-schema ./tsconfig.json GahConfig -o assets/gah-config-schema.json"
+    "schema": "node generate-schema.js"
   },
   "author": "LoaderB0T",
   "license": "MIT",
