@@ -1,11 +1,9 @@
 import { injectable } from 'inversify';
 
-import { ModuleDefinition } from '@awdware/gah-shared';
+import { ModuleDefinition, GahHost, GahModule } from '@awdware/gah-shared';
 import { Controller } from './controller';
 import path from 'path';
 import { paramCase } from 'change-case';
-import { GahModule } from '@awdware/gah-shared/lib/models/gah-module';
-import { GahHost } from '@awdware/gah-shared/lib/models/gah-host';
 
 @injectable()
 export class InitController extends Controller {

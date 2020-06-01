@@ -1,11 +1,11 @@
 import { injectable } from 'inversify';
 
-import { GahEvent, InstallFinishedEvent, ModuleDefinition, ModuleReference, ModulesTemplateData, ModuleTemplateData, PackageJson, TsConfig, TsConfigCompilerOptionsPaths } from '@awdware/gah-shared';
+import {
+  GahEvent, InstallFinishedEvent, ModuleDefinition, ModuleReference, ModulesTemplateData,
+  ModuleTemplateData, PackageJson, TsConfig, TsConfigCompilerOptionsPaths, GahModuleType, GahModule, GahHost
+} from '@awdware/gah-shared';
 
 import { Controller } from './controller';
-import { GahHost } from '@awdware/gah-shared/lib/models/gah-host';
-import { GahModule } from '@awdware/gah-shared/lib/models/gah-module';
-import { GahModuleType } from '@awdware/gah-shared/lib/models/gah-module-type';
 
 const hostDependencyPath = './src/app/.gah/dependencies';
 const hostGeneratedPath = './src/app/.gah/generated';

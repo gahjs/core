@@ -1,11 +1,8 @@
 import { injectable, inject } from 'inversify';
 
-import { GahConfig, TsConfig, IConfigurationService, IFileSystemService } from '@awdware/gah-shared';
+import { GahConfig, TsConfig, IConfigurationService, IFileSystemService, GahHost, GahModule, GahModuleType } from '@awdware/gah-shared';
 
 import { FileSystemService } from './file-system.service';
-import { GahModule } from '@awdware/gah-shared/lib/models/gah-module';
-import { GahHost } from '@awdware/gah-shared/lib/models/gah-host';
-import { GahModuleType } from '@awdware/gah-shared/lib/models/gah-module-type';
 
 const gahConfigFileName = 'gah-config.json';
 const gahModuleConfigFileName = 'gah-module.json';
