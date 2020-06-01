@@ -64,6 +64,7 @@ export class InstallController extends Controller {
 
     this.didCleanup = false;
     this.installedModules = new Array<string>();
+    this.foundEntry = false;
     this.cleanTsCfgFile(baseDir);
 
     const dirName = this._fileSystemService.directoryName(baseDir);

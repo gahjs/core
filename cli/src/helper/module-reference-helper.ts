@@ -24,12 +24,14 @@ export class ModuleReferenceHelper {
     }
     if (availableExternalModules.length === 1) {
       dependencyModuleNames = availableExternalModules;
+      return dependencyModuleNames;
     }
+    const enabled = !dependencyModuleNames || dependencyModuleNames.length === 0;
 
     return await promptService.checkbox({
       msg: 'Which of the modules do you want to add?',
       choices: () => availableExternalModules,
-      enabled: () => !dependencyModuleNames || dependencyModuleNames.length === 0,
+      enabled: () => enabled,
       cancelled: cancelled
     });
   }

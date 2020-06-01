@@ -77,7 +77,7 @@ export class ConfigService implements IConfigurationService {
     const mType = this.getGahModuleType(inFolder);
     if (mType === GahModuleType.UNKNOWN) { throw new Error('Could not find any module or host config in folder ' + inFolder); }
 
-    return this.loadAndParseGahAnyType(mType === GahModuleType.HOST);
+    return this.loadAndParseGahAnyType(mType === GahModuleType.HOST, inFolder);
   }
 
   private loadGahConfig(): void {
