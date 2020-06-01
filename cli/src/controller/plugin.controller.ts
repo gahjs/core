@@ -17,12 +17,10 @@ export class PluginController extends Controller {
 
     pluginName = pluginName ?? pluginName_;
     canceled = canceled || !pluginName;
-    if (canceled)
-      return;
+    if (canceled) { return; }
 
     const cfg = this._configService.getGahConfig();
-    if (!cfg.plugins)
-      cfg.plugins = new Array<GahPluginDependencyConfig>();
+    if (!cfg.plugins) { cfg.plugins = new Array<GahPluginDependencyConfig>(); }
 
     if (cfg.plugins.some(x => x.name.toLowerCase() === pluginName?.toLowerCase())) {
       this._loggerService.warn('This plugin has already been added.');
@@ -36,15 +34,13 @@ export class PluginController extends Controller {
   public async remove(pluginName?: string) {
 
     const pluginName_ = await this.askForInstalledPlugin('Please select the plugin you want to remove', pluginName);
-    if (!pluginName_)
-      return;
+    if (!pluginName_) { return; }
 
     const success = await this._pluginService.removePlugin(pluginName_);
     if (success) {
       const cfg = this._configService.getGahConfig();
       const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
-      if (idx === -1)
-        throw new Error('Error uninstalling plugin ' + pluginName);
+      if (idx === -1) { throw new Error('Error uninstalling plugin ' + pluginName); }
 
       cfg.plugins?.splice(idx, 1);
       this._configService.saveGahConfig();
@@ -55,8 +51,7 @@ export class PluginController extends Controller {
 
   public async update(pluginName: string) {
     const updateablePlugins = await this._pluginService.getUpdateablePlugins(pluginName);
-    if (!updateablePlugins || updateablePlugins.length === 0)
-      return;
+    if (!updateablePlugins || updateablePlugins.length === 0) { return; }
     let pluginsToUpdate: string[];
     if (!pluginName) {
       const resp = await this._promptService.checkbox({
@@ -92,8 +87,7 @@ export class PluginController extends Controller {
 
     pluginName = pluginName ?? pluginName_;
     canceled = canceled || !pluginName;
-    if (canceled)
-      return null;
+    if (canceled) { return null; }
     return pluginName;
   }
 

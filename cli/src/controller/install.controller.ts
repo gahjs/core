@@ -22,9 +22,8 @@ export class InstallController extends Controller {
   private isHost: boolean;
 
   public async install() {
-    let cfg: GahHost | GahModule;
     const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
-    cfg = isHost ? this._configService.getGahHost() : this._configService.getGahModule();
+    const cfg = isHost ? this._configService.getGahHost() : this._configService.getGahModule();
 
     const paths = new Array<string>();
     paths.push(isHost ? 'gah-host.json' : 'gah-module.json');
@@ -41,8 +40,7 @@ export class InstallController extends Controller {
       this.findAllInstallPathsForReference((cfg as GahHost).modules, gahCfgPath, paths);
     } else {
       for (const m of (cfg as GahModule).modules) {
-        if (!m.dependencies)
-          return;
+        if (!m.dependencies) { return; }
         this.findAllInstallPathsForReference(m.dependencies, gahCfgPath, paths);
       }
     }
@@ -286,8 +284,7 @@ export class InstallController extends Controller {
   }
 
   private copyAssetsAndBaseStyles(baseDir: string, externalFacadePath: string | null, moduleName: string, relativeExternalBasePath: string, moduleGroupPath: string) {
-    if (!externalFacadePath)
-      return;
+    if (!externalFacadePath) { return; }
     // Copying assets
     if (this._fileSystemService.directoryExists(this._fileSystemService.join(externalFacadePath, 'assets'))) {
       this._fileSystemService.copyFilesInDirectory(this._fileSystemService.join(externalFacadePath, 'assets'), this._fileSystemService.join(baseDir, hostAssetsFolder, moduleName));

@@ -68,7 +68,7 @@ export class MainController extends Controller {
       .action(async (moduleName, dependencyConfigPath, dependencyModuleNames) => await this._dependencyController.add(moduleName, dependencyConfigPath, dependencyModuleNames));
     cmdDependency
       .command('remove [moduleName]')
-      .description('Adds new dependencies to a specified module.')
+      .description('Removes dependencies from a specified module.')
       .action(async (moduleName) => await this._dependencyController.remove(moduleName));
 
     const cmdHostModule = program
@@ -80,7 +80,7 @@ export class MainController extends Controller {
       .action(async (dependencyConfigPath, dependencyModuleNames) => await this._hostModuleController.add(dependencyConfigPath, dependencyModuleNames));
     cmdHostModule
       .command('remove [moduleName]')
-      .description('Adds new dependencies to a specified module.')
+      .description('Removes modules from the host.')
       .action(async (moduleName) => await this._hostModuleController.remove(moduleName));
 
     const cmdPlugin = program

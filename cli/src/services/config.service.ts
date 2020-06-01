@@ -1,5 +1,4 @@
 import { injectable, inject } from 'inversify';
-import path_ from 'path';
 
 import { GahConfig, TsConfig, IConfigurationService, IFileSystemService } from '@awdware/gah-shared';
 
@@ -79,8 +78,7 @@ export class ConfigService implements IConfigurationService {
 
   public getGahAnyType(inFolder: string) {
     const mType = this.getGahModuleType(inFolder);
-    if (mType === GahModuleType.UNKNOWN)
-      throw new Error('Could not find any module or host config in folder ' + inFolder);
+    if (mType === GahModuleType.UNKNOWN) { throw new Error('Could not find any module or host config in folder ' + inFolder); }
 
     return this.loadAndParseGahAnyType(mType === GahModuleType.HOST);
   }

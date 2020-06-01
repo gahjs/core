@@ -16,8 +16,7 @@ export class ExecutionService implements IExecutionService {
         if (outPut) {
           if (outPutCallback) {
             const newOut = outPutCallback(buffer);
-            if (newOut)
-              console.log(newOut);
+            if (newOut) { console.log(newOut); }
           } else {
             console.log(buffer);
           }

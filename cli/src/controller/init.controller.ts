@@ -113,8 +113,7 @@ export class InitController extends Controller {
 
     if (isHost) {
       const success = this.tryCopyHostToCwd(newModule.name);
-      if (!success)
-        return;
+      if (!success) { return; }
       if (this._configService.gahConfigExists()) {
         this._configService.deleteGahConfig();
       }
@@ -140,13 +139,11 @@ export class InitController extends Controller {
 
   private tryGuessbaseModuleName(): string | undefined {
     const possibleModuleFiles = this._fileSystemService.getFilesFromGlob('projects/**/src/lib/!(*routing*).module.ts');
-    if (!possibleModuleFiles || possibleModuleFiles.length === 0)
-      return undefined;
+    if (!possibleModuleFiles || possibleModuleFiles.length === 0) { return undefined; }
 
     const firtsPossibleModuleContent = this._fileSystemService.readFile(possibleModuleFiles[0]);
     const match = firtsPossibleModuleContent.match(/export class (\S+) {/);
-    if (!match)
-      return undefined;
+    if (!match) { return undefined; }
     return match[1];
   }
 
@@ -163,8 +160,7 @@ export class InitController extends Controller {
         const conflictingFilePath = conflictingFiles[i];
         this._loggerService.warn(`'${path.basename(conflictingFilePath)}'`);
       }
-      if (conflictingFiles.length > 5)
-        this._loggerService.warn(` ... And ${conflictingFiles.length - 5} more.`);
+      if (conflictingFiles.length > 5) { this._loggerService.warn(` ... And ${conflictingFiles.length - 5} more.`); }
       this._loggerService.warn('Cancelling host creation to prevent loss of data / changes. Either start the host initialization in a different directory or use --force to enforce overwriting the generated files.');
       return false;
     }

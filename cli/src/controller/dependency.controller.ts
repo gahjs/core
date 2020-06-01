@@ -28,8 +28,7 @@ export class DependencyController extends Controller {
         choices: () => availableModules
       });
 
-    if (availableModules.length === 1)
-      moduleName = availableModules[0];
+    if (availableModules.length === 1) { moduleName = availableModules[0]; }
 
     cancelled = cancelled || !(moduleName || moduleName_);
     moduleName = moduleName ?? moduleName_;
@@ -38,8 +37,7 @@ export class DependencyController extends Controller {
       enabled: () => !dependencyConfigPath,
       cancelled: cancelled,
       validator: (val: string) => {
-        if (!val.endsWith('gah-config.json'))
-          return false;
+        if (!val.endsWith('gah-config.json')) { return false; }
         return this._fileSystemService.fileExists(val);
       }
     });
@@ -52,11 +50,9 @@ export class DependencyController extends Controller {
     const availableExternalModules = this._configService.externalConfig.modules.map(x => x.name);
     if (dependencyModuleNames && dependencyModuleNames.length > 0) {
       const invalidModule = dependencyModuleNames.find(x => !availableExternalModules.includes(x));
-      if (invalidModule)
-        throw new Error('Cannot find the module ' + invalidModule);
+      if (invalidModule) { throw new Error('Cannot find the module ' + invalidModule); }
     }
-    if (availableExternalModules.length === 1)
-      dependencyModuleNames = availableExternalModules;
+    if (availableExternalModules.length === 1) { dependencyModuleNames = availableExternalModules; }
 
     const dependencyModuleNames_ = await this._promptService.checkbox({
       msg: 'Which of the modules do you want to add as a reference',
@@ -65,12 +61,10 @@ export class DependencyController extends Controller {
       cancelled: cancelled
     });
 
-    if (!dependencyModuleNames || dependencyModuleNames.length === 0)
-      dependencyModuleNames = dependencyModuleNames_;
+    if (!dependencyModuleNames || dependencyModuleNames.length === 0) { dependencyModuleNames = dependencyModuleNames_; }
 
     const module = this._configService.getGahModule().modules.find(x => x.name === moduleName);
-    if (!module)
-      throw new Error('Module \'' + moduleName + '\' could not be found');
+    if (!module) { throw new Error('Module \'' + moduleName + '\' could not be found'); }
 
     const newDep = new ModuleReference();
 
@@ -78,13 +72,11 @@ export class DependencyController extends Controller {
 
     const selectedModules = this._configService.externalConfig.modules.filter(x => dependencyModuleNames!.includes(x.name));
 
-    if (!selectedModules || selectedModules.length !== dependencyModuleNames.length)
-      throw new Error('Some dependencies could not be found');
+    if (!selectedModules || selectedModules.length !== dependencyModuleNames.length) { throw new Error('Some dependencies could not be found'); }
 
     newDep.names = selectedModules.map(x => x.name);
 
-    if (!module.dependencies)
-      module.dependencies = new Array<ModuleReference>();
+    if (!module.dependencies) { module.dependencies = new Array<ModuleReference>(); }
 
     module.dependencies.push(newDep);
 
