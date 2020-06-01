@@ -55,7 +55,7 @@ export class DependencyController extends Controller {
     if (availableExternalModules.length === 1) { dependencyModuleNames = availableExternalModules; }
 
     const dependencyModuleNames_ = await this._promptService.checkbox({
-      msg: 'Which of the modules do you want to add as a reference',
+      msg: 'Which of the modules do you want to add as a dependency?',
       choices: () => availableExternalModules,
       enabled: () => !dependencyModuleNames || dependencyModuleNames.length === 0,
       cancelled: cancelled
