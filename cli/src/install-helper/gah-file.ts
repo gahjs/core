@@ -1,22 +1,23 @@
-import { IFileSystemService, GahConfig, GahHost, GahModule } from '@awdware/gah-shared';
+import { IFileSystemService, GahHost, GahModule } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
 import { GahHostDef } from './gah-host-def';
+import DIContainer from '../di-container';
+import { FileSystemService } from '../services/file-system.service';
 
 export class GahFile {
+  private _fileSystemService: IFileSystemService;
+
+  private _gahFileName: string;
+
   public isHost: boolean;
   public isInstalled: boolean;
-  protected _path: string;
-  protected _gahFileName: string;
-  protected _fileSystemService: IFileSystemService;
-  protected gahCfg: GahConfig;
 
   protected _modules: GahModuleBase[];
-  constructor(filePath: string, fileSystemService: IFileSystemService) {
-    this._fileSystemService = fileSystemService;
+  constructor(filePath: string) {
+    this._fileSystemService = DIContainer.get(FileSystemService);
     this.isInstalled = false;
 
-    this._path = this._fileSystemService.getDirectoryPathFromFilePath(filePath);
     this._gahFileName = this._fileSystemService.getFilenameFromFilePath(filePath);
 
     this.setModuleType(filePath);
@@ -31,7 +32,7 @@ export class GahFile {
   }
 
   public install() {
-    this.allReferencedModules.forEach(x => {
+    this._modules.forEach(x => {
       x.install();
     });
   }
@@ -39,15 +40,15 @@ export class GahFile {
   private loadHost(cfg: GahHost, cfgPath: string) {
     cfg.modules.forEach(moduleRef => {
       moduleRef.names.forEach(moduleName => {
-        this._modules.push(new GahModuleDef(moduleRef.path, moduleName, this._fileSystemService));
+        this._modules.push(new GahModuleDef(moduleRef.path, moduleName));
       });
     });
-    this._modules.push(new GahHostDef(cfgPath, this._fileSystemService));
+    this._modules.push(new GahHostDef(cfgPath));
   }
 
   private loadModule(cfg: GahModule, cfgPath: string) {
     cfg.modules.forEach(moduleDef => {
-      this._modules.push(new GahModuleDef(cfgPath, moduleDef.name, this._fileSystemService));
+      this._modules.push(new GahModuleDef(cfgPath, moduleDef.name));
     });
   }
 
@@ -61,22 +62,5 @@ export class GahFile {
     else {
       throw new Error('The provided file is not a gah module or gah host file!\npath: "' + filePath + '"');
     }
-  }
-
-  public get allReferencedModules(): GahModuleBase[] {
-    const allModules = new Array<GahModuleBase>();
-    this._modules.forEach(mod => {
-      this.collectAllReferencedModules(mod, allModules);
-    });
-    return allModules;
-  }
-
-  private collectAllReferencedModules(module: GahModuleBase, allModules: GahModuleBase[]) {
-    if (allModules.indexOf(module) === -1) {
-      allModules.push(module);
-    }
-    module.dependencies.forEach(dep => {
-      this.collectAllReferencedModules(dep, allModules);
-    });
   }
 }

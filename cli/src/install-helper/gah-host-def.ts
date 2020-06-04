@@ -1,12 +1,12 @@
 import { GahModuleBase } from './gah-module-base';
-import { IFileSystemService, GahHost } from '@awdware/gah-shared';
+import { GahHost } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 
 export class GahHostDef extends GahModuleBase {
 
-  constructor(gahCfgPath: string, fileSystemService: IFileSystemService) {
-    super(gahCfgPath, null, fileSystemService);
+  constructor(gahCfgPath: string) {
+    super(gahCfgPath, null);
 
     this.srcBasePath = './src';
 
@@ -16,14 +16,19 @@ export class GahHostDef extends GahModuleBase {
     }
     hostCfg.modules?.forEach(moduleDependency => {
       moduleDependency.names.forEach(moduleName => {
-        this.dependencies.push(new GahModuleDef(moduleDependency.path, moduleName, fileSystemService));
+        this.dependencies.push(new GahModuleDef(moduleDependency.path, moduleName));
       });
     });
 
-    this.gahFolder = new GahFolder(this.basePath, this.srcBasePath + '/app', this.fileSystemService);
+    this.gahFolder = new GahFolder(this.basePath, this.srcBasePath + '/app');
   }
 
   public async install() {
+    if (this.installed) {
+      return;
+    }
+    this.installed = true;
+
     this.tsConfigFile.clean();
     this.gahFolder.cleanGeneratedDirectory();
     this.gahFolder.cleanDependencyDirectory();
@@ -36,6 +41,62 @@ export class GahHostDef extends GahModuleBase {
 
     this.createSymlinksToDependencies();
     this.addDependenciesToTsConfigFile();
+    this.generateFromTemplate();
+    this.copyAssetsAndBaseStyles();
+    this.mergePackageDependencies();
+    this.generateStyleImports();
+    await this.installPackages();
+  }
+
+  private generateFromTemplate() {
+    for (const dep of this.dependencies) {
+      this.gahFolder.addGeneratedFileTemplateData(dep.moduleName!, dep.isEntry, dep.baseNgModuleName);
+    }
+    this.gahFolder.generateFileFromTemplate();
+  }
+
+  private async installPackages() {
+    this.loggerService.startLoadingAnimation('Installing yarn packages');
+    const success = await this.executionService.execute('yarn', false);
+    if (success) {
+      this.loggerService.stopLoadingAnimation(false, true, 'Packages installed successfully');
+    } else {
+      this.loggerService.stopLoadingAnimation(false, false, 'Installing packages failed');
+      this.loggerService.error(this.executionService.executionErrorResult);
+    }
+  }
+
+  private copyAssetsAndBaseStyles() {
+    const stylesScss = this.fileSystemService.readFileLineByLine(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'));
+
+    for (const dep of this.dependencies) {
+      if (!dep.facadePathRelativeToBasePath) {
+        return;
+      }
+      // Copying assets
+      const absoluteFacadePathOfDep = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath);
+      const absoluteAssetsFolderOfDep = this.fileSystemService.join(absoluteFacadePathOfDep, 'assets');
+      if (this.fileSystemService.directoryExists(absoluteAssetsFolderOfDep)) {
+        const hostAssetsFolder = this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets', dep.moduleName!);
+        this.fileSystemService.copyFilesInDirectory(absoluteAssetsFolderOfDep, hostAssetsFolder);
+      }
+
+      const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath, 'styles.scss');
+
+      // Copying base styles if they exist
+      if (this.fileSystemService.fileExists(absoluteStylesFilePathOfDep)) {
+
+        const depAbsoluteSrcFolder = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
+        const depAbsoluteFacadeFolder = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath);
+
+        const depFacadeFolderRelativeToSrcBase = this.fileSystemService.ensureRelativePath(depAbsoluteFacadeFolder, depAbsoluteSrcFolder, true);
+
+        const moduleFacadePath = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, depFacadeFolderRelativeToSrcBase, 'styles.scss');
+        stylesScss.push(`@import "${moduleFacadePath}";`);
+      }
+    }
+
+    this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'), stylesScss.join('\n'));
   }
 
 }

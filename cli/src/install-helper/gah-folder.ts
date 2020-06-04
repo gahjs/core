@@ -1,13 +1,19 @@
-import { IFileSystemService, ModuleTemplateData, ModulesTemplateData } from '@awdware/gah-shared';
+import { IFileSystemService, ModuleTemplateData, ModulesTemplateData, ITemplateService } from '@awdware/gah-shared';
+import DIContainer from '../di-container';
+import { FileSystemService } from '../services/file-system.service';
+import { TemplateService } from '../services/template.service';
 
 export class GahFolder {
   private _fileSystemService: IFileSystemService;
+  private _templateService: ITemplateService;
+
   private _moduleBaseFolder: string;
   private pathRelativeToModuleBaseFolder: string;
   private _modulesTemplateData: ModulesTemplateData;
 
-  constructor(moduleBaseFolder: string, srcBasePath: string, fileSystemService: IFileSystemService) {
-    this._fileSystemService = fileSystemService;
+  constructor(moduleBaseFolder: string, srcBasePath: string) {
+    this._fileSystemService = DIContainer.get(FileSystemService);
+    this._templateService = DIContainer.get(TemplateService);
     this._modulesTemplateData = new ModulesTemplateData();
 
     this._moduleBaseFolder = moduleBaseFolder;
@@ -52,5 +58,13 @@ export class GahFolder {
     newTemplateData.baseModuleName = baseNgModuleName;
     newTemplateData.saveName = saveModuleName;
     this._modulesTemplateData.modules.push(newTemplateData);
+  }
+
+  public generateFileFromTemplate() {
+    this._templateService.renderFile(
+      this._fileSystemService.join(__dirname, '../templates/modules.ejs.t'),
+      this._modulesTemplateData,
+      this._fileSystemService.join(this.generatedPath, 'gah-modules.ts')
+    );
   }
 }
