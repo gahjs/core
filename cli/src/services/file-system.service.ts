@@ -126,6 +126,10 @@ export class FileSystemService implements IFileSystemService {
     return path_.dirname(filePath);
   }
 
+  getFilenameFromFilePath(filePath: string): string {
+    return path_.basename(filePath);
+  }
+
   join(basePath: string, ...subPaths: string[]): string {
     return path_.join(basePath, ...subPaths).replace(/\\/g, '/');
   }
