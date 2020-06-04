@@ -13,7 +13,7 @@ export class TsConfigFile {
 
     const allPaths = Object.keys(this._tsConfig.compilerOptions.paths);
     allPaths.forEach((x) => {
-      if (x.startsWith('@gah-deps')) {
+      if (x.startsWith('@gah')) {
         delete this._tsConfig.compilerOptions.paths[x];
       }
     });

@@ -1,11 +1,11 @@
 import { GahModuleBase } from './gah-module-base';
-import { GahHost } from '@awdware/gah-shared';
+import { GahHost, PackageJson } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 
 export class GahHostDef extends GahModuleBase {
 
-  constructor(gahCfgPath: string) {
+  constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
 
     this.srcBasePath = './src';
@@ -15,8 +15,13 @@ export class GahHostDef extends GahModuleBase {
       throw new Error('Cannot find host in file "' + gahCfgPath + '"');
     }
     hostCfg.modules?.forEach(moduleDependency => {
-      moduleDependency.names.forEach(moduleName => {
-        this.dependencies.push(new GahModuleDef(moduleDependency.path, moduleName));
+      moduleDependency.names.forEach(depModuleName => {
+        const alreadyInitialized = initializedModules.find(x => x.moduleName === depModuleName);
+        if (alreadyInitialized) {
+          this.dependencies.push(alreadyInitialized);
+        } else {
+          this.dependencies.push(new GahModuleDef(moduleDependency.path, depModuleName, initializedModules));
+        }
       });
     });
 
@@ -49,7 +54,7 @@ export class GahHostDef extends GahModuleBase {
   }
 
   private generateFromTemplate() {
-    for (const dep of this.dependencies) {
+    for (const dep of this.allRecursiveDependencies) {
       this.gahFolder.addGeneratedFileTemplateData(dep.moduleName!, dep.isEntry, dep.baseNgModuleName);
     }
     this.gahFolder.generateFileFromTemplate();
@@ -69,9 +74,9 @@ export class GahHostDef extends GahModuleBase {
   private copyAssetsAndBaseStyles() {
     const stylesScss = this.fileSystemService.readFileLineByLine(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'));
 
-    for (const dep of this.dependencies) {
+    for (const dep of this.allRecursiveDependencies) {
       if (!dep.facadePathRelativeToBasePath) {
-        return;
+        continue;
       }
       // Copying assets
       const absoluteFacadePathOfDep = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath);
@@ -90,13 +95,49 @@ export class GahHostDef extends GahModuleBase {
         const depAbsoluteFacadeFolder = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath);
 
         const depFacadeFolderRelativeToSrcBase = this.fileSystemService.ensureRelativePath(depAbsoluteFacadeFolder, depAbsoluteSrcFolder, true);
+        const dependencyPathRelativeFromSrcBase = this.fileSystemService.ensureRelativePath(this.gahFolder.dependencyPath, this.srcBasePath, true);
 
-        const moduleFacadePath = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, depFacadeFolderRelativeToSrcBase, 'styles.scss');
+        const moduleFacadePath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depFacadeFolderRelativeToSrcBase, 'styles.scss');
         stylesScss.push(`@import "${moduleFacadePath}";`);
       }
     }
 
     this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'), stylesScss.join('\n'));
   }
+
+  private mergePackageDependencies() {
+    for (const dep of this.allRecursiveDependencies) {
+      const packageJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
+      // Get package.json from host
+      const packageJson = this.fileSystemService.parseFile<PackageJson>(packageJsonPath);
+      // Get package.json from module to installed into host
+      const externalPackageJson = this.fileSystemService.parseFile<PackageJson>(this.fileSystemService.join(dep.basePath, 'package.json'));
+
+      // Getting (dev-)dependency objects from host and module
+      const hostDeps = packageJson.dependencies!;
+      const hostDevDeps = packageJson.devDependencies!;
+      const externalDeps = externalPackageJson.dependencies!;
+      const externalDevDeps = externalPackageJson.devDependencies!;
+
+      const deps = Object.keys(externalDeps);
+      const devDeps = Object.keys(externalDevDeps);
+
+      // Merging module (dev-)dependencies into host
+      deps.forEach((dep) => {
+        if (!hostDeps[dep]) {
+          hostDeps[dep] = externalDeps[dep];
+        }
+      });
+      devDeps.forEach((dep) => {
+        if (!hostDevDeps[dep]) {
+          hostDevDeps[dep] = externalDevDeps[dep];
+        }
+      });
+
+      // Saving the file back into the host package.json
+      this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
+    }
+  }
+
 
 }

@@ -4,8 +4,9 @@ import { GahFolder } from './gah-folder';
 
 export class GahModuleDef extends GahModuleBase {
 
-  constructor(gahCfgPath: string, moduleName: string | null) {
+  constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, moduleName);
+    initializedModules.push(this);
 
     const moduleCfg = this.fileSystemService.parseFile<GahModule>(gahCfgPath).modules.find(x => x.name === moduleName);
     if (!moduleCfg) {
@@ -20,8 +21,14 @@ export class GahModuleDef extends GahModuleBase {
     this.baseNgModuleName = moduleCfg.baseNgModuleName;
     this.isEntry = moduleCfg.isEntry || false;
     moduleCfg.dependencies?.forEach(moduleDependency => {
-      moduleDependency.names.forEach(moduleName => {
-        this.dependencies.push(new GahModuleDef(moduleDependency.path, moduleName));
+      moduleDependency.names.forEach(depModuleName => {
+        const depAbsoluteBasepath = this.fileSystemService.join(this.basePath, moduleDependency.path);
+        const alreadyInitialized = initializedModules.find(x => x.moduleName === depModuleName);
+        if (alreadyInitialized) {
+          this.dependencies.push(alreadyInitialized);
+        } else {
+          this.dependencies.push(new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules));
+        }
       });
     });
 
@@ -39,7 +46,6 @@ export class GahModuleDef extends GahModuleBase {
 
     this.createSymlinksToDependencies();
     this.addDependenciesToTsConfigFile();
-    this.mergePackageDependencies();
     this.generateStyleImports();
     this.adjustGitignore();
   }

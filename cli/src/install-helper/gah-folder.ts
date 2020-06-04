@@ -21,30 +21,30 @@ export class GahFolder {
   }
 
   public get dependencyPath(): string {
-    return this._fileSystemService.join(this._moduleBaseFolder, this.pathRelativeToModuleBaseFolder, 'dependencies');
+    return this._fileSystemService.join(this.pathRelativeToModuleBaseFolder, 'dependencies');
   }
 
   public get stylesPath(): string {
-    return this._fileSystemService.join(this._moduleBaseFolder, this.pathRelativeToModuleBaseFolder, 'styles');
+    return this._fileSystemService.join(this.pathRelativeToModuleBaseFolder, 'styles');
   }
 
   public get generatedPath(): string {
-    return this._fileSystemService.join(this._moduleBaseFolder, this.pathRelativeToModuleBaseFolder, 'generated');
+    return this._fileSystemService.join(this.pathRelativeToModuleBaseFolder, 'generated');
   }
 
   public cleanDependencyDirectory() {
-    this._fileSystemService.deleteFilesInDirectory(this.dependencyPath);
-    this._fileSystemService.ensureDirectory(this.dependencyPath);
+    this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
   }
 
   public cleanStylesDirectory() {
-    this._fileSystemService.ensureDirectory(this.stylesPath);
-    this._fileSystemService.deleteFilesInDirectory(this.stylesPath);
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
+    this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
   }
 
   public cleanGeneratedDirectory() {
-    this._fileSystemService.deleteFilesInDirectory(this.generatedPath);
-    this._fileSystemService.ensureDirectory(this.generatedPath);
+    this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
   }
 
   public addGeneratedFileTemplateData(moduleName: string, isEntry: boolean, baseNgModuleName?: string) {
@@ -64,7 +64,7 @@ export class GahFolder {
     this._templateService.renderFile(
       this._fileSystemService.join(__dirname, '../templates/modules.ejs.t'),
       this._modulesTemplateData,
-      this._fileSystemService.join(this.generatedPath, 'gah-modules.ts')
+      this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath, 'gah-modules.ts')
     );
   }
 }

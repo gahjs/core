@@ -15,8 +15,11 @@ export class GahFile {
 
   protected _modules: GahModuleBase[];
   constructor(filePath: string) {
+    const initializedModules = new Array<GahModuleBase>();
+
     this._fileSystemService = DIContainer.get(FileSystemService);
     this.isInstalled = false;
+    this._modules = new Array<GahModuleBase>();
 
     this._gahFileName = this._fileSystemService.getFilenameFromFilePath(filePath);
 
@@ -24,10 +27,10 @@ export class GahFile {
 
     if (this.isHost) {
       const hostCfg = this._fileSystemService.parseFile<GahHost>(filePath);
-      this.loadHost(hostCfg, filePath);
+      this.loadHost(hostCfg, filePath, initializedModules);
     } else {
       const moduleCfg = this._fileSystemService.parseFile<GahModule>(filePath);
-      this.loadModule(moduleCfg, filePath);
+      this.loadModule(moduleCfg, filePath, initializedModules);
     }
   }
 
@@ -37,18 +40,18 @@ export class GahFile {
     });
   }
 
-  private loadHost(cfg: GahHost, cfgPath: string) {
+  private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
     cfg.modules.forEach(moduleRef => {
       moduleRef.names.forEach(moduleName => {
-        this._modules.push(new GahModuleDef(moduleRef.path, moduleName));
+        this._modules.push(new GahModuleDef(moduleRef.path, moduleName, initializedModules));
       });
     });
-    this._modules.push(new GahHostDef(cfgPath));
+    this._modules.push(new GahHostDef(cfgPath, initializedModules));
   }
 
-  private loadModule(cfg: GahModule, cfgPath: string) {
+  private loadModule(cfg: GahModule, cfgPath: string, initializedModules: GahModuleBase[]) {
     cfg.modules.forEach(moduleDef => {
-      this._modules.push(new GahModuleDef(cfgPath, moduleDef.name));
+      this._modules.push(new GahModuleDef(cfgPath, moduleDef.name, initializedModules));
     });
   }
 

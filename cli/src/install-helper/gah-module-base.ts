@@ -1,4 +1,4 @@
-import { IFileSystemService, ITemplateService, PackageJson, IWorkspaceService, IExecutionService, ILoggerService } from '@awdware/gah-shared';
+import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
@@ -39,12 +39,12 @@ export abstract class GahModuleBase {
     this.executionService = DIContainer.get(ExecutionService);
     this.loggerService = DIContainer.get(LoggerService);
 
-    this.basePath = this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath);
+    this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.installed = false;
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
 
-    this.tsConfigFile = new TsConfigFile(this.fileSystemService.join(this.basePath, 'ts-config.json'), this.fileSystemService);
+    this.tsConfigFile = new TsConfigFile(this.fileSystemService.join(this.basePath, 'tsconfig.json'), this.fileSystemService);
   }
 
   public abstract async install(): Promise<void>;
@@ -70,8 +70,8 @@ export abstract class GahModuleBase {
   protected createSymlinksToDependencies() {
     for (const dep of this.allRecursiveDependencies) {
       const from = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath, dep.moduleName!);
-      const to = dep.srcBasePath;
-      this.fileSystemService.createDirLink(to, from);
+      const to = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
+      this.fileSystemService.createDirLink(from, to);
     }
   }
 
@@ -85,42 +85,8 @@ export abstract class GahModuleBase {
     this.tsConfigFile.save();
   }
 
-  protected mergePackageDependencies() {
-    for (const dep of this.allRecursiveDependencies) {
-      const packageJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
-      // Get package.json from host
-      const packageJson = this.fileSystemService.parseFile<PackageJson>(packageJsonPath);
-      // Get package.json from module to installed into host
-      const externalPackageJson = this.fileSystemService.parseFile<PackageJson>(this.fileSystemService.join(dep.basePath, 'package.json'));
-
-      // Getting (dev-)dependency objects from host and module
-      const hostDeps = packageJson.dependencies!;
-      const hostDevDeps = packageJson.devDependencies!;
-      const externalDeps = externalPackageJson.dependencies!;
-      const externalDevDeps = externalPackageJson.devDependencies!;
-
-      const deps = Object.keys(externalDeps);
-      const devDeps = Object.keys(externalDevDeps);
-
-      // Merging module (dev-)dependencies into host
-      deps.forEach((dep) => {
-        if (!hostDeps[dep]) {
-          hostDeps[dep] = externalDeps[dep];
-        }
-      });
-      devDeps.forEach((dep) => {
-        if (!hostDevDeps[dep]) {
-          hostDevDeps[dep] = externalDevDeps[dep];
-        }
-      });
-
-      // Saving the file back into the host package.json
-      this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
-    }
-  }
-
   protected generateStyleImports() {
-    for (const dep of this.dependencies) {
+    for (const dep of this.allRecursiveDependencies) {
 
       // Generate scss style files
       // Find all scss files in a folder called styles in the external module
@@ -133,7 +99,7 @@ export abstract class GahModuleBase {
 
         // Generate all the imports to the found style files (pointing to .gah/dependencies)
         const fileContent = relativePaths.map((s) => `@import "${s}";`).join('\n');
-        this.fileSystemService.saveFile(this.fileSystemService.join(this.gahFolder.stylesPath, dep.moduleName! + '.scss'), fileContent);
+        this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.gahFolder.stylesPath, dep.moduleName! + '.scss'), fileContent);
       }
     }
   }
