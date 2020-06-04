@@ -111,6 +111,11 @@ export interface IFileSystemService {
    */
   getDirectoryPathFromFilePath(filePath: string): string;
   /**
+   * Returns the name of the file of the provided path
+   * @param filePath The path to the file
+   */
+  getFilenameFromFilePath(filePath: string): string;
+  /**
    * Returns a joined path with forward slashes
    * @param basePath The fist path
    * @param subPaths The path(s) to join

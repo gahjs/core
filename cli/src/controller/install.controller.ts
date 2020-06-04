@@ -6,6 +6,7 @@ import {
 } from '@awdware/gah-shared';
 
 import { Controller } from './controller';
+import { GahFile } from '../install-helper/gah-file';
 
 const hostDependencyPath = './src/app/.gah/dependencies';
 const hostGeneratedPath = './src/app/.gah/generated';
@@ -17,65 +18,24 @@ export class InstallController extends Controller {
 
   private modulesTemplateData: ModulesTemplateData;
   private didCleanup = false;
-  private foundEntry = false;
-  private installedModules: string[];
-  private isHost: boolean;
 
   public async install() {
     const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
-    const cfg = isHost ? this._configService.getGahHost() : this._configService.getGahModule();
+    const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
 
-    const paths = new Array<string>();
-    paths.push(isHost ? 'gah-host.json' : 'gah-module.json');
-    this.findAllInstallPaths(isHost ? 'gah-host.json' : 'gah-module.json', cfg, paths);
-    for (let i = 0; i < paths.length; i++) {
-      const mPath = paths[i];
-      const baseDir = this._fileSystemService.getDirectoryPathFromFilePath(mPath);
-      await this.doInstall(baseDir, i, paths.length);
-    }
+    const gahFile = new GahFile(fileName, this._fileSystemService);
+
+    gahFile.install();
   }
 
-  private findAllInstallPaths(gahCfgPath: string, cfg: GahHost | GahModule, paths: string[]) {
-    if (cfg.isHost) {
-      this.findAllInstallPathsForReference((cfg as GahHost).modules, gahCfgPath, paths);
-    } else {
-      for (const m of (cfg as GahModule).modules) {
-        if (!m.dependencies) { return; }
-        this.findAllInstallPathsForReference(m.dependencies, gahCfgPath, paths);
-      }
-    }
-  }
 
-  private findAllInstallPathsForReference(moduleRefs: ModuleReference[], gahCfgPath: string, paths: string[]) {
-    for (const moduleRef of moduleRefs) {
-      const mPath = this._fileSystemService.join(this._fileSystemService.getDirectoryPathFromFilePath(gahCfgPath), moduleRef.path);
-      if (!paths.includes(mPath)) {
-        paths.push(mPath);
-        const nCfg = this._fileSystemService.parseFile<GahModule>(mPath);
-        this.findAllInstallPaths(mPath, nCfg, paths);
-      }
-    }
-  }
-
-  private async doInstall(baseDir: string, index: number, moduleCount: number): Promise<void> {
-    this.isHost = this._configService.getGahModuleType(baseDir) === GahModuleType.HOST;
-
-    const cfg = this._configService.getGahAnyType(baseDir);
+  private async doInstall(gahFolder: GahFile): Promise<void> {
 
     this.didCleanup = false;
     this.installedModules = new Array<string>();
     this.foundEntry = false;
-    this.cleanTsCfgFile(baseDir);
 
     const dirName = this._fileSystemService.directoryName(baseDir);
-    if (this.isHost) {
-      this.modulesTemplateData = new ModulesTemplateData();
-      this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(baseDir, hostGeneratedPath));
-      this._fileSystemService.ensureDirectory(this._fileSystemService.join(baseDir, hostGeneratedPath));
-      this._loggerService.log(`[${index + 1}/${moduleCount}] Installing gah host '${dirName}'`);
-    } else {
-      this._loggerService.log(`[${index + 1}/${moduleCount}] Installing gah module '${dirName}'`);
-    }
 
     const allModGroupRefs = this.getAllReferencedModulesForModule(cfg);
 
@@ -113,29 +73,6 @@ export class InstallController extends Controller {
     } else {
       this._loggerService.success('Module installed');
     }
-  }
-
-  private cleanTsCfgFile(baseDir: string) {
-    const tsConfigPath = this._fileSystemService.join(baseDir, 'tsconfig.json');
-    const tsConfig = this._fileSystemService.parseFile<TsConfig>(tsConfigPath);
-    const tsConfigCompilerOpts = tsConfig.compilerOptions;
-
-    if (!tsConfigCompilerOpts.paths) {
-      tsConfigCompilerOpts.paths = new TsConfigCompilerOptionsPaths();
-    }
-
-    const allPaths = Object.keys(tsConfigCompilerOpts.paths);
-    allPaths.forEach((x) => {
-      if (x.startsWith('@gah-deps')) {
-        delete tsConfigCompilerOpts.paths[x];
-      }
-    });
-
-    if (!tsConfigCompilerOpts.baseUrl) {
-      tsConfigCompilerOpts.baseUrl = './';
-    }
-
-    this._fileSystemService.saveObjectToFile(tsConfigPath, tsConfig);
   }
 
   private getAllReferencedModulesForModule(cfg: GahModule | GahHost): Array<[ModuleDefinition | null, ModuleReference]> {
@@ -195,8 +132,6 @@ export class InstallController extends Controller {
       // Get the destonation for the style references depending on module-type
       const stylesFolder = this.getStylesFolder(workingDir, ownModule);
 
-      this.cleanUpFolders(baseDir, dependencyFolder, stylesFolder);
-      this.createDependencySymlinkAndEditTsConfig(baseDir, workingDir, dependencyFolder, moduleName, relativeExternalBasePathFromBaseDir, externalPublicApiPath);
       this.isHost && this.generateDataForEjsTemplate(moduleName, externalModuleDef);
       this.isHost && this.copyAssetsAndBaseStyles(baseDir, externalFacadePath, moduleName, relativeExternalBasePathFromWorkingDir, moduleGroupBaseDir);
       this.generateStyleImports(workingDir, moduleGroupBaseDir, moduleName, relativeExternalBasePathFromWorkingDir, stylesFolder);
@@ -231,46 +166,6 @@ export class InstallController extends Controller {
       this.foundEntry = true;
     }
     return externalModuleDef;
-  }
-
-  private cleanUpFolders(workingDir: string, dependencyFolder: string, stylesFolder: string) {
-    // Delete links to modules for module or host and ensure the folders exist
-    if (!this.didCleanup) {
-      this._fileSystemService.deleteFilesInDirectory(dependencyFolder);
-      this._fileSystemService.ensureDirectory(dependencyFolder);
-      this.didCleanup = true;
-      if (this.isHost) {
-        this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(workingDir, hostAssetsFolder));
-        this._fileSystemService.ensureDirectory(this._fileSystemService.join(workingDir, hostAssetsFolder));
-        this._fileSystemService.deleteFile(this._fileSystemService.join(workingDir, 'src/styles.scss'));
-        this._fileSystemService.saveFile(this._fileSystemService.join(workingDir, 'src/styles.scss'), '/*\n  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n  *   Please do not edit this file. Any changes to this file will be overwriten by gah.   *\n  *              Check the documentation for how to edit your global styles:              *\n  *                        https://github.com/awdware/gah/wiki                        *\n  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\n*/');
-      }
-      this._fileSystemService.ensureDirectory(stylesFolder);
-      this._fileSystemService.deleteFilesInDirectory(stylesFolder);
-    }
-  }
-
-  private createDependencySymlinkAndEditTsConfig(baseDir: string, workingDir: string, dependencyFolder: string, moduleName: string, relativeExternalBasePath: string, publicApiPath: string) {
-    // Creating the actual link to the module inside of the .gah/dependencies folder
-    const linkPath = this._fileSystemService.join(dependencyFolder, moduleName);
-    const realPath = this._fileSystemService.join(baseDir, relativeExternalBasePath);
-    this._fileSystemService.createDirLink(linkPath, realPath);
-
-    // Calculate the public-api file path from the linked src folder
-    const publicApiRelativePath = this._fileSystemService.ensureRelativePath(publicApiPath, realPath, true);
-
-    // Calculate the public-api file path from the linked src folder
-    const publicApiRelativePathWithoutExtention = publicApiRelativePath.substr(0, publicApiRelativePath.length - 3);
-
-    // Getting the relative path that is written to TS Config paths section
-    const gahDependencyPathForModule = this._fileSystemService.ensureRelativePath(linkPath, workingDir, true);
-
-    // Adding entries to the tsconfig paths section
-    const tsConfigPath = this._fileSystemService.join(workingDir, 'tsconfig.json');
-    const tsConfig = this._fileSystemService.parseFile<TsConfig>(tsConfigPath);
-    tsConfig.compilerOptions.paths['@gah/' + moduleName + '/*'] = [gahDependencyPathForModule + '/' + publicApiRelativePathWithoutExtention];
-
-    this._fileSystemService.saveObjectToFile(tsConfigPath, tsConfig);
   }
 
   private generateDataForEjsTemplate(moduleName: string, externalModuleDef: ModuleDefinition) {
