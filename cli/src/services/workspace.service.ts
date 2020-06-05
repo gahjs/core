@@ -15,7 +15,7 @@ export class WorkspaceService implements IWorkspaceService {
     }
 
     const gitIgnoreLines = this._fileSystemService.readFileLineByLine(gitIgnorePath);
-    if (!gitIgnoreLines.includes(gitIgnorePattern)) {
+    if (!gitIgnoreLines.some(x => x.indexOf(gitIgnorePattern) !== -1)) {
       if (gitIgnoreLines[gitIgnoreLines.length - 1]) {
         gitIgnoreLines.push('');
       }

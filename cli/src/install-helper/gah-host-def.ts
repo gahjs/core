@@ -50,7 +50,13 @@ export class GahHostDef extends GahModuleBase {
     this.copyAssetsAndBaseStyles();
     this.mergePackageDependencies();
     this.generateStyleImports();
+    this.adjustGitignore();
+    this.adjustGitignoreForHost();
     await this.installPackages();
+  }
+
+  adjustGitignoreForHost() {
+    this.workspaceService.ensureGitIgnoreLine('src/assets/**', 'Ignoring gah generated assets', this.basePath);
   }
 
   private generateFromTemplate() {
