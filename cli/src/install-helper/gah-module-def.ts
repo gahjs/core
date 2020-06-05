@@ -12,7 +12,9 @@ export class GahModuleDef extends GahModuleBase {
     if (!moduleCfg) {
       throw new Error('Cannot find module with name "' + moduleName + '" in file "' + gahCfgPath + '"');
     }
+    this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.srcBasePath = this.fileSystemService.getDirectoryPathFromFilePath(moduleCfg.publicApiPath);
+    this.initTsConfigObject();
 
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();

@@ -9,6 +9,8 @@ import { InstallController } from './install.controller';
 import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
 import { HostModuleController } from './host-module.controller';
+import { GahModuleType } from '@awdware/gah-shared';
+import { CopyHost } from '../install-helper/copy-host';
 
 @injectable()
 export class MainController extends Controller {
@@ -23,11 +25,15 @@ export class MainController extends Controller {
   @inject(PluginController)
   private _pluginController: PluginController;
 
-
   public async main() {
 
     // TODO add flag or config or somehting
     this._loggerService.enableDebugLogging();
+
+    if (this._configService.getGahModuleType() === GahModuleType.HOST) {
+      this._contextService.setContext({ calledFromHostFolder: true });
+      CopyHost.copyIfNeeded(this._fileSystemService);
+    }
 
     await this._pluginService.loadInstalledPlugins();
 

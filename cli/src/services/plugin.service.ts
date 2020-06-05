@@ -1,6 +1,10 @@
 import { injectable, inject } from 'inversify';
 
-import { GahEventHandler, GahPlugin, GahEventPayload, GahEvent, IPluginService, GahPluginDependencyConfig, PackageJson, IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService, ILoggerService, IFileSystemService } from '@awdware/gah-shared';
+import {
+  GahEventHandler, GahPlugin, GahEventPayload, GahEvent, IPluginService, GahPluginDependencyConfig,
+  PackageJson, IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
+  ILoggerService, IFileSystemService, IContextService, PlguinUpdate
+} from '@awdware/gah-shared';
 
 import { FileSystemService } from './file-system.service';
 import { LoggerService } from './logger.service';
@@ -9,7 +13,7 @@ import { TemplateService } from './template.service';
 import { PromptService } from './prompt.service';
 import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
-import { PlguinUpdate } from '@awdware/gah-shared';
+import { ContextService } from './context-service';
 
 
 @injectable()
@@ -31,6 +35,15 @@ export class PluginService implements IPluginService {
   private _workspaceService: IWorkspaceService;
   @inject(ExecutionService)
   private _executionService: IExecutionService;
+  @inject(ContextService)
+  private _contextService: IContextService;
+
+  private get packageJsonPath(): string {
+    return this._contextService.getContext().calledFromHostFolder ? '.gah/package.json' : 'package.json';
+  }
+  private get cwd(): string | undefined {
+    return this._contextService.getContext().calledFromHostFolder ? '.gah' : undefined;
+  }
 
 
   private initPluginServices(plugin: GahPlugin) {
@@ -72,7 +85,8 @@ export class PluginService implements IPluginService {
 
   private tryLoadInstalledPlugin(pluginDepCfg: GahPluginDependencyConfig): boolean {
     try {
-      const pluginDefinition = require(this._fileSystemService.join(process.cwd(), 'node_modules', pluginDepCfg.name));
+      const pluginPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.', 'node_modules', pluginDepCfg.name);
+      const pluginDefinition = require(pluginPath);
       const plugin = new pluginDefinition.default();
       this.registerPlugin(plugin as GahPlugin, pluginDepCfg);
     } catch (error) {
@@ -111,19 +125,19 @@ export class PluginService implements IPluginService {
   }
 
   public async installPlugin(pluginName: string): Promise<boolean> {
-    const packageJson = this._fileSystemService.parseFile<PackageJson>('package.json');
+    const packageJson = this._fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
 
     const alreadyInstalled = (packageJson.dependencies?.[pluginName] || packageJson.devDependencies?.[pluginName]) && true;
 
     this._loggerService.startLoadingAnimation('Downloading Plugin');
-    const success = await this._executionService.execute('yarn add ' + pluginName + ' -D -E', false);
+    const success = await this._executionService.execute('yarn add ' + pluginName + ' -D -E', false, undefined, this.cwd);
     if (!success) {
       this._loggerService.stopLoadingAnimation(false, false, 'Downloading Plugin failed');
       return false;
     }
     this._loggerService.stopLoadingAnimation(false, true, 'Downloading Plugin succeeded');
     this._loggerService.startLoadingAnimation('Checking Plugin');
-    const pluginPath = this._fileSystemService.join(process.cwd(), 'node_modules', pluginName);
+    const pluginPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.', 'node_modules', pluginName);
     const pluginDefinition = await import(pluginPath);
     let plugin: GahPlugin;
     try {
@@ -174,7 +188,7 @@ export class PluginService implements IPluginService {
 
   private async removePackage(pluginName: string) {
     this._loggerService.startLoadingAnimation('Cleaning up downloaded files.');
-    const success = await this._executionService.execute('yarn remove ' + pluginName, false);
+    const success = await this._executionService.execute('yarn remove ' + pluginName, false, undefined, this.cwd);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, 'Cleaned up downloaded files.');
     } else {
@@ -185,7 +199,7 @@ export class PluginService implements IPluginService {
 
   public async removePlugin(pluginName: string): Promise<boolean> {
     this._loggerService.startLoadingAnimation('Uninstalling plugin: ' + pluginName);
-    const success = await this._executionService.execute('yarn remove ' + pluginName, false);
+    const success = await this._executionService.execute('yarn remove ' + pluginName, false, undefined, this.cwd);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, `Plugin '${pluginName}' has been uninstalled.`);
       return true;
@@ -206,7 +220,7 @@ export class PluginService implements IPluginService {
     const searchForPkugins = pluginName ?? cfg.plugins.map(x => x.name).join(' ');
 
     this._loggerService.startLoadingAnimation('Searching for plugin updates');
-    await this._executionService.execute('yarn outdated ' + searchForPkugins, false);
+    await this._executionService.execute('yarn outdated ' + searchForPkugins, false, undefined, this.cwd);
     const yarnOutput = this._executionService.executionResult;
     const updates = new Array<PlguinUpdate>();
     yarnOutput.split('\n').forEach(yarnOutputLine => {
@@ -227,7 +241,7 @@ export class PluginService implements IPluginService {
 
   public async updatePlugins(pluginNames: string[]) {
     this._loggerService.startLoadingAnimation('Updating plugins');
-    const success = await this._executionService.execute('yarn add ' + pluginNames.join(' ') + ' -D -E', false);
+    const success = await this._executionService.execute('yarn add ' + pluginNames.join(' ') + ' -D -E', false, undefined, this.cwd);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, 'Updated plugins');
     } else {

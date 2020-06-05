@@ -17,29 +17,6 @@
         }
     },
     "definitions": {
-        "GahPluginDependencyConfig": {
-            "description": "Describes a plugin dependency",
-            "type": "object",
-            "properties": {
-                "name": {
-                    "description": "The name of the plugin that should be used. This has to be the name of a npm package.",
-                    "type": "string"
-                },
-                "settings": {
-                    "$ref": "#/definitions/GahPluginConfig",
-                    "description": "The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available."
-                }
-            }
-        },
-        "GahPluginConfig": {
-            "additionalProperties": true,
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                }
-            }
-        },
         "ModuleDefinition": {
             "type": "object",
             "properties": {

@@ -36,55 +36,6 @@
                     "type": "boolean"
                 }
             }
-        },
-        "ModuleDefinition": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "description": "The name of the module. This has to be unique withing the scope of all modules that are used within the same host.",
-                    "type": "string"
-                },
-                "facadePath": {
-                    "description": "The path to the folder containing facade files. This is optional and the path is relative to the folder this config file is in.",
-                    "type": "string"
-                },
-                "publicApiPath": {
-                    "description": "The path to the public-api.ts file. The path is relative to the folder this config file is in.",
-                    "type": "string"
-                },
-                "dependencies": {
-                    "description": "The array of modules that are the dependencies for this module. This is optional.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ModuleReference"
-                    }
-                },
-                "baseNgModuleName": {
-                    "description": "The typescript class name of the base NgModule for this module. This is optional for modules that just act as a library without providing page-like functionality or routing.",
-                    "type": "string"
-                },
-                "isEntry": {
-                    "description": "Describes whether a module is the entry module for the host. This has to be set to true for exactly one module that is referenced by a host.",
-                    "type": "boolean"
-                }
-            }
-        },
-        "ModuleReference": {
-            "description": "Contains information about a external referenced module",
-            "type": "object",
-            "properties": {
-                "path": {
-                    "description": "The path to the gah-config.json of the external module. Relative to the folder containing this config file.",
-                    "type": "string"
-                },
-                "names": {
-                    "description": "The names of the referenced modules within the project",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
         }
     },
     "$schema": "http://json-schema.org/draft-07/schema#"

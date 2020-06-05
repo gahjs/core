@@ -171,9 +171,9 @@ export class InitController extends Controller {
     const originalPackageJson = this._fileSystemService.readFile('package.json');
     const originalIndexHtml = this._fileSystemService.readFile('src/index.html');
 
-    const adjustedAngularJson = originalAngularJson.replace(/<%dashed-name%>/g, paramCase(hostName));
-    const adjustedPackageJson = originalPackageJson.replace(/<%dashed-name%>/g, paramCase(hostName));
-    const adjustedIndexHtml = originalIndexHtml.replace(/<%name%>/g, hostName);
+    const adjustedAngularJson = originalAngularJson.replace(/gah-host/g, paramCase(hostName));
+    const adjustedPackageJson = originalPackageJson.replace(/gah-host/g, paramCase(hostName));
+    const adjustedIndexHtml = originalIndexHtml.replace(/Generic Angular Host/g, hostName);
 
     this._fileSystemService.saveFile('angular.json', adjustedAngularJson);
     this._fileSystemService.saveFile('package.json', adjustedPackageJson);

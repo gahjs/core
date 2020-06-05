@@ -7,8 +7,9 @@ import { PluginService } from '../services/plugin.service';
 import { PromptService } from '../services/prompt.service';
 import { TemplateService } from '../services/template.service';
 import { WorkspaceService } from '../services/workspace.service';
+import { ContextService } from '../services/context-service';
 import { injectable } from 'inversify';
-import { IWorkspaceService, ITemplateService, IPromptService, IPluginService, ILoggerService, IFileSystemService, IExecutionService, IConfigurationService } from '@awdware/gah-shared';
+import { IWorkspaceService, ITemplateService, IPromptService, IPluginService, ILoggerService, IFileSystemService, IExecutionService, IConfigurationService, IContextService } from '@awdware/gah-shared';
 
 @injectable()
 export abstract class Controller {
@@ -20,6 +21,7 @@ export abstract class Controller {
   protected _promptService: IPromptService;
   protected _templateService: ITemplateService;
   protected _workspaceService: IWorkspaceService;
+  protected _contextService: IContextService;
 
   constructor() {
     this._configService = DIContainer.get(ConfigService);
@@ -30,5 +32,6 @@ export abstract class Controller {
     this._promptService = DIContainer.get(PromptService);
     this._templateService = DIContainer.get(TemplateService);
     this._workspaceService = DIContainer.get(WorkspaceService);
+    this._contextService = DIContainer.get(ContextService);
   }
 }

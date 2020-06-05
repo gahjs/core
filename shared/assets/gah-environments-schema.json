@@ -1,0 +1,27 @@
+{
+    "type": "object",
+    "additionalProperties": {
+        "$ref": "#/definitions/GahEnvironment"
+    },
+    "properties": {
+        "default": {
+            "$ref": "#/definitions/GahEnvironment"
+        }
+    },
+    "definitions": {
+        "GahEnvironment": {
+            "type": "object",
+            "additionalProperties": {},
+            "properties": {
+                "production": {
+                    "type": "boolean"
+                },
+                "test": {
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#"
+}
+
