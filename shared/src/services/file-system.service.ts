@@ -102,6 +102,12 @@ export interface IFileSystemService {
    */
   createDirLink(linkPath: string, realPath: string): void;
   /**
+   * Synchronously creates a symbolic link to a file.
+   * @param linkPath  The path of the link that gets created.
+   * @param realPath  The path of the file that should get linked to.
+   */
+  createFileLink(linkPath: string, realPath: string): void;
+  /**
    * Get the name of the current working directory
    */
   getCwdName(): string;

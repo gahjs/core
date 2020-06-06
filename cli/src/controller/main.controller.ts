@@ -108,10 +108,11 @@ export class MainController extends Controller {
       .action(async (pluginName) => await this._pluginController.update(pluginName));
 
     program
-      .command('run <command...>')
+      .command('run  <command...>')
       .description('Executes a command.')
+      .option('-e --environment <name>', 'The name of the environment that should be used')
       .allowUnknownOption()
-      .action(async (command) => await this._runController.exec(command));
+      .action(async (command, cmdObj) => await this._runController.exec(command, cmdObj.environment));
 
     program
       .command('install')

@@ -107,14 +107,24 @@ export class FileSystemService implements IFileSystemService {
   }
 
   createDirLink(linkPath: string, realPath: string) {
-    let cmd: string;
     if (platform() === 'win32') {
-      cmd = 'mklink /j "' + linkPath + '" "' + realPath + '"';
+      const cmd = 'mklink /j "' + linkPath + '" "' + realPath + '"';
       this._executionService.execute(cmd, false).then(success => {
         if (!success) { throw new Error(this._executionService.executionErrorResult); }
       });
     } else {
       fs.ensureSymlinkSync(realPath, linkPath, 'dir');
+    }
+  }
+
+  createFileLink(linkPath: string, realPath: string) {
+    if (platform() === 'win32') {
+      const cmd = 'mklink /h "' + linkPath + '" "' + realPath + '"';
+      this._executionService.execute(cmd, false).then(success => {
+        if (!success) { throw new Error(this._executionService.executionErrorResult); }
+      });
+    } else {
+      fs.ensureSymlinkSync(realPath, linkPath, 'file');
     }
   }
 

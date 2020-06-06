@@ -5,6 +5,9 @@ export class CopyHost {
   public static copy(fileSystemService: IFileSystemService, workspaceService: IWorkspaceService, force: boolean = false) {
     const destinationFolder = './.gah';
 
+    workspaceService.ensureGitIgnoreLine('.gah', 'Ignoring the automatically generated .gah folder');
+    workspaceService.ensureGitIgnoreLine('dist', 'Ignoring the compiled output path');
+
     if (!force && fileSystemService.directoryExists(fileSystemService.join(destinationFolder, 'src', 'app'))) {
       return;
     }
@@ -15,7 +18,5 @@ export class CopyHost {
       const fswin = require('fswin');
       fswin.setAttributesSync('.gah', { IS_HIDDEN: true });
     }
-
-    workspaceService.ensureGitIgnoreLine('.gah', 'Ignoring the automatically generated .gah folder');
   }
 }

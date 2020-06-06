@@ -3,15 +3,15 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
-import { GahEnvironments, GahEnvironment } from '@awdware/gah-shared';
+import { GahEnvironment } from '@awdware/gah-shared';
 
 
-const environments = require('../../environments.json') as GahEnvironments;
+const env = require('../environment.json') as GahEnvironment;
 if (!environment.production) {
-  console.log(environments);
+  console.log(env);
 }
 const win = window as any as Window & { __env: GahEnvironment };
-win.__env = environments.default;
+win.__env = env;
 
 if (environment.production) {
   enableProdMode();

@@ -10,7 +10,7 @@ const schemaDefs = new Array();
 schemaDefs.push({ name: 'gah-config', schema: 'GahConfig'});
 schemaDefs.push({ name: 'gah-module', schema: 'GahModule' });
 schemaDefs.push({ name: 'gah-host', schema: 'GahHost' });
-schemaDefs.push({ name: 'gah-environments', schema: 'GahEnvironments' });
+schemaDefs.push({ name: 'gah-environment', schema: 'GahEnvironment' });
 
 
 schemaDefs.forEach(sd => {
