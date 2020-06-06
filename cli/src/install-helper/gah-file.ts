@@ -1,17 +1,17 @@
-import { IFileSystemService, GahHost, GahModule } from '@awdware/gah-shared';
+import { IFileSystemService, GahHost, GahModule, IWorkspaceService } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
 import { GahHostDef } from './gah-host-def';
 import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
-import { LoggerService } from '../services/logger.service';
+import { WorkspaceService } from '../services/workspace.service';
 import { CopyHost } from './copy-host';
 
 export class GahFile {
   private _fileSystemService: IFileSystemService;
+  private _workspaceService: IWorkspaceService;
 
   private _gahFileName: string;
-  private _loggerService: LoggerService;
 
   public isHost: boolean;
   public isInstalled: boolean;
@@ -21,7 +21,7 @@ export class GahFile {
     const initializedModules = new Array<GahModuleBase>();
 
     this._fileSystemService = DIContainer.get(FileSystemService);
-    this._loggerService = DIContainer.get(LoggerService);
+    this._workspaceService = DIContainer.get(WorkspaceService);
     this.isInstalled = false;
     this._modules = new Array<GahModuleBase>();
 
@@ -76,6 +76,6 @@ export class GahFile {
   }
 
   private copyHostFiles() {
-    CopyHost.copy(this._fileSystemService);
+    CopyHost.copy(this._fileSystemService, this._workspaceService, true);
   }
 }

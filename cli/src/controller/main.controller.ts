@@ -11,6 +11,7 @@ import { Controller } from './controller';
 import { HostModuleController } from './host-module.controller';
 import { GahModuleType } from '@awdware/gah-shared';
 import { CopyHost } from '../install-helper/copy-host';
+import { RunController } from './run.controller';
 
 @injectable()
 export class MainController extends Controller {
@@ -24,6 +25,8 @@ export class MainController extends Controller {
   private _installController: InstallController;
   @inject(PluginController)
   private _pluginController: PluginController;
+  @inject(RunController)
+  private _runController: RunController;
 
   public async main() {
 
@@ -32,7 +35,7 @@ export class MainController extends Controller {
 
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
-      CopyHost.copy(this._fileSystemService);
+      CopyHost.copy(this._fileSystemService, this._workspaceService);
     }
 
     await this._pluginService.loadInstalledPlugins();
@@ -40,7 +43,7 @@ export class MainController extends Controller {
     var pjson = require(this._fileSystemService.join(__dirname, '../../package.json'));
     const version = pjson.version;
 
-    // This is so highly useless, I love it.
+    // This is so useless, I love it.
     const fontWidth = process.stdout.columns > 111 ? 'full' : process.stdout.columns > 96 ? 'fitted' : 'controlled smushing';
 
     program.on('--help', () => {
@@ -103,6 +106,12 @@ export class MainController extends Controller {
       .command('update [pluginName]')
       .description('Updates plugin to its newest version.')
       .action(async (pluginName) => await this._pluginController.update(pluginName));
+
+    program
+      .command('run <command...>')
+      .description('Executes a command.')
+      .allowUnknownOption()
+      .action(async (command) => await this._runController.exec(command));
 
     program
       .command('install')

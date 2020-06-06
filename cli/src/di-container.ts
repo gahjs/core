@@ -16,6 +16,7 @@ import { PluginService } from './services/plugin.service';
 import { PluginController } from './controller/plugin.controller';
 import { ExecutionService } from './services/execution.service';
 import { ContextService } from './services/context-service';
+import { RunController } from './controller/run.controller';
 
 
 const DIContainer = new Container();
@@ -25,6 +26,7 @@ DIContainer.bind<DependencyController>(DependencyController).toSelf().inSingleto
 DIContainer.bind<HostModuleController>(HostModuleController).toSelf().inSingletonScope();
 DIContainer.bind<InstallController>(InstallController).toSelf().inSingletonScope();
 DIContainer.bind<PluginController>(PluginController).toSelf().inSingletonScope();
+DIContainer.bind<RunController>(RunController).toSelf().inSingletonScope();
 
 DIContainer.bind<FileSystemService>(FileSystemService).toSelf().inSingletonScope();
 DIContainer.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();

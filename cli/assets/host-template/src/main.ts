@@ -1,16 +1,17 @@
-/*
-  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-  *   Please Only edit this file in the marked areas. Changes outside there areas might be overwriten by gah.   *
-  *    If you really need to edit a section that is not marked for editing, please open an issue on github:     *
-  *                               https://github.com/awdware/gah/issues/new                                 *
-  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*/
-
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
+import { GahEnvironments, GahEnvironment } from '@awdware/gah-shared';
+
+
+const environments = require('../../environments.json') as GahEnvironments;
+if (!environment.production) {
+  console.log(environments);
+}
+const win = window as any as Window & { __env: GahEnvironment };
+win.__env = environments.default;
 
 if (environment.production) {
   enableProdMode();

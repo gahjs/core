@@ -1,6 +1,7 @@
 export class GahEnvironments {
   $schema: any = '"https://raw.githubusercontent.com/awdware/gah/master/assets/gah-environments-schema.json"';
   default: GahEnvironment;
+  production: GahEnvironment;
   [name: string]: GahEnvironment;
 }
 
