@@ -2,7 +2,9 @@
   "name": "gah-host",
   "version": "0.0.0",
   "scripts": {
-    "ng": "ng"
+    "ng": "ng",
+    "gah": "gah",
+    "install": "gah install"
   },
   "private": true,
   "dependencies": {
