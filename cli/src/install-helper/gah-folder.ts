@@ -2,6 +2,7 @@ import { IFileSystemService, ModuleTemplateData, ModulesTemplateData, ITemplateS
 import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
 import { TemplateService } from '../services/template.service';
+import { platform } from 'os';
 
 export class GahFolder {
   private _fileSystemService: IFileSystemService;
@@ -45,6 +46,13 @@ export class GahFolder {
   public cleanGeneratedDirectory() {
     this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
     this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
+  }
+
+  public tryHideGahFolder() {
+    if (platform() === 'win32') {
+      const fswin = require('fswin');
+      fswin.setAttributesSync(this._fileSystemService.join(this._moduleBaseFolder, this.pathRelativeToModuleBaseFolder), { IS_HIDDEN: true });
+    }
   }
 
   public addGeneratedFileTemplateData(moduleName: string, isEntry: boolean, baseNgModuleName?: string) {
