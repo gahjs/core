@@ -105,6 +105,6 @@ export abstract class GahModuleBase {
   }
 
   protected adjustGitignore() {
-    this.workspaceService.ensureGitIgnoreLine('**/.gah/**', 'Ignoring gah generated files', this.basePath);
+    this.workspaceService.ensureGitIgnoreLine('**/.gah', 'Ignoring gah generated files', this.basePath);
   }
 }
