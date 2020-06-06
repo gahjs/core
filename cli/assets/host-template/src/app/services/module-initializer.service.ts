@@ -11,8 +11,8 @@ import { Injectable } from '@angular/core';
 import { Resolve, Router, Routes } from '@angular/router';
 import { Observable } from 'rxjs';
 
-import { environment } from '../../environments/environment';
 import { modulePackages } from '../.gah/generated/gah-modules';
+import { GahEnvironments, GahEnvironment } from '@awdware/gah-shared';
 
 
 @Injectable({ providedIn: 'root' })
@@ -21,20 +21,24 @@ export class ModuleInitializerService implements Resolve<null> {
   private _modules = new Array<any>();
   private _facadeRoutes: Routes = [];
   private _routes: Routes = [];
+  private _env: GahEnvironment;
 
   constructor(
     router: Router,
   ) {
     this._router = router;
+    const environments = require('../../../../environments.json') as GahEnvironments;
+    console.log(environments);
+    this._env = environments.default;
   }
 
   private setEnvironmentValues(env: any) {
     if (env) {
       Object.keys(env).forEach(k => {
-        if (environment[k] === undefined) {
+        if (this._env[k] === undefined) {
           console.error('Missing value in host environment: ' + k);
         }
-        env[k] = environment[k];
+        env[k] = this._env[k];
       });
     }
   }

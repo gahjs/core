@@ -76,6 +76,6 @@ export class GahFile {
   }
 
   private copyHostFiles() {
-    CopyHost.copyIfNeeded(this._fileSystemService);
+    CopyHost.copy(this._fileSystemService);
   }
 }

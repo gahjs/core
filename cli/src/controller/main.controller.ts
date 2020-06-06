@@ -32,7 +32,7 @@ export class MainController extends Controller {
 
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
-      CopyHost.copyIfNeeded(this._fileSystemService);
+      CopyHost.copy(this._fileSystemService);
     }
 
     await this._pluginService.loadInstalledPlugins();
