@@ -11,7 +11,7 @@ export class RunController extends Controller {
   public async exec(command: string[], configurationName?: string) {
     const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
 
-    const likedEnvFile = '.gah/environment.json';
+    const likedEnvFile = '.gah/src/environment.json';
 
     if (isHost) {
 
