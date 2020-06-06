@@ -1,11 +1,10 @@
 {
-  "name": "<%dashed-name%>",
+  "name": "gah-host",
   "version": "0.0.0",
   "scripts": {
-    "pre-build": "yarn && gah i",
-    "build": "yarn pre-build && yarn ng build",
-    "build-prod": "yarn pre-build && yarn ng build --prod",
-    "start": "yarn pre-build && ng serve"
+    "ng": "ng",
+    "gah": "gah",
+    "install": "gah install"
   },
   "private": true,
   "dependencies": {
@@ -17,6 +16,7 @@
     "@angular/platform-browser": "~9.0.0",
     "@angular/platform-browser-dynamic": "~9.0.0",
     "@angular/router": "~9.0.0",
+    "@awdware/gah-shared": "0.0.10",
     "rxjs": "~6.5.4",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"

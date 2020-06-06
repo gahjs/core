@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@awdware/gah-shared@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.9.tgz#717b44b84148aba8f6ea6d4525520731cdf9fa1f"
-  integrity sha512-7lhJb+UjYHzmjhBgs2VDBgGWo2feKz1fm+EA/ZSE48w3S+HiS2VHNMV8aCyGnCsUaozZzSAyWSvrwY6owQCHtQ==
+"@awdware/gah-shared@0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.10.tgz#95c19c293895aad822bdac8fa101ca200dc476e3"
+  integrity sha512-1QdTqoXl2zXLuo5FL3hA0BUXlIcNupPthz+XiSQb9ksE3pp6Nm65oMRn8iyTGHKmeZu3I2LpnhOk8L4CtRHKEQ==
 
 "@babel/code-frame@^7.0.0":
   version "7.10.1"
@@ -1271,10 +1271,10 @@ fragment-cache@^0.2.1:
   dependencies:
     map-cache "^0.2.2"
 
-fs-extra@^9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.0.0.tgz#b6afc31036e247b2466dc99c29ae797d5d4580a3"
-  integrity sha512-pmEYSk3vYsG/bF651KPUXZ+hvjpgWYw/Gc7W9NFUe3ZVLczKKWIij3IKpOrQcdw4TILtibFslZ0UmR8Vvzig4g==
+fs-extra@^9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-9.0.1.tgz#910da0062437ba4c39fedd863f1675ccfefcb9fc"
+  integrity sha512-h2iAoN838FqAFJY2/qVpzFXy+EBxfVE220PalAqQLDVsFOHLJrZvut5puAbCdNv6WJk+B8ihI+k0c7JK5erwqQ==
   dependencies:
     at-least-node "^1.0.0"
     graceful-fs "^4.2.0"
@@ -1290,6 +1290,11 @@ fsevents@~2.1.2:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/fsevents/-/fsevents-2.1.3.tgz#fb738703ae8d2f9fe900c33836ddebee8b97f23e"
   integrity sha512-Auw9a4AxqWpa9GUfj370BMPzzyncfBABW8Mab7BGWBYDj4Isgq+cDKtx0i6u9jcX9pQDnswsaaOTgTmA5pEjuQ==
+
+fswin@^3.19.908:
+  version "3.19.908"
+  resolved "https://registry.yarnpkg.com/fswin/-/fswin-3.19.908.tgz#7bf4d945757f9f94c5e29e4c8bba9f709af4d7a7"
+  integrity sha512-xwq6wBg+KNuSjzQ3gZUOXt/FUhN9Wd+qQxz3yGM1xyTWu00ty82X+9Tc09z9XtMONYAhA8cCE3nolWoU7Rlz6g==
 
 functional-red-black-tree@^1.0.1:
   version "1.0.1"

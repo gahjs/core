@@ -39,16 +39,16 @@ export abstract class GahModuleBase {
     this.executionService = DIContainer.get(ExecutionService);
     this.loggerService = DIContainer.get(LoggerService);
 
-    this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.installed = false;
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
+  }
 
+  protected initTsConfigObject() {
     this.tsConfigFile = new TsConfigFile(this.fileSystemService.join(this.basePath, 'tsconfig.json'), this.fileSystemService);
   }
 
   public abstract async install(): Promise<void>;
-
 
   public get allRecursiveDependencies(): GahModuleBase[] {
     const allModules = new Array<GahModuleBase>();

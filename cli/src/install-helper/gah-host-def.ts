@@ -8,7 +8,11 @@ export class GahHostDef extends GahModuleBase {
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
 
+
+    const gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
+    this.basePath = this.fileSystemService.join(gahCfgFolder, '.gah');
     this.srcBasePath = './src';
+    this.initTsConfigObject();
 
     const hostCfg = this.fileSystemService.parseFile<GahHost>(gahCfgPath);
     if (!hostCfg) {
@@ -68,7 +72,7 @@ export class GahHostDef extends GahModuleBase {
 
   private async installPackages() {
     this.loggerService.startLoadingAnimation('Installing yarn packages');
-    const success = await this.executionService.execute('yarn', false);
+    const success = await this.executionService.execute('yarn', false, undefined, '.gah');
     if (success) {
       this.loggerService.stopLoadingAnimation(false, true, 'Packages installed successfully');
     } else {

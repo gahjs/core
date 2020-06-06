@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "<%dashed-name%>": {
+    "gah-host": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,16 +17,16 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/<%dashed-name%>",
+            "outputPath": "../dist",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "aot": true,
             "assets": [
-              "src/favicon.ico",
               "src/assets",
-              "src/web.config"
+              "src/web.config",
+              "src/environment.json"
             ],
             "styles": [
               "src/styles.scss"
@@ -68,7 +68,7 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "<%dashed-name%>:build",
+            "browserTarget": "gah-host:build",
             "sourceMap": {
               "scripts": true,
               "styles": true,
@@ -77,14 +77,14 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "<%dashed-name%>:build:production"
+              "browserTarget": "gah-host:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "<%dashed-name%>:build"
+            "browserTarget": "gah-host:build"
           }
         },
         "test": {
@@ -119,5 +119,5 @@
       }
     }
   },
-  "defaultProject": "<%dashed-name%>"
+  "defaultProject": "gah-host"
 }

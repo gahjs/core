@@ -1,23 +1,27 @@
-import { IFileSystemService, GahHost, GahModule } from '@awdware/gah-shared';
+import { IFileSystemService, GahHost, GahModule, IWorkspaceService } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
 import { GahHostDef } from './gah-host-def';
 import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
+import { WorkspaceService } from '../services/workspace.service';
+import { CopyHost } from './copy-host';
 
 export class GahFile {
   private _fileSystemService: IFileSystemService;
+  private _workspaceService: IWorkspaceService;
 
   private _gahFileName: string;
 
   public isHost: boolean;
   public isInstalled: boolean;
 
-  protected _modules: GahModuleBase[];
+  private _modules: GahModuleBase[];
   constructor(filePath: string) {
     const initializedModules = new Array<GahModuleBase>();
 
     this._fileSystemService = DIContainer.get(FileSystemService);
+    this._workspaceService = DIContainer.get(WorkspaceService);
     this.isInstalled = false;
     this._modules = new Array<GahModuleBase>();
 
@@ -35,6 +39,10 @@ export class GahFile {
   }
 
   public install() {
+    if (this.isHost) {
+      this.copyHostFiles();
+    }
+
     this._modules.forEach(x => {
       x.install();
     });
@@ -65,5 +73,9 @@ export class GahFile {
     else {
       throw new Error('The provided file is not a gah module or gah host file!\npath: "' + filePath + '"');
     }
+  }
+
+  private copyHostFiles() {
+    CopyHost.copy(this._fileSystemService, this._workspaceService, true);
   }
 }
