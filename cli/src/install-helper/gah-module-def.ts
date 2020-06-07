@@ -42,7 +42,7 @@ export class GahModuleDef extends GahModuleBase {
       return;
     }
     this.installed = true;
-
+    this.tsConfigFile.clean();
     this.gahFolder.cleanDependencyDirectory();
     this.gahFolder.cleanStylesDirectory();
     this.gahFolder.tryHideGahFolder();

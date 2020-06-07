@@ -78,7 +78,7 @@ export abstract class GahModuleBase {
   protected addDependenciesToTsConfigFile() {
     for (const dep of this.allRecursiveDependencies) {
       const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, 'public-api');
-      const aliasName = '@gah/' + dep.moduleName! + '/*';
+      const aliasName = '@gah/' + dep.moduleName!;
 
       this.tsConfigFile.addPathAlias(aliasName, path);
     }
