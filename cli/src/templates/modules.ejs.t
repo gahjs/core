@@ -1,7 +1,7 @@
 <% 
 const moduleImports = [];
 modules.forEach(mod => { %>
-import * as <%- mod.saveName %> from '@gah/<%- mod.name %>/*';
+import * as <%- mod.saveName %> from '@gah/<%- mod.name %>';
 <% });
 %>
 export const modulePackages = [
