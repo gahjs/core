@@ -40,6 +40,7 @@ export class GahFile {
 
   public install() {
     if (this.isHost) {
+      this.checkValidConfiguration();
       this.copyHostFiles();
     }
 
@@ -77,5 +78,19 @@ export class GahFile {
 
   private copyHostFiles() {
     CopyHost.copy(this._fileSystemService, this._workspaceService, true);
+  }
+
+  private checkValidConfiguration() {
+    let entryModuleNames: string[] = [];
+    this._modules.forEach(x => {
+      if (x.isEntry) {
+        entryModuleNames.push(x.moduleName!);
+      }
+    });
+    if (entryModuleNames.length === 0) {
+      throw new Error('You do not have any entry modules defined! You need at exactly one entry module for the system to work!');
+    } else if (entryModuleNames.length > 1) {
+      throw new Error('You have too many entry modules defined! You need at exactly one entry module for the system to work! The following modules are configured as entry modules: ' + entryModuleNames.join(', '));
+    }
   }
 }

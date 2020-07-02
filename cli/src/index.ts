@@ -16,12 +16,11 @@ console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
 
   DIContainer.get(ContextService).setContext({ calledFromCli: true });
 
-  try {
-    // Cal main method
-    await mainController.main();
-  } catch (error) {
-    console.error(chalk.red(' ■ ') + error);
-    console.error(error);
-    process.exit(1);
-  }
-})();
+  // Call main method
+  await mainController.main();
+
+})().catch(err => {
+  console.error(chalk.red(' ■ ') + err);
+  console.error(err);
+  process.exit(1);
+});

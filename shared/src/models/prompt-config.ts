@@ -1,3 +1,5 @@
+import { FileSystemType } from '../services/file-system.service';
+
 export class PromptConfig {
   msg: string;
   default?: any;
@@ -7,8 +9,9 @@ export class PromptConfig {
 }
 
 export class FuzzyPathPromptConfig extends PromptConfig {
-  itemType?: 'any' | 'directory' | 'file' = 'any';
-  excludePath?: (val: string) => boolean;
+  itemType?: FileSystemType = 'any';
+  excludePattern?: string[];
+  exclude?: (val: string) => boolean;
 }
 
 export class SelectionPromptConfig extends PromptConfig {

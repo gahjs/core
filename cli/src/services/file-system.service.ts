@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import fs from 'fs-extra';
 import path_ from 'path';
-import { IFileSystemService, ILoggerService, IExecutionService } from '@awdware/gah-shared';
+import { IFileSystemService, ILoggerService, IExecutionService, FileSystemType } from '@awdware/gah-shared';
 import globby from 'globby';
 import { platform } from 'os';
 import { ExecutionService } from './execution.service';
@@ -89,7 +89,7 @@ export class FileSystemService implements IFileSystemService {
     fs.copySync(fromDirectory, toDirectory, { recursive: true });
   }
 
-  getFilesFromGlob(glob_: string, ignore?: string | string[], noDefaultIgnore?: boolean): string[] {
+  getFilesFromGlob(glob_: string, ignore?: string | string[], noDefaultIgnore?: boolean, type: FileSystemType = 'any'): string[] {
     const ignore_ = new Array<string>();
     if (!noDefaultIgnore) {
       ignore_.push('**/node_modules/**');
@@ -99,7 +99,10 @@ export class FileSystemService implements IFileSystemService {
     if (ignore && typeof (ignore) === 'string') { ignore_.push(ignore); }
     if (ignore && Array.isArray(ignore)) { ignore.forEach(x => ignore_.push(x)); }
 
-    return globby.sync(glob_, { ignore: ignore_ });
+    const onlyFiles = type && type === 'file';
+    const onlyDirectories = type && type === 'directory';
+
+    return globby.sync(glob_, { ignore: ignore_, onlyFiles, onlyDirectories });
   }
 
   copyFile(file: string, destinationFolder: string) {

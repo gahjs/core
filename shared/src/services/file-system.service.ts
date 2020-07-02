@@ -1,3 +1,7 @@
+
+export type FileSystemType = ('any' | 'file' | 'directory');
+
+
 export interface IFileSystemService {
   /**
    * Synchronously tests whether or not the given file exists by checking with the file system.
@@ -89,7 +93,7 @@ export interface IFileSystemService {
    * @param noDefaultIgnore  Set this parameter to true if you want to disable the default ignore patterns for this search.
    * @returns A string array of relative paths to the matches files.
    */
-  getFilesFromGlob(glob: string, ignore?: string | string[], noDefaultIgnore?: boolean): string[];
+  getFilesFromGlob(glob: string, ignore?: string | string[], noDefaultIgnore?: boolean, type?: FileSystemType): string[];
   /**
    * @param file The path to the file that should be copied
    * @param destinationFolder The path to the destonation folder
