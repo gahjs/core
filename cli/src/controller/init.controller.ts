@@ -57,6 +57,11 @@ export class InitController extends Controller {
         enabled: () => !isHost && !facadeFolderPath,
       });
 
+    let defaultFacadePath = this._fileSystemService.getFilesFromGlob('**/facade', ['.gah', 'dist'])?.[0];
+
+    if (process.platform === 'win32') {
+      defaultFacadePath = defaultFacadePath.replace(/\//g, '\\');
+    }
 
     const facadeFolderPath_ = await this._promptService
       .fuzzyPath({
@@ -64,13 +69,14 @@ export class InitController extends Controller {
         cancelled: canceled,
         enabled: () => !isHost && hasFacadeFolderPath && !facadeFolderPath,
         itemType: 'directory',
-        excludePath: (val) => val.includes('.gah'),
+        excludePattern: ['.gah', 'dist'],
+        default: defaultFacadePath
       });
 
     facadeFolderPath = facadeFolderPath ?? facadeFolderPath_;
 
-    let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts')?.[0]
-      ?? this._fileSystemService.getFilesFromGlob('**/index.ts')?.[0];
+    let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist'])?.[0]
+      ?? this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist'])?.[0];
 
     if (process.platform === 'win32') {
       defaultPublicApiPath = defaultPublicApiPath.replace(/\//g, '\\');
@@ -82,7 +88,8 @@ export class InitController extends Controller {
         cancelled: canceled,
         enabled: () => !isHost && !publicApiPath,
         itemType: 'file',
-        excludePath: (val) => val.includes('.gah') || !val.endsWith('.ts') || val.endsWith('.d.ts'),
+        exclude: (val) => !val.endsWith('.ts') || val.endsWith('.d.ts'),
+        excludePattern: ['.gah'],
         default: defaultPublicApiPath
       });
 
@@ -124,7 +131,12 @@ export class InitController extends Controller {
       newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
       newModule.baseNgModuleName = baseModuleName;
       newModule.isEntry = isEntry;
-      (gahCfg as GahModule).modules.push(newModule);
+      if (overwrite) {
+        const idx = (gahCfg as GahModule).modules.findIndex(x => x.name === newModule.name);
+        (gahCfg as GahModule).modules[idx] = newModule;
+      } else {
+        (gahCfg as GahModule).modules.push(newModule);
+      }
     }
 
     this._configService.saveGahModuleConfig();

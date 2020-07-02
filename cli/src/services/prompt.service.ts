@@ -1,93 +1,77 @@
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
 import inquirer from 'inquirer';
-import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig } from '@awdware/gah-shared';
+import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig, IFileSystemService } from '@awdware/gah-shared';
+
+
+import { prompt } from 'enquirer';
+import { FileSystemService } from './file-system.service';
 
 @injectable()
 export class PromptService implements IPromptService {
+  @inject(FileSystemService)
+  private _fileSystemService: IFileSystemService;
 
   constructor() {
-    inquirer.registerPrompt('autosubmit', require('inquirer-autosubmit-prompt'));
-    inquirer.registerPrompt('fuzzypath', require('inquirer-fuzzy-path'));
+
   }
 
-  public input(cfg: PromptConfig) {
-    return new Promise<string>((resolve, reject) => {
-      inquirer.prompt({
-        type: 'input',
-        when: () => !cfg.cancelled && cfg.enabled(),
-        message: cfg.msg,
-        name: '_',
-        default: cfg.default
-      })
-        .then(_ => resolve(_._))
-        .catch(_ => reject(_));
-    });
+  public async input(cfg: PromptConfig) {
+    return prompt({
+      type: 'input',
+      name: '_',
+      message: cfg.msg,
+      initial: cfg.default,
+      skip: cfg.cancelled || !cfg.enabled()
+    }).then(_ => (_ as any)._);
   }
 
-  public confirm(cfg: PromptConfig) {
-    return new Promise<boolean>((resolve, reject) => {
-      inquirer.prompt({
-        type: 'confirm',
-        when: () => !cfg.cancelled && cfg.enabled(),
-        message: cfg.msg,
-        name: '_',
-        default: cfg.default ?? false
-      })
-        .then(_ => resolve(_._))
-        .catch(_ => reject(_));
-    });
+  public async confirm(cfg: PromptConfig) {
+    return prompt({
+      type: 'confirm',
+      name: '_',
+      message: cfg.msg,
+      initial: cfg.default ?? false,
+      skip: cfg.cancelled || !cfg.enabled()
+    }).then(_ => (_ as any)._);
   }
 
-  public fuzzyPath(cfg: FuzzyPathPromptConfig) {
+  public async fuzzyPath(cfg: FuzzyPathPromptConfig) {
+    const excludes = cfg.excludePattern && cfg.excludePattern || [];
+    const allFiles = this._fileSystemService.getFilesFromGlob('**', ['node_modules', ...excludes], undefined, cfg.itemType);
 
-    const excludePath = (val: string) => {
-      if (cfg.excludePath) { return cfg.excludePath(val); }
-      return false;
-    };
+    const filteredFiles = (cfg.exclude ? allFiles.filter(x => !cfg.exclude!(x)) : allFiles).map(x => x.replace(/\\/g, '/'));
 
-    return new Promise<string>((resolve, reject) => {
-      inquirer.prompt<{ _: string }>({
-        type: 'fuzzypath',
-        when: () => !cfg.cancelled && cfg.enabled(),
-        message: cfg.msg,
-        name: '_',
-        itemType: cfg.itemType,
-        depthLimit: 5,
-        excludePath: (nodePath: string) => nodePath.startsWith('node_modules'),
-        excludeFilter: (nodePath: string) => excludePath(nodePath),
-        default: cfg.default,
-      } as any)
-        .then(_ => resolve(_._))
-        .catch(_ => reject(_));
-    });
+    const def = cfg.default && filteredFiles.findIndex(x => x === cfg.default.replace(/\\/g, '/')) || undefined;
+
+    return prompt({
+      type: 'autocomplete',
+      name: '_',
+      message: cfg.msg,
+      limit: 8,
+      choices: filteredFiles,
+      initial: def === -1 ? 0 : def ?? 0,
+      skip: cfg.cancelled || !cfg.enabled()
+    } as any).then(_ => (_ as any)._);
   }
 
 
-  public list(cfg: SelectionPromptConfig) {
-    return new Promise<string>((resolve, reject) => {
-      inquirer.prompt({
-        type: 'list',
-        when: () => !cfg.cancelled && cfg.enabled(),
-        message: cfg.msg,
-        name: '_',
-        choices: () => cfg.choices()
-      })
-        .then(_ => resolve(_._))
-        .catch(_ => reject(_));
-    });
+  public async list(cfg: SelectionPromptConfig) {
+    return prompt({
+      type: 'list',
+      name: '_',
+      message: cfg.msg,
+      choices: cfg.choices(),
+      skip: cfg.cancelled || !cfg.enabled()
+    }).then(_ => (_ as any)._);
   }
 
-  public checkbox(cfg: SelectionPromptConfig) {
-    return new Promise<string[]>((resolve, reject) => {
-      inquirer.prompt({
-        type: 'checkbox',
-        when: () => !cfg.cancelled && cfg.enabled(),
-        message: cfg.msg,
-        name: '_',
-        choices: () => cfg.choices()
-      })
-        .then(_ => resolve(_._))
-        .catch(_ => reject(_));
-    });
+  public async checkbox(cfg: SelectionPromptConfig) {
+    return prompt({
+      type: 'multiselect',
+      name: '_',
+      message: cfg.msg,
+      choices: cfg.choices(),
+      skip: cfg.cancelled || !cfg.enabled()
+    }).then(_ => (_ as any)._);
   }
 }

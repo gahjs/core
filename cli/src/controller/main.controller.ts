@@ -67,7 +67,7 @@ export class MainController extends Controller {
       .option('--facadeFolderPath <path>', 'The relative path to the facade files')
       .option('--publicApiPath <path>', 'The relative path public api file (public-api.ts / index.ts / etc.)')
       .option('--baseModuleName <name>', 'The name of the base NgModule of the new module')
-      .action((cmdObj) => this._initController.init(cmdObj.host, cmdObj.entry, cmdObj.moduleName, cmdObj.facadeFolderPath, cmdObj.publicApiPath, cmdObj.baseModuleName));
+      .action(async (cmdObj) => await this._initController.init(cmdObj.host, cmdObj.entry, cmdObj.moduleName, cmdObj.facadeFolderPath, cmdObj.publicApiPath, cmdObj.baseModuleName));
 
     const cmdDependency = program
       .command('dependency <add|remove> [options]');
@@ -118,9 +118,9 @@ export class MainController extends Controller {
       .command('install')
       .description('Installs all dependencies.')
       .alias('i')
-      .action(async () => await this._installController.install());
+      .action(async () => this._installController.install());
 
-    program.parse(process.argv);
+    await program.parseAsync(process.argv);
   }
 
 
