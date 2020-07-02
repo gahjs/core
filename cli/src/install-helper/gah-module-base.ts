@@ -9,6 +9,7 @@ import { GahFolder } from './gah-folder';
 import DIContainer from '../di-container';
 import { LoggerService } from '../services/logger.service';
 import { ExecutionService } from '../services/execution.service';
+import { GahModuleDef } from './gah-module-def';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -31,6 +32,7 @@ export abstract class GahModuleBase {
 
   public dependencies: GahModuleBase[];
   public moduleName: string | null;
+  public packageName: string | null;
 
   constructor(gahCfgPath: string, moduleName: string | null) {
     this.fileSystemService = DIContainer.get(FileSystemService);
@@ -50,7 +52,7 @@ export abstract class GahModuleBase {
 
   public abstract async install(): Promise<void>;
 
-  public get allRecursiveDependencies(): GahModuleBase[] {
+  public get allRecursiveDependencies(): GahModuleDef[] {
     const allModules = new Array<GahModuleBase>();
     this.dependencies.forEach(dep => {
       this.collectAllReferencedModules(dep, allModules);
@@ -78,7 +80,7 @@ export abstract class GahModuleBase {
   protected addDependenciesToTsConfigFile() {
     for (const dep of this.allRecursiveDependencies) {
       const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, 'public-api');
-      const aliasName = '@gah/' + dep.moduleName!;
+      const aliasName = '@' + dep.packageName + '/' + dep.moduleName!;
 
       this.tsConfigFile.addPathAlias(aliasName, path);
     }

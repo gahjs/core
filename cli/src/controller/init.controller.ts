@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { ModuleDefinition, GahHost, GahModule } from '@awdware/gah-shared';
+import { ModuleDefinition, GahHost, GahModule, PackageJson } from '@awdware/gah-shared';
 import { Controller } from './controller';
 import path from 'path';
 import { paramCase } from 'change-case';
@@ -8,7 +8,7 @@ import { paramCase } from 'change-case';
 @injectable()
 export class InitController extends Controller {
   private nameExists: boolean;
-  public async init(isHost?: boolean, isEntry?: boolean, newModuleName?: string, facadeFolderPath?: string, publicApiPath?: string, baseModuleName?: string) {
+  public async init(isHost?: boolean, isEntry?: boolean) {
     this.nameExists = false;
 
     if (isEntry && isHost) {
@@ -28,15 +28,45 @@ export class InitController extends Controller {
       });
     canceled = canceled || (isHost ?? false) && alreadyInitialized && !overwriteHost;
 
-    const moduleName = await this._promptService
+    let guessedModuleName: string = '';
+    const packageJson = this._fileSystemService.tryReadFile('package.json');
+    if (packageJson) {
+      const pkgJson = JSON.parse(packageJson) as PackageJson;
+      if (pkgJson.name) {
+        const pkgName = pkgJson.name.match(/(@[\w-]+\/)?([\w/\-.]+)/)?.[2]?.replace(/\//, '-').toLocaleLowerCase();
+        if (pkgName) {
+          guessedModuleName = pkgName;
+        }
+      }
+    }
+    const newModuleName = await this._promptService
       .input({
         msg: 'Enter a unique name for this ' + (isHost ? 'host' : 'module'),
         cancelled: canceled,
-        enabled: () => !newModuleName,
-        default: this._fileSystemService.getCwdName()
+        enabled: () => !isHost,
+        default: guessedModuleName
       });
-    newModuleName = newModuleName ?? moduleName;
-    canceled = canceled || !newModuleName;
+    canceled = canceled || !newModuleName && !isHost;
+
+    let guessedPackageName: string = '';
+    if (packageJson) {
+      const pkgJson = JSON.parse(packageJson) as PackageJson;
+      if (pkgJson.name) {
+        const pkgName = pkgJson.name.match(/@([\w-]+)\//)?.[1].toLocaleLowerCase();
+        if (pkgName) {
+          guessedPackageName = pkgName;
+        }
+      }
+    }
+
+    const packageName = await this._promptService
+      .input({
+        msg: 'Enter the name of the package prefix of this module',
+        cancelled: canceled,
+        enabled: () => !isHost,
+        default: guessedPackageName || null
+      });
+    canceled = canceled || !packageName && !isHost;
 
     const overwrite = await this._promptService
       .confirm({
@@ -54,26 +84,27 @@ export class InitController extends Controller {
       .confirm({
         msg: 'Does this module contain a folder for facade files?',
         cancelled: canceled,
-        enabled: () => !isHost && !facadeFolderPath,
+        enabled: () => !isHost,
       });
 
-    let defaultFacadePath = this._fileSystemService.getFilesFromGlob('**/facade', ['.gah', 'dist'])?.[0];
+    let defaultFacadePath: string | null = null;
+    if (hasFacadeFolderPath) {
+      defaultFacadePath = this._fileSystemService.getFilesFromGlob('**/facade', ['.gah', 'dist'])?.[0];
 
-    if (process.platform === 'win32') {
-      defaultFacadePath = defaultFacadePath.replace(/\//g, '\\');
+      if (process.platform === 'win32') {
+        defaultFacadePath = defaultFacadePath?.replace(/\//g, '\\');
+      }
     }
 
-    const facadeFolderPath_ = await this._promptService
+    const facadeFolderPath = await this._promptService
       .fuzzyPath({
         msg: 'Enter the path to the folder containing the facade files',
         cancelled: canceled,
-        enabled: () => !isHost && hasFacadeFolderPath && !facadeFolderPath,
+        enabled: () => !isHost && hasFacadeFolderPath,
         itemType: 'directory',
         excludePattern: ['.gah', 'dist'],
         default: defaultFacadePath
       });
-
-    facadeFolderPath = facadeFolderPath ?? facadeFolderPath_;
 
     let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist'])?.[0]
       ?? this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist'])?.[0];
@@ -82,29 +113,26 @@ export class InitController extends Controller {
       defaultPublicApiPath = defaultPublicApiPath.replace(/\//g, '\\');
     }
 
-    const publicApiPath_ = await this._promptService
+    const publicApiPath = await this._promptService
       .fuzzyPath({
         msg: 'Enter the path to the public-api.ts file',
         cancelled: canceled,
-        enabled: () => !isHost && !publicApiPath,
+        enabled: () => !isHost,
         itemType: 'file',
         exclude: (val) => !val.endsWith('.ts') || val.endsWith('.d.ts'),
         excludePattern: ['.gah'],
         default: defaultPublicApiPath
       });
 
-    publicApiPath = publicApiPath ?? publicApiPath_;
     canceled = canceled || (!publicApiPath && !isHost);
 
-    const baseModuleName_ = await this._promptService
+    const baseModuleName = await this._promptService
       .input({
         msg: 'Enter the class name of the base NgModule for this GahModule (empty if there is none)',
         cancelled: canceled,
-        enabled: () => !isHost && !baseModuleName,
+        enabled: () => !isHost,
         default: this.tryGuessbaseModuleName()
       });
-
-    baseModuleName = baseModuleName ?? baseModuleName_;
 
     if (canceled) {
       return;
@@ -128,6 +156,7 @@ export class InitController extends Controller {
       if (facadeFolderPath) {
         newModule.facadePath = this._fileSystemService.ensureRelativePath(facadeFolderPath);
       }
+      newModule.packageName = packageName;
       newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
       newModule.baseNgModuleName = baseModuleName;
       newModule.isEntry = isEntry;
