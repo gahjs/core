@@ -66,6 +66,11 @@ export class PromptService implements IPromptService {
   }
 
   public async checkbox(cfg: SelectionPromptConfig) {
+    // Workaround for https://github.com/enquirer/enquirer/issues/298
+    if (cfg.cancelled || !cfg.enabled()) {
+      return null;
+    }
+
     return prompt({
       type: 'multiselect',
       name: '_',
