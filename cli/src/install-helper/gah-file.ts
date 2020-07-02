@@ -1,4 +1,4 @@
-import { IFileSystemService, GahHost, GahModule, IWorkspaceService } from '@awdware/gah-shared';
+import { IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
 import { GahHostDef } from './gah-host-def';
@@ -6,10 +6,12 @@ import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { CopyHost } from './copy-host';
+import { LoggerService } from '../services/logger.service';
 
 export class GahFile {
   private _fileSystemService: IFileSystemService;
   private _workspaceService: IWorkspaceService;
+  private _loggerService: ILoggerService;
 
   private _gahFileName: string;
 
@@ -22,6 +24,7 @@ export class GahFile {
 
     this._fileSystemService = DIContainer.get(FileSystemService);
     this._workspaceService = DIContainer.get(WorkspaceService);
+    this._loggerService = DIContainer.get(LoggerService);
     this.isInstalled = false;
     this._modules = new Array<GahModuleBase>();
 
@@ -38,15 +41,19 @@ export class GahFile {
     }
   }
 
-  public install() {
+  public async install() {
+    this._loggerService.startProgressBar(this._modules.length, 'modules');
+
     if (this.isHost) {
       this.checkValidConfiguration();
       this.copyHostFiles();
     }
-
-    this._modules.forEach(x => {
-      x.install();
-    });
+    let i = 0;
+    for (const x of this._modules) {
+      await x.install();
+      this._loggerService.updateProgressBar(++i);
+    }
+    this._loggerService.success('Install finished!');
   }
 
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {

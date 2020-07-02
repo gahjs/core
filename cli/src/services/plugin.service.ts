@@ -21,6 +21,8 @@ export class PluginService implements IPluginService {
   private _plugins = new Array<GahPlugin>();
   private _handlers = new Array<GahEventHandler>();
 
+  public pluginNames: { name: string, version: string }[] = [];
+
   @inject(FileSystemService)
   private _fileSystemService: IFileSystemService;
   @inject(LoggerService)
@@ -62,6 +64,7 @@ export class PluginService implements IPluginService {
       const cfg = this._configService.getGahConfig();
       if (cfg.plugins && cfg.plugins.length > 0) {
         for (const plugin of cfg.plugins) {
+          this.pluginNames.push({ name: plugin.name, version: plugin.version });
           await this.loadInstalledPlugin(plugin);
         }
       }
@@ -178,6 +181,14 @@ export class PluginService implements IPluginService {
     this._loggerService.log(`Starting settings configuration for '${pluginName}'`);
     pluginCfg.settings = await plugin['onInstall'](pluginCfg.settings);
     this._loggerService.log('Plugin settings configuration finished');
+    await this._executionService.execute('yarn info @awdware/gah-translation-merger version', false);
+    const vOut = this._executionService.executionResult;
+    const v = vOut.match(/yarn\sinfo\sv\d+.\d+.\d+\s([\w\d.-]+)\sDone/)?.[1];
+    if (!v) {
+      throw Error('Could not find version of the newly installed plugin');
+    }
+    pluginCfg.version = v;
+
 
     if (!cfg.plugins.some(x => x.name === pluginName)) {
       cfg.plugins.push(pluginCfg);

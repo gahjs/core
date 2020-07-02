@@ -1,4 +1,4 @@
-import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService } from '@awdware/gah-shared';
+import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, IPluginService } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
@@ -10,6 +10,7 @@ import DIContainer from '../di-container';
 import { LoggerService } from '../services/logger.service';
 import { ExecutionService } from '../services/execution.service';
 import { GahModuleDef } from './gah-module-def';
+import { PluginService } from '../services/plugin.service';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -17,6 +18,7 @@ export abstract class GahModuleBase {
   protected workspaceService: IWorkspaceService;
   protected executionService: IExecutionService;
   protected loggerService: ILoggerService;
+  protected pluginService: IPluginService;
 
   public basePath: string;
   public srcBasePath: string;
@@ -40,6 +42,7 @@ export abstract class GahModuleBase {
     this.templateService = DIContainer.get(TemplateService);
     this.executionService = DIContainer.get(ExecutionService);
     this.loggerService = DIContainer.get(LoggerService);
+    this.pluginService = DIContainer.get(PluginService);
 
     this.installed = false;
     this.moduleName = moduleName;

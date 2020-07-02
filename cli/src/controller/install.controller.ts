@@ -15,7 +15,8 @@ export class InstallController extends Controller {
 
     const gahFile = new GahFile(fileName);
 
-    gahFile.install();
+
+    await gahFile.install();
 
     this._pluginService.triggerEvent(GahEvent.INSTALL_FINISHED, {} as InstallFinishedEvent);
   }

@@ -3,8 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "gah": "gah",
-    "install": "gah install"
+    "gah": "gah"
   },
   "private": true,
   "dependencies": {
