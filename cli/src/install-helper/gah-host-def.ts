@@ -65,16 +65,16 @@ export class GahHostDef extends GahModuleBase {
 
   private generateFromTemplate() {
     for (const dep of this.allRecursiveDependencies) {
-      this.gahFolder.addGeneratedFileTemplateData(dep.moduleName!, dep.isEntry, dep.baseNgModuleName);
+      this.gahFolder.addGeneratedFileTemplateData(dep.moduleName!, dep.packageName!, dep.isEntry, dep.baseNgModuleName);
     }
     this.gahFolder.generateFileFromTemplate();
   }
 
   private async installPackages() {
-    this.loggerService.startLoadingAnimation('Installing yarn packages');
+    // this.loggerService.startLoadingAnimation('Installing yarn packages');
     const success = await this.executionService.execute('yarn', false, undefined, '.gah');
     if (success) {
-      this.loggerService.stopLoadingAnimation(false, true, 'Packages installed successfully');
+      // this.loggerService.stopLoadingAnimation(false, true, 'Packages installed successfully');
     } else {
       this.loggerService.stopLoadingAnimation(false, false, 'Installing packages failed');
       this.loggerService.error(this.executionService.executionErrorResult);
@@ -116,16 +116,18 @@ export class GahHostDef extends GahModuleBase {
   }
 
   private mergePackageDependencies() {
+    const packageJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
+    // Get package.json from host
+    const packageJson = this.fileSystemService.parseFile<PackageJson>(packageJsonPath);
+    const hostDeps = packageJson.dependencies!;
+    const hostDevDeps = packageJson.devDependencies!;
+
+
     for (const dep of this.allRecursiveDependencies) {
-      const packageJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
-      // Get package.json from host
-      const packageJson = this.fileSystemService.parseFile<PackageJson>(packageJsonPath);
       // Get package.json from module to installed into host
       const externalPackageJson = this.fileSystemService.parseFile<PackageJson>(this.fileSystemService.join(dep.basePath, 'package.json'));
 
       // Getting (dev-)dependency objects from host and module
-      const hostDeps = packageJson.dependencies!;
-      const hostDevDeps = packageJson.devDependencies!;
       const externalDeps = externalPackageJson.dependencies!;
       const externalDevDeps = externalPackageJson.devDependencies!;
 
@@ -144,9 +146,14 @@ export class GahHostDef extends GahModuleBase {
         }
       });
 
-      // Saving the file back into the host package.json
-      this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
     }
+
+    this.pluginService.pluginNames.forEach(x => {
+      hostDevDeps[x.name] = x.version;
+    });
+
+    // Saving the file back into the host package.json
+    this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
   }
 
 

@@ -10,4 +10,5 @@ export interface IPluginService {
   removePlugin(pluginName: string): Promise<boolean>;
   getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null>;
   updatePlugins(pluginNames: string[]): void;
+  pluginNames: { name: string, version: string }[];
 }

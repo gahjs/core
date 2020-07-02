@@ -15,9 +15,9 @@ export class GahModuleDef extends GahModuleBase {
     this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.srcBasePath = this.fileSystemService.getDirectoryPathFromFilePath(moduleCfg.publicApiPath);
     this.initTsConfigObject();
-
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
+    this.packageName = moduleCfg.packageName;
     this.facadePathRelativeToBasePath = moduleCfg.facadePath;
     this.publicApiPathRelativeToBasePath = moduleCfg.publicApiPath;
     this.baseNgModuleName = moduleCfg.baseNgModuleName;

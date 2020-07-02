@@ -1,4 +1,4 @@
-import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService } from '@awdware/gah-shared';
+import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, IPluginService } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
@@ -9,6 +9,8 @@ import { GahFolder } from './gah-folder';
 import DIContainer from '../di-container';
 import { LoggerService } from '../services/logger.service';
 import { ExecutionService } from '../services/execution.service';
+import { GahModuleDef } from './gah-module-def';
+import { PluginService } from '../services/plugin.service';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -16,6 +18,7 @@ export abstract class GahModuleBase {
   protected workspaceService: IWorkspaceService;
   protected executionService: IExecutionService;
   protected loggerService: ILoggerService;
+  protected pluginService: IPluginService;
 
   public basePath: string;
   public srcBasePath: string;
@@ -31,6 +34,7 @@ export abstract class GahModuleBase {
 
   public dependencies: GahModuleBase[];
   public moduleName: string | null;
+  public packageName: string | null;
 
   constructor(gahCfgPath: string, moduleName: string | null) {
     this.fileSystemService = DIContainer.get(FileSystemService);
@@ -38,6 +42,7 @@ export abstract class GahModuleBase {
     this.templateService = DIContainer.get(TemplateService);
     this.executionService = DIContainer.get(ExecutionService);
     this.loggerService = DIContainer.get(LoggerService);
+    this.pluginService = DIContainer.get(PluginService);
 
     this.installed = false;
     this.moduleName = moduleName;
@@ -50,7 +55,7 @@ export abstract class GahModuleBase {
 
   public abstract async install(): Promise<void>;
 
-  public get allRecursiveDependencies(): GahModuleBase[] {
+  public get allRecursiveDependencies(): GahModuleDef[] {
     const allModules = new Array<GahModuleBase>();
     this.dependencies.forEach(dep => {
       this.collectAllReferencedModules(dep, allModules);
@@ -78,7 +83,7 @@ export abstract class GahModuleBase {
   protected addDependenciesToTsConfigFile() {
     for (const dep of this.allRecursiveDependencies) {
       const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, 'public-api');
-      const aliasName = '@gah/' + dep.moduleName!;
+      const aliasName = '@' + dep.packageName + '/' + dep.moduleName!;
 
       this.tsConfigFile.addPathAlias(aliasName, path);
     }

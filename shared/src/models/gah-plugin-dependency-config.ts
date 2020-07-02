@@ -12,4 +12,8 @@ export class GahPluginDependencyConfig {
    * The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available.
    */
   public settings: GahPluginConfig;
+  /**
+   * The version of the plugin that should be used.
+   */
+  public version: string;
 }

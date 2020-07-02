@@ -8,6 +8,7 @@ export class ModulesTemplateData {
 
 export class ModuleTemplateData {
   name: string;
+  packageName: string;
   saveName: string;
   isEntry: boolean;
   publicApiImportPath: string;

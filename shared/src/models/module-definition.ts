@@ -6,6 +6,10 @@ export class ModuleDefinition {
    */
   public name: string;
   /**
+   * The package name of the module. This determins the prefix of the import statement to this module. "import {...} from '@packageName/moduleName'"
+   */
+  public packageName: string;
+  /**
    * The path to the folder containing facade files. This is optional and the path is relative to the folder this config file is in.
    */
   public facadePath?: string;
