@@ -15,7 +15,7 @@
 ✅ CI Support  
 ✅ Reload on save features fully supported for all dependencies  
 ✅ Pluggable: Write your own plugins to add project-specific functionality  
-✅ Use from code: Run all the commands from nodeJS scripts or from build tools like grunt  
+✅ Use from code: Run the `install` and `run` commands from nodeJS scripts or from build tools like grunt  
 
 ## Upcoming
 🆕 Multi-Repository Support  
@@ -54,7 +54,7 @@ $ gah install
 If everything is configured correctly, you will now  be able to run the angular-cli commands for building or serving your application from the host folder.
 
 ### From Code
-You can also use `gah` from code. See the example below.
+You can also use `gah install` from code. See the example below.
 ```TypeScript
 // commonJS import style
 const gah = require('@awdware/gah').gah;
@@ -62,7 +62,8 @@ const gah = require('@awdware/gah').gah;
 // ES6 import style
 import { gah } from '@awdware/gah';
 
-await gah.addPlugin('@awdware/gah-translation-merger'); // <- This does only make sense in rare usecases I think.
-await gah.install(); // <- Usually you would only call install in here I assume.
+await gah.install();
+
+await gah.run('ng build');
 ```
 Please note that all commands are executed for the current working directory of NodeJS. So for adding dependencies you first have to navigate to that folder and execute the script there. (Not within the script but within your terminal!)
