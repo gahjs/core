@@ -93,7 +93,9 @@ export class GahHostDef extends GahModuleBase {
       const absoluteAssetsFolderOfDep = this.fileSystemService.join(absoluteFacadePathOfDep, 'assets');
       if (this.fileSystemService.directoryExists(absoluteAssetsFolderOfDep)) {
         const hostAssetsFolder = this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets', dep.moduleName!);
-        this.fileSystemService.createDirLink(hostAssetsFolder, absoluteAssetsFolderOfDep);
+        this.fileSystemService.copyFilesInDirectory(absoluteAssetsFolderOfDep, hostAssetsFolder);
+        // Symlinks are not copied to dist folder (bug ?)
+        // this.fileSystemService.createDirLink(hostAssetsFolder, absoluteAssetsFolderOfDep);
       }
 
       const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath, 'styles.scss');
