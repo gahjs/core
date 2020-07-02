@@ -57,7 +57,7 @@ export class GahFolder {
 
   public addGeneratedFileTemplateData(moduleName: string, packageName: string, isEntry: boolean, baseNgModuleName?: string) {
     // Get a save name of a module removing some special chars. Mainly dots are probably used in names and have to be replaced.
-    const saveModuleName = moduleName.replace(/[.*:$]/g, '_');
+    const saveModuleName = moduleName.replace(/[.*:$-]/g, '_');
     // Generationg data for the ejs template generation generating the gah-modules.ts
     const newTemplateData = new ModuleTemplateData();
     newTemplateData.name = moduleName;

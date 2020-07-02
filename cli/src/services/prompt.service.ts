@@ -20,7 +20,8 @@ export class PromptService implements IPromptService {
       name: '_',
       message: cfg.msg,
       initial: cfg.default,
-      skip: cfg.cancelled || !cfg.enabled()
+      skip: cfg.cancelled || !cfg.enabled(),
+      validate: cfg.validator
     }).then(_ => (_ as any)._);
   }
 

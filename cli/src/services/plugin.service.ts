@@ -250,13 +250,20 @@ export class PluginService implements IPluginService {
     return updates;
   }
 
-  public async updatePlugins(pluginNames: string[]) {
+  public async updatePlugins(pluginUpdates: PlguinUpdate[]) {
     this._loggerService.startLoadingAnimation('Updating plugins');
-    const success = await this._executionService.execute('yarn add ' + pluginNames.join(' ') + ' -D -E', false, undefined, this.cwd);
+    const success = await this._executionService.execute('yarn add ' + pluginUpdates.map(x => x.name).join(' ') + ' -D -E', false, undefined, this.cwd);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, 'Updated plugins');
     } else {
       this._loggerService.stopLoadingAnimation(false, false, 'Updating plugin(s) failed');
+      throw new Error('Updating plugin(s) failed\n' + this._executionService.executionErrorResult);
     }
+    const gahCfg = this._configService.getGahConfig();
+    pluginUpdates.forEach(pluginUpdate => {
+      const plugin = gahCfg.plugins?.find(x => x.name === pluginUpdate.name);
+      plugin!.version = pluginUpdate.toVersion;
+    });
+    this._configService.saveGahConfig();
   }
 }

@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { GahPluginDependencyConfig } from '@awdware/gah-shared';
+import { GahPluginDependencyConfig, PlguinUpdate } from '@awdware/gah-shared';
 import { Controller } from './controller';
 
 @injectable()
@@ -52,7 +52,7 @@ export class PluginController extends Controller {
   public async update(pluginName: string) {
     const updateablePlugins = await this._pluginService.getUpdateablePlugins(pluginName);
     if (!updateablePlugins || updateablePlugins.length === 0) { return; }
-    let pluginsToUpdate: string[];
+    let pluginsToUpdate: PlguinUpdate[];
     if (!pluginName) {
       const resp = await this._promptService.checkbox({
         msg: 'Please select the plugins you want to update',
@@ -60,9 +60,9 @@ export class PluginController extends Controller {
         enabled: () => true,
         choices: () => updateablePlugins.map(x => x.name + ' ' + x.fromVersion + ' > ' + x.toVersion)
       });
-      pluginsToUpdate = resp.map(x => x.split(' ')[0]);
+      pluginsToUpdate = resp.map(x => x.split(' ')[0]).map(name => updateablePlugins.find(x => x.name === name)!);
     } else {
-      pluginsToUpdate = [pluginName];
+      pluginsToUpdate = [updateablePlugins.find(x => x.name === pluginName)!];
     }
 
     await this._pluginService.updatePlugins(pluginsToUpdate);

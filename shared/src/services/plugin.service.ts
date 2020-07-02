@@ -9,6 +9,6 @@ export interface IPluginService {
   installPlugin(pluginName: string): Promise<boolean>;
   removePlugin(pluginName: string): Promise<boolean>;
   getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null>;
-  updatePlugins(pluginNames: string[]): void;
+  updatePlugins(pluginUpdates: PlguinUpdate[]): Promise<void>;
   pluginNames: { name: string, version: string }[];
 }
