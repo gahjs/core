@@ -1,16 +1,16 @@
-import { IFileSystemService, ModuleTemplateData, ModulesTemplateData, ITemplateService } from '@awdware/gah-shared';
+import { IFileSystemService, ModuleTemplateData, ModulesTemplateData, ITemplateService, GahFolderData } from '@awdware/gah-shared';
 import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
 import { TemplateService } from '../services/template.service';
 import { platform } from 'os';
 
 export class GahFolder {
-  private _fileSystemService: IFileSystemService;
-  private _templateService: ITemplateService;
+  private readonly _fileSystemService: IFileSystemService;
+  private readonly _templateService: ITemplateService;
 
-  private _moduleBaseFolder: string;
-  private pathRelativeToModuleBaseFolder: string;
-  private _modulesTemplateData: ModulesTemplateData;
+  private readonly _moduleBaseFolder: string;
+  private readonly _pathRelativeToModuleBaseFolder: string;
+  private readonly _modulesTemplateData: ModulesTemplateData;
 
   constructor(moduleBaseFolder: string, srcBasePath: string) {
     this._fileSystemService = DIContainer.get(FileSystemService);
@@ -18,19 +18,30 @@ export class GahFolder {
     this._modulesTemplateData = new ModulesTemplateData();
 
     this._moduleBaseFolder = moduleBaseFolder;
-    this.pathRelativeToModuleBaseFolder = this._fileSystemService.join(srcBasePath, '.gah');
+    this._pathRelativeToModuleBaseFolder = this._fileSystemService.join(srcBasePath, '.gah');
+  }
+
+  public data(): GahFolderData {
+    return {
+      dependencyPath: this.dependencyPath,
+      generatedPath: this.generatedPath,
+      moduleBaseFolder: this._moduleBaseFolder,
+      modulesTemplateData: this._modulesTemplateData,
+      pathRelativeToModuleBaseFolder: this._pathRelativeToModuleBaseFolder,
+      stylesPath: this.stylesPath
+    };
   }
 
   public get dependencyPath(): string {
-    return this._fileSystemService.join(this.pathRelativeToModuleBaseFolder, 'dependencies');
+    return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'dependencies');
   }
 
   public get stylesPath(): string {
-    return this._fileSystemService.join(this.pathRelativeToModuleBaseFolder, 'styles');
+    return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'styles');
   }
 
   public get generatedPath(): string {
-    return this._fileSystemService.join(this.pathRelativeToModuleBaseFolder, 'generated');
+    return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'generated');
   }
 
   public cleanDependencyDirectory() {
@@ -51,7 +62,7 @@ export class GahFolder {
   public tryHideGahFolder() {
     if (platform() === 'win32') {
       const fswin = require('fswin');
-      fswin.setAttributesSync(this._fileSystemService.join(this._moduleBaseFolder, this.pathRelativeToModuleBaseFolder), { IS_HIDDEN: true });
+      fswin.setAttributesSync(this._fileSystemService.join(this._moduleBaseFolder, this._pathRelativeToModuleBaseFolder), { IS_HIDDEN: true });
     }
   }
 

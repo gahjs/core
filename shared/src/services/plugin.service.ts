@@ -1,5 +1,4 @@
-import { GahEventPayload } from '../models/gah-event-payload.model';
-import { GahEvent } from '../models/gah-event';
+import { GahEvent, GahEventPayload } from '../models/gah-event';
 import { PlguinUpdate } from '../models/plugin-update';
 
 export interface IPluginService {

@@ -2,33 +2,40 @@ import { injectable } from 'inversify';
 import { ILoggerService } from '@awdware/gah-shared';
 import ora, { Ora } from 'ora';
 import chalk from 'chalk';
-import { SingleBar, Presets } from 'cli-progress';
 
 @injectable()
 export class LoggerService implements ILoggerService {
   private _ora: Ora;
+  private _lastOraText: string;
   public debugLoggingEnabled: boolean;
-  private _pBar: SingleBar;
-  private _progressRunning: boolean;
 
   public log(text: string) {
-    this.stopExistingAnimations();
-    console.log(chalk.blue(' ■ ') + text);
+    this.interruptLoading(() => {
+      console.log(chalk.blue(' ■ ') + text);
+    });
   }
+
   public warn(text: string) {
-    this.stopExistingAnimations();
-    console.warn(chalk.yellow(' ■ ') + text);
+    this.interruptLoading(() => {
+      console.warn(chalk.yellow(' ■ ') + text);
+    });
   }
   public error(text: string) {
-    this.stopExistingAnimations();
-    console.error(chalk.red(' ■ ') + text);
+    this.interruptLoading(() => {
+      console.error(chalk.red(' ■ ') + text);
+    });
   }
   public debug(text: string) {
-    if (this.debugLoggingEnabled) { console.log(chalk.magenta(' ■ ') + text); }
+    if (this.debugLoggingEnabled) {
+      this.interruptLoading(() => {
+        console.log(chalk.magenta(' ■ ') + text);
+      });
+    }
   }
   public success(text: string) {
-    this.stopExistingAnimations();
-    console.log(chalk.green(' ■ ') + text);
+    this.interruptLoading(() => {
+      console.log(chalk.green(' ■ ') + text);
+    });
   }
 
   public enableDebugLogging(): void {
@@ -36,7 +43,6 @@ export class LoggerService implements ILoggerService {
   }
 
   public startLoadingAnimation(text: string) {
-    this.stopExistingAnimations();
     this._ora = ora({
       text: text,
       spinner: {
@@ -44,6 +50,7 @@ export class LoggerService implements ILoggerService {
         frames: [' ▄', ' ■', ' ▀', ' ▀', ' ■']
       }
     }).start();
+    this._lastOraText = text;
   }
 
   public stopLoadingAnimation(removeLine: boolean = false, succeeded: boolean = true, text?: string): void {
@@ -64,30 +71,14 @@ export class LoggerService implements ILoggerService {
     }
   }
 
-  public updateProgressBar(value: number) {
-    this._pBar.update(value);
-
-    if (this._pBar.getTotal() === value) {
-      this._pBar.stop();
+  interruptLoading(interruptForAction: () => void) {
+    const isSpinning = this._ora?.isSpinning;
+    if (isSpinning) {
+      this._ora.stop();
     }
-  }
-
-  public startProgressBar(total: number, description: string) {
-
-    this._pBar = new SingleBar({
-      format: chalk.yellow('{bar}') + ' {value}/{total} ' + description,
-      hideCursor: true,
-      clearOnComplete: true
-    }, Presets.rect);
-
-    this._progressRunning = true;
-    this._pBar.start(total, 0, { description });
-  }
-
-  private stopExistingAnimations() {
-    if (this._progressRunning) {
-      this._pBar.stop();
-      this._progressRunning = false;
+    interruptForAction();
+    if (isSpinning) {
+      this.startLoadingAnimation(this._lastOraText);
     }
   }
 }

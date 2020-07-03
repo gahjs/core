@@ -16,17 +16,17 @@ import { RunController } from './run.controller';
 @injectable()
 export class MainController extends Controller {
   @inject(InitController)
-  private _initController: InitController;
+  private readonly _initController: InitController;
   @inject(DependencyController)
-  private _dependencyController: DependencyController;
+  private readonly _dependencyController: DependencyController;
   @inject(HostModuleController)
-  private _hostModuleController: HostModuleController;
+  private readonly _hostModuleController: HostModuleController;
   @inject(InstallController)
-  private _installController: InstallController;
+  private readonly _installController: InstallController;
   @inject(PluginController)
-  private _pluginController: PluginController;
+  private readonly _pluginController: PluginController;
   @inject(RunController)
-  private _runController: RunController;
+  private readonly _runController: RunController;
 
   public async main() {
 

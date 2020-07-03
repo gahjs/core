@@ -14,7 +14,8 @@
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2018,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": "./tsconfig.json"
   },
   "plugins": [
     "@typescript-eslint"
@@ -38,6 +39,13 @@
     "@typescript-eslint/no-unused-vars": [
       "warn"
     ],
-    "curly": "warn"
+    "curly": "warn",
+    "@typescript-eslint/prefer-readonly": [
+      "warn"
+    ],
+    "max-len": [
+      "warn",
+      180
+    ]
   }
 }

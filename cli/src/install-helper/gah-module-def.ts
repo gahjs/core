@@ -1,11 +1,12 @@
 import { GahModuleBase } from './gah-module-base';
-import { GahModule } from '@awdware/gah-shared';
+import { GahModule, GahModuleData } from '@awdware/gah-shared';
 import { GahFolder } from './gah-folder';
 
 export class GahModuleDef extends GahModuleBase {
 
   constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, moduleName);
+    this.isHost = false;
     initializedModules.push(this);
 
     const moduleCfg = this.fileSystemService.parseFile<GahModule>(gahCfgPath).modules.find(x => x.name === moduleName);
@@ -35,6 +36,10 @@ export class GahModuleDef extends GahModuleBase {
     });
 
     this.gahFolder = new GahFolder(this.basePath, this.srcBasePath);
+  }
+
+  public specificData(): Partial<GahModuleData> {
+    return {};
   }
 
   public async install() {

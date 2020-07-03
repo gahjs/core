@@ -5,7 +5,6 @@ export * from './models/gah-module-type';
 export * from './models/gah-environment';
 export * from './models/gah-event';
 export * from './models/gah-event-handler';
-export * from './models/gah-event-payload.model';
 export * from './models/gah-plugin';
 export * from './models/module-definition';
 export * from './models/module-reference';
@@ -17,7 +16,10 @@ export * from './models/gah-plugin-dependency-config';
 export * from './models/package-json';
 export * from './models/plugin-update';
 
-export * from './models/events/install-finished.event';
+export * from './models/install-helper/gah-file';
+export * from './models/install-helper/gah-folder';
+export * from './models/install-helper/gah-module-base';
+export * from './models/install-helper/ts-config-file';
 
 export * from './services/configuration.service';
 export * from './services/context.service';

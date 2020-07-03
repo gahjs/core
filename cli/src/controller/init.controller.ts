@@ -200,7 +200,8 @@ export class InitController extends Controller {
         this._loggerService.warn(`'${path.basename(conflictingFilePath)}'`);
       }
       if (conflictingFiles.length > 5) { this._loggerService.warn(` ... And ${conflictingFiles.length - 5} more.`); }
-      this._loggerService.warn('Cancelling host creation to prevent loss of data / changes. Either start the host initialization in a different directory or use --force to enforce overwriting the generated files.');
+      this._loggerService.warn('Cancelling host creation to prevent loss of data / changes.'
+        + ' Either start the host initialization in a different directory or use --force to enforce overwriting the generated files.');
       return false;
     }
 

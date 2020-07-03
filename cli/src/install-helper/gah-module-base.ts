@@ -1,4 +1,4 @@
-import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, IPluginService, IConfigurationService, GahConfig } from '@awdware/gah-shared';
+import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, IPluginService, GahConfig, GahModuleData } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
@@ -11,7 +11,6 @@ import { LoggerService } from '../services/logger.service';
 import { ExecutionService } from '../services/execution.service';
 import { GahModuleDef } from './gah-module-def';
 import { PluginService } from '../services/plugin.service';
-import { ConfigService } from '../services/config.service';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -54,6 +53,31 @@ export abstract class GahModuleBase {
     if (this.fileSystemService.fileExists(gahCfgPath)) {
       this.gahConfig = this.fileSystemService.parseFile<GahConfig>(gahCfgPath);
     }
+  }
+
+  public abstract specificData(): Partial<GahModuleData>;
+
+  public data(): GahModuleData {
+    const myData: GahModuleData = {
+      basePath: this.basePath,
+      dependencies: this.dependencies.map(x => x.data()),
+      gahConfig: this.gahConfig,
+      gahFolder: this.gahFolder.data(),
+      installed: this.installed,
+      isEntry: this.isEntry,
+      isHost: this.isHost,
+      publicApiPathRelativeToBasePath: this.publicApiPathRelativeToBasePath,
+      srcBasePath: this.srcBasePath,
+      tsConfigFile: this.tsConfigFile.data(),
+      baseNgModuleName: this.baseNgModuleName,
+      facadePathRelativeToBasePath: this.facadePathRelativeToBasePath,
+      moduleName: this.moduleName ?? undefined,
+      packageName: this.packageName ?? undefined
+    };
+
+    const specificData = this.specificData();
+
+    return Object.assign(myData, specificData);
   }
 
   protected initTsConfigObject() {

@@ -1,5 +1,4 @@
-import { GahEvent } from './gah-event';
-import { GahEventPayload } from './gah-event-payload.model';
+import { GahEvent, GahEventPayload } from './gah-event';
 
 export class GahEventHandler {
   public event: GahEvent;

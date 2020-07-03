@@ -8,6 +8,4 @@ export interface ILoggerService {
   startLoadingAnimation(text: string): void;
   stopLoadingAnimation(removeLine?: boolean, succeeded?: boolean, text?: string): void
   enableDebugLogging(): void;
-  updateProgressBar(value: number): void;
-  startProgressBar(total: number, description: string): void;
 }

@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { GahEvent, InstallFinishedEvent, GahModuleType } from '@awdware/gah-shared';
+import { GahEvent, InstallFinishedEvent, InstallStartedEvent, GahModuleType } from '@awdware/gah-shared';
 
 import { Controller } from './controller';
 import { GahFile } from '../install-helper/gah-file';
@@ -15,6 +15,7 @@ export class InstallController extends Controller {
 
     const gahFile = new GahFile(fileName);
 
+    this._pluginService.triggerEvent(GahEvent.INSTALL_STARTED, { gahFile: gahFile.data() } as InstallStartedEvent);
 
     await gahFile.install();
 

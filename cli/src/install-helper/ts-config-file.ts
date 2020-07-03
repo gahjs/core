@@ -1,10 +1,18 @@
-import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig } from '@awdware/gah-shared';
+import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData } from '@awdware/gah-shared';
 
 export class TsConfigFile {
-  private _fileSystemService: IFileSystemService;
+  private readonly _fileSystemService: IFileSystemService;
 
-  private _path: string;
-  private _tsConfig: TsConfig;
+  private readonly _path: string;
+  private readonly _tsConfig: TsConfig;
+
+
+  public data(): TsConfigFileData {
+    return {
+      path: this._path,
+      tsConfig: this._tsConfig
+    };
+  }
 
   public clean() {
     if (!this._tsConfig.compilerOptions.paths) {

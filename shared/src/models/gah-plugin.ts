@@ -5,8 +5,7 @@ import { ITemplateService } from '../services/template.service';
 import { IPromptService } from '../services/prompt.service';
 import { IWorkspaceService } from '../services/workspace.service';
 import { IPluginService } from '../services/plugin.service';
-import { GahEventPayload } from './gah-event-payload.model';
-import { GahEvent } from './gah-event';
+import { GahEvent, GahEventPayload } from './gah-event';
 import { GahPluginConfig } from './gah-plugin-config';
 import { IExecutionService } from '../services/execution.service';
 

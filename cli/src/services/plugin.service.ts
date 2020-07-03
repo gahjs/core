@@ -18,27 +18,27 @@ import { ContextService } from './context-service';
 
 @injectable()
 export class PluginService implements IPluginService {
-  private _plugins = new Array<GahPlugin>();
-  private _handlers = new Array<GahEventHandler>();
+  private readonly _plugins = new Array<GahPlugin>();
+  private readonly _handlers = new Array<GahEventHandler>();
 
   public pluginNames: { name: string, version: string }[] = [];
 
   @inject(FileSystemService)
-  private _fileSystemService: IFileSystemService;
+  private readonly _fileSystemService: IFileSystemService;
   @inject(LoggerService)
-  private _loggerService: ILoggerService;
+  private readonly _loggerService: ILoggerService;
   @inject(ConfigService)
-  private _configService: IConfigurationService;
+  private readonly _configService: IConfigurationService;
   @inject(TemplateService)
-  private _templateService: ITemplateService;
+  private readonly _templateService: ITemplateService;
   @inject(PromptService)
-  private _promptService: IPromptService;
+  private readonly _promptService: IPromptService;
   @inject(WorkspaceService)
-  private _workspaceService: IWorkspaceService;
+  private readonly _workspaceService: IWorkspaceService;
   @inject(ExecutionService)
-  private _executionService: IExecutionService;
+  private readonly _executionService: IExecutionService;
   @inject(ContextService)
-  private _contextService: IContextService;
+  private readonly _contextService: IContextService;
 
   private get packageJsonPath(): string {
     return this._contextService.getContext().calledFromHostFolder ? '.gah/package.json' : 'package.json';
