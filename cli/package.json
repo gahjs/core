@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.44",
+  "version": "0.0.50",
   "homepage": "https://github.com/awdware/gah",
   "repository": {
     "type": "git",
@@ -31,7 +31,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@awdware/gah-shared": "0.0.16",
+    "@awdware/gah-shared": "^0.0.19",
     "chalk": "^4.0.0",
     "change-case": "^4.1.1",
     "cli-progress": "^3.8.2",
@@ -61,6 +61,6 @@
     "eslint": "^6.8.0",
     "legally": "^3.5.2",
     "ts-node": "^8.10.1",
-    "typescript": "~3.8.3"
+    "typescript": "~3.9.4"
   }
 }

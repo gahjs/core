@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@awdware/gah-shared@0.0.13":
-  version "0.0.13"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.13.tgz#2a57a5e6d1132b92b662a15930ceb60bde13ea01"
-  integrity sha512-VpmwG9gevnow319QlxCc0bTJXCWfSdIKrcbJ92bL5ExpxK5X9p6vTMcdXpLcSHeKpKioXXsf6DE0Hn4BYkKTBg==
+"@awdware/gah-shared@^0.0.19":
+  version "0.0.19"
+  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.19.tgz#044ac042e091c2e48fd4297550d3928128bbf44b"
+  integrity sha512-U+WDKCyCmS+3qqzLTLsXYlVmzRsAW/dnHdQfcTfahD/BcI/x+gwZYwBIlgycEChj/b4O3xLkpNuLaWHssyz1IA==
 
 "@babel/code-frame@^7.0.0":
   version "7.10.1"
@@ -2585,10 +2585,10 @@ type-fest@^0.8.1:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.8.1.tgz#09e249ebde851d3b1e48d27c105444667f17b83d"
   integrity sha512-4dbzIzqvjtgiM5rw1k5rEHtBANKmdudhGyBEajN01fEyhaAIhsoKNy6y7+IN93IfpFtwY9iqi7kD+xwKhQsNJA==
 
-typescript@~3.8.3:
-  version "3.8.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.8.3.tgz#409eb8544ea0335711205869ec458ab109ee1061"
-  integrity sha512-MYlEfn5VrLNsgudQTVJeNaQFUAI7DkhnOjdpAp4T+ku1TfQClewlbSuTVHiA+8skNBgaf02TL/kLOvig4y3G8w==
+typescript@~3.9.4:
+  version "3.9.6"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-3.9.6.tgz#8f3e0198a34c3ae17091b35571d3afd31999365a"
+  integrity sha512-Pspx3oKAPJtjNwE92YS05HQoY7z2SFyOpHo9MqJor3BXAGNaPUs83CuVp9VISFkSjyRfiTpmKuAYGJB7S7hOxw==
 
 union-value@^1.0.0:
   version "1.0.1"
