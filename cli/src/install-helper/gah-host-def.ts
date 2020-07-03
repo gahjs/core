@@ -4,6 +4,7 @@ import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 
 export class GahHostDef extends GahModuleBase {
+  private _ngOptions: { aot: boolean } = {} as any;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
@@ -28,7 +29,7 @@ export class GahHostDef extends GahModuleBase {
         }
       });
     });
-
+    this._ngOptions.aot = hostCfg.aot;
     this.gahFolder = new GahFolder(this.basePath, this.srcBasePath + '/app');
   }
 
@@ -56,6 +57,7 @@ export class GahHostDef extends GahModuleBase {
     this.generateStyleImports();
     this.adjustGitignore();
     this.adjustGitignoreForHost();
+    this.adjustAngularJsonConfig();
     await this.installPackages();
   }
 
@@ -76,7 +78,7 @@ export class GahHostDef extends GahModuleBase {
     if (success) {
       // this.loggerService.stopLoadingAnimation(false, true, 'Packages installed successfully');
     } else {
-      this.loggerService.stopLoadingAnimation(false, false, 'Installing packages failed');
+      // this.loggerService.stopLoadingAnimation(false, false, 'Installing packages failed');
       this.loggerService.error(this.executionService.executionErrorResult);
     }
   }
@@ -96,6 +98,7 @@ export class GahHostDef extends GahModuleBase {
         this.fileSystemService.copyFilesInDirectory(absoluteAssetsFolderOfDep, hostAssetsFolder);
         // Symlinks are not copied to dist folder (bug ?)
         // this.fileSystemService.createDirLink(hostAssetsFolder, absoluteAssetsFolderOfDep);
+        // Possible fix: Include symlinked folder directly in assets config in angular json
       }
 
       const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath, 'styles.scss');
@@ -124,6 +127,11 @@ export class GahHostDef extends GahModuleBase {
     const hostDeps = packageJson.dependencies!;
     const hostDevDeps = packageJson.devDependencies!;
 
+    const blocklistPackages = new Array<string>();
+
+    for (const dep of this.allRecursiveDependencies) {
+      blocklistPackages.push('@' + dep.packageName + '/' + dep.moduleName!);
+    }
 
     for (const dep of this.allRecursiveDependencies) {
       // Get package.json from module to installed into host
@@ -133,18 +141,18 @@ export class GahHostDef extends GahModuleBase {
       const externalDeps = externalPackageJson.dependencies!;
       const externalDevDeps = externalPackageJson.devDependencies!;
 
-      const deps = Object.keys(externalDeps);
+      const deps = Object.keys(externalDeps).filter(x => blocklistPackages.indexOf(x) === - 1);
       const devDeps = Object.keys(externalDevDeps);
 
       // Merging module (dev-)dependencies into host
-      deps.forEach((dep) => {
-        if (!hostDeps[dep]) {
-          hostDeps[dep] = externalDeps[dep];
+      deps.forEach((d) => {
+        if (!hostDeps[d] || dep.isEntry) {
+          hostDeps[d] = externalDeps[d];
         }
       });
-      devDeps.forEach((dep) => {
-        if (!hostDevDeps[dep]) {
-          hostDevDeps[dep] = externalDevDeps[dep];
+      devDeps.forEach((d) => {
+        if (!hostDevDeps[d] || dep.isEntry) {
+          hostDevDeps[d] = externalDevDeps[d];
         }
       });
 
@@ -158,5 +166,13 @@ export class GahHostDef extends GahModuleBase {
     this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
   }
 
+  private adjustAngularJsonConfig() {
+    const ngJsonPath = this.fileSystemService.join(this.basePath, 'angular.json');
+    const ngJson = this.fileSystemService.parseFile<any>(ngJsonPath);
+    if (!this._ngOptions.aot) {
+      ngJson.projects['gah-host'].architect.build.options.aot = false;
+    }
+    this.fileSystemService.saveObjectToFile(ngJsonPath, ngJson, true);
+  }
 
 }

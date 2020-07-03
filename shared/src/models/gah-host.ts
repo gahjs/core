@@ -7,6 +7,11 @@ export class GahHost {
    */
   public modules: ModuleReference[];
 
+  /**
+   * Use aot compilation for the host? (Enabled by default)
+   */
+  public aot: boolean = true;
+
   public get isHost() { return true; }
 
   constructor() {
