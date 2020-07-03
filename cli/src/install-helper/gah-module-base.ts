@@ -1,4 +1,4 @@
-import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, IPluginService } from '@awdware/gah-shared';
+import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, IPluginService, IConfigurationService, GahConfig } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
@@ -11,6 +11,7 @@ import { LoggerService } from '../services/logger.service';
 import { ExecutionService } from '../services/execution.service';
 import { GahModuleDef } from './gah-module-def';
 import { PluginService } from '../services/plugin.service';
+import { ConfigService } from '../services/config.service';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -27,6 +28,7 @@ export abstract class GahModuleBase {
   public baseNgModuleName?: string;
   protected isHost: boolean;
   protected installed: boolean;
+  protected gahConfig: GahConfig;
   public isEntry: boolean;
 
   public tsConfigFile: TsConfigFile;
@@ -36,7 +38,7 @@ export abstract class GahModuleBase {
   public moduleName: string | null;
   public packageName: string | null;
 
-  constructor(gahCfgPath: string, moduleName: string | null) {
+  constructor(gahModulePath: string, moduleName: string | null) {
     this.fileSystemService = DIContainer.get(FileSystemService);
     this.workspaceService = DIContainer.get(WorkspaceService);
     this.templateService = DIContainer.get(TemplateService);
@@ -47,6 +49,11 @@ export abstract class GahModuleBase {
     this.installed = false;
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
+
+    const gahCfgPath = this.fileSystemService.join(this.fileSystemService.getDirectoryPathFromFilePath(gahModulePath), 'gah-config.json');
+    if (this.fileSystemService.fileExists(gahCfgPath)) {
+      this.gahConfig = this.fileSystemService.parseFile<GahConfig>(gahCfgPath);
+    }
   }
 
   protected initTsConfigObject() {
@@ -81,6 +88,10 @@ export abstract class GahModuleBase {
   }
 
   protected addDependenciesToTsConfigFile() {
+    if (this.gahConfig?.skipTsConfigPathsAdjustments) {
+      return;
+    }
+
     for (const dep of this.allRecursiveDependencies) {
 
       // /public-api.ts or / Index.ts or similar. Usually without sub-folders

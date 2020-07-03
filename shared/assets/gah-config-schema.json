@@ -3,7 +3,7 @@
     "properties": {
         "$schema": {
             "type": "string",
-            "default": "https://raw.githubusercontent.com/awdware/gah/master/assets/gah-config-schema.json"
+            "default": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-config-schema.json"
         },
         "plugins": {
             "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
@@ -11,6 +11,10 @@
             "items": {
                 "$ref": "#/definitions/GahPluginDependencyConfig"
             }
+        },
+        "skipTsConfigPathsAdjustments": {
+            "description": "If this property is set to true, gah will not adjust the paths object in the tsconfig json of the module(s) in this folder.",
+            "type": "boolean"
         }
     },
     "definitions": {
@@ -25,6 +29,10 @@
                 "settings": {
                     "$ref": "#/definitions/GahPluginConfig",
                     "description": "The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available."
+                },
+                "version": {
+                    "description": "The version of the plugin that should be used.",
+                    "type": "string"
                 }
             }
         },

@@ -1,7 +1,7 @@
 import { ModuleReference } from './module-reference';
 
 export class GahHost {
-  protected $schema: string = 'https://raw.githubusercontent.com/awdware/gah/master/assets/gah-host-schema.json';
+  protected $schema: string = 'https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-host-schema.json';
   /**
    * The array of the modules that should be loaded for this host.
    */

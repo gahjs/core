@@ -4,7 +4,7 @@
     "properties": {
         "$schema": {
             "type": "string",
-            "default": "\"https://raw.githubusercontent.com/awdware/gah/master/assets/gah-environment-schema.json\""
+            "default": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-environment-schema.json"
         },
         "production": {
             "type": "boolean"

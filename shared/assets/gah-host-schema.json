@@ -3,7 +3,7 @@
     "properties": {
         "$schema": {
             "type": "string",
-            "default": "https://raw.githubusercontent.com/awdware/gah/master/assets/gah-host-schema.json"
+            "default": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-host-schema.json"
         },
         "modules": {
             "description": "The array of the modules that should be loaded for this host.",
@@ -11,6 +11,11 @@
             "items": {
                 "$ref": "#/definitions/ModuleReference"
             }
+        },
+        "aot": {
+            "description": "Use aot compilation for the host? (Enabled by default)",
+            "type": "boolean",
+            "default": true
         },
         "isHost": {
             "type": "boolean"
