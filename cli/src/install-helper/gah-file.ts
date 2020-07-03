@@ -56,18 +56,18 @@ export class GahFile {
   }
 
   public async install() {
-    this._loggerService.startLoadingAnimation(`Installing modules 1/${this._modules.length}`);
+    this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, 0)} 1/${this._modules.length}`);
 
     if (this.isHost) {
       this.checkValidConfiguration();
       this.copyHostFiles();
       this._pluginService.triggerEvent(GahEvent.HOST_COPIED, { gahFile: this.data() } as HostCopiedEvent);
     }
-    let i = 1;
+    let i = 0;
     for (const x of this._modules) {
       this._pluginService.triggerEvent(GahEvent.STARTING_MODULE_INSTALL, { module: x.data() } as StartingModuleInstallEvent);
       this._loggerService.stopLoadingAnimation(true);
-      this._loggerService.startLoadingAnimation(`Installing modules ${i}/${this._modules.length}`);
+      this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, i)} ${i}/${this._modules.length}`);
       await x.install();
       i++;
       this._pluginService.triggerEvent(GahEvent.FINISHED_MODULE_INSTALL, { module: x.data() } as FinishedgModuleInstallEvent);

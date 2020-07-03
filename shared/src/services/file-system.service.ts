@@ -104,13 +104,13 @@ export interface IFileSystemService {
    * @param linkPath  The path of the link that gets created.
    * @param realPath  The path of the directory that should get linked to.
    */
-  createDirLink(linkPath: string, realPath: string): void;
+  createDirLink(linkPath: string, realPath: string): Promise<void>;
   /**
    * Synchronously creates a symbolic link to a file.
    * @param linkPath  The path of the link that gets created.
    * @param realPath  The path of the file that should get linked to.
    */
-  createFileLink(linkPath: string, realPath: string): void;
+  createFileLink(linkPath: string, realPath: string): Promise<void>;
   /**
    * Get the name of the current working directory
    */

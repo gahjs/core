@@ -7,6 +7,7 @@ import {
 } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
+import readline from 'readline';
 
 export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
@@ -69,7 +70,7 @@ export class GahHostDef extends GahModuleBase {
       + '  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n');
     this.pluginService.triggerEvent(GahEvent.STYLES_FILE_GENERATED, { module: this.data() } as StylesFileGeneratedEvent);
 
-    this.createSymlinksToDependencies();
+    await this.createSymlinksToDependencies();
     this.pluginService.triggerEvent(GahEvent.SYMLINKS_CREATED, { module: this.data() } as SymlinksCreatedEvent);
 
     this.addDependenciesToTsConfigFile();
@@ -103,12 +104,49 @@ export class GahHostDef extends GahModuleBase {
   }
 
   private async installPackages() {
-    // this.loggerService.startLoadingAnimation('Installing yarn packages');
-    const success = await this.executionService.execute('yarn', false, undefined, '.gah');
+    this.loggerService.log('Installing yarn packages');
+    let state = 0;
+    let stateString = 'Installing yarn packages';
+    const success = await this.executionService.execute('yarn', true, (test) => {
+
+      // This is just for super fancy logging:
+
+      if (test.indexOf('Done in') !== -1) {
+        state = 4;
+        stateString = 'Done.';
+      } else if (test.indexOf('[4/4]') !== -1) {
+        state = 4;
+        stateString = 'Building fresh packages';
+      } else if (test.indexOf('[3/4]') !== -1) {
+        state = 3;
+        stateString = 'Linking dependencies';
+      } else if (test.indexOf('[2/4]') !== -1) {
+        state = 2;
+        stateString = 'Fetching packages';
+      } else if (test.indexOf('[1/4]') !== -1) {
+        state = 1;
+        stateString = 'Resolving packages';
+      }
+
+      this.loggerService.interruptLoading(() => {
+        readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
+        readline.clearLine(process.stdout, 0);
+      });
+      this.loggerService.log(`${this.loggerService.getProgressBarString(4, state)} [${state}/4] ${stateString}`);
+      return '';
+
+      // Super fancy logging end.
+    }, '.gah');
+
+    this.loggerService.interruptLoading(() => {
+      readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
+      readline.clearLine(process.stdout, 0);
+    });
+
     if (success) {
-      // this.loggerService.stopLoadingAnimation(false, true, 'Packages installed successfully');
+      this.loggerService.success('Packages installed successfully');
     } else {
-      // this.loggerService.stopLoadingAnimation(false, false, 'Installing packages failed');
+      this.loggerService.error('Installing packages failed');
       this.loggerService.error(this.executionService.executionErrorResult);
     }
   }

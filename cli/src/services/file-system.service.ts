@@ -10,9 +10,9 @@ import { LoggerService } from './logger.service';
 @injectable()
 export class FileSystemService implements IFileSystemService {
   @inject(ExecutionService)
-  private _executionService: IExecutionService;
+  private readonly _executionService: IExecutionService;
   @inject(LoggerService)
-  private _loggerService: ILoggerService;
+  private readonly _loggerService: ILoggerService;
 
   constructor() { }
 
@@ -109,25 +109,25 @@ export class FileSystemService implements IFileSystemService {
     fs.copyFileSync(file, path_.join(destinationFolder, path_.basename(file)));
   }
 
-  createDirLink(linkPath: string, realPath: string) {
+  async createDirLink(linkPath: string, realPath: string) {
     if (platform() === 'win32') {
       const cmd = 'mklink /j "' + linkPath + '" "' + realPath + '"';
-      this._executionService.execute(cmd, false).then(success => {
+      await this._executionService.execute(cmd, false).then(success => {
         if (!success) { throw new Error(this._executionService.executionErrorResult); }
       });
     } else {
-      fs.ensureSymlinkSync(realPath, linkPath, 'dir');
+      fs.ensureSymlink(realPath, linkPath, 'dir');
     }
   }
 
-  createFileLink(linkPath: string, realPath: string) {
+  async createFileLink(linkPath: string, realPath: string) {
     if (platform() === 'win32') {
       const cmd = 'mklink /h "' + linkPath + '" "' + realPath + '"';
-      this._executionService.execute(cmd, false).then(success => {
+      await this._executionService.execute(cmd, false).then(success => {
         if (!success) { throw new Error(this._executionService.executionErrorResult); }
       });
     } else {
-      fs.ensureSymlinkSync(realPath, linkPath, 'file');
+      await fs.ensureSymlink(realPath, linkPath, 'file');
     }
   }
 

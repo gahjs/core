@@ -113,7 +113,9 @@ export class PluginService implements IPluginService {
           handler.handler(payload);
         } catch (error) {
           this._loggerService.error('Error in plugin ' + handler.pluginName + '.\nCallstack from plugin:');
-          throw error;
+          this._loggerService.error(error);
+          this._loggerService.log('--------------------------------------------------------------------------------');
+          this._loggerService.log('Trying to continue with execution...\n');
         }
       }
     });
@@ -198,12 +200,12 @@ export class PluginService implements IPluginService {
   }
 
   private async removePackage(pluginName: string) {
-    this._loggerService.startLoadingAnimation('Cleaning up downloaded files.');
+    this._loggerService.startLoadingAnimation('Cleaning up downloaded packages.');
     const success = await this._executionService.execute('yarn remove ' + pluginName, false, undefined, this.cwd);
     if (success) {
-      this._loggerService.stopLoadingAnimation(false, true, 'Cleaned up downloaded files.');
+      this._loggerService.stopLoadingAnimation(false, true, 'Cleaned up downloaded packages.');
     } else {
-      this._loggerService.stopLoadingAnimation(false, false, 'Uninstalling plugin failed!');
+      this._loggerService.stopLoadingAnimation(false, false, 'Cleaning up downloaded packages failed! Stacktrace:');
       this._loggerService.error(this._executionService.executionErrorResult);
     }
   }

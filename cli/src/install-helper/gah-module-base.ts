@@ -103,11 +103,11 @@ export abstract class GahModuleBase {
     });
   }
 
-  protected createSymlinksToDependencies() {
+  protected async createSymlinksToDependencies() {
     for (const dep of this.allRecursiveDependencies) {
       const from = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath, dep.moduleName!);
       const to = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
-      this.fileSystemService.createDirLink(from, to);
+      await this.fileSystemService.createDirLink(from, to);
     }
   }
 

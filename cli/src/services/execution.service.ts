@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 import { exec, spawn } from 'child_process';
 import { IExecutionService } from '@awdware/gah-shared';
+import fs from 'fs';
 
 @injectable()
 export class ExecutionService implements IExecutionService {
@@ -25,11 +26,16 @@ export class ExecutionService implements IExecutionService {
         }
       });
       childProcess.stderr?.on('data', buffer => {
-        if (outPut) {
-          console.error(buffer);
-        }
         this.executionResult += buffer;
         this.executionErrorResult += buffer;
+        if (outPut) {
+          if (outPutCallback) {
+            const newOut = outPutCallback(buffer);
+            if (newOut) { console.log(newOut); }
+          } else {
+            console.error(buffer);
+          }
+        }
       });
 
       childProcess.on('exit', code => {

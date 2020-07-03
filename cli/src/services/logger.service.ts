@@ -71,7 +71,11 @@ export class LoggerService implements ILoggerService {
     }
   }
 
-  interruptLoading(interruptForAction: () => void) {
+  public getProgressBarString(total: number, current: number, length: number = 30, char0: string = '·', char1: string = '■'): string {
+    return chalk.gray('■') + chalk.blue(char1.repeat(current / total * length) + char0.repeat((1 - current / total) * length)) + chalk.gray('■');
+  }
+
+  public interruptLoading(interruptForAction: () => void) {
     const isSpinning = this._ora?.isSpinning;
     if (isSpinning) {
       this._ora.stop();
