@@ -1,12 +1,12 @@
 {
   "name": "@awdware/gah-shared",
-  "version": "0.0.16",
+  "version": "0.0.19",
   "description": "Provides types and interfaces for gah",
   "main": "./lib/index.js",
   "scripts": {
     "prebuild": "del-cli lib",
     "lint": "eslint src/** --fix",
-    "build": "yarn run prebuild && tsc -p .",
+    "build": "yarn run prebuild && tsc -p . && node ts-version-support.js",
     "drop": "yarn run build && yarn publish --access public --no-git-tag-version",
     "schema": "node generate-schema.js"
   },
@@ -19,9 +19,19 @@
     "@typescript-eslint/eslint-plugin": "^2.29.0",
     "@typescript-eslint/parser": "^2.29.0",
     "del-cli": "^3.0.0",
+    "downlevel-dts": "^0.5.0",
     "eslint": "^6.8.0",
+    "fs-extra": "^9.0.1",
     "ts-node": "^8.9.1",
-    "typescript": "^3.8.3",
+    "typescript": "^3.9.4",
     "typescript-json-schema": "^0.42.0"
+  },
+  "types": "lib/index.d.ts",
+  "typesVersions": {
+    "<3.9": {
+      "*": [
+        "type-compat/ts3.4/*"
+      ]
+    }
   }
 }
