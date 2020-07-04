@@ -239,6 +239,17 @@ export class GahHostDef extends GahModuleBase {
     const ngJson = this.fileSystemService.parseFile<any>(ngJsonPath);
     if (!this._ngOptions.aot) {
       ngJson.projects['gah-host'].architect.build.options.aot = false;
+
+      const configs = ngJson.projects['gah-host'].architect.build.configurations;
+      const keys = Object.keys(configs);
+      keys.forEach(key => {
+        // buildOptimizer is only available when using aot. We have to disable it for all configurations
+        if (configs[key].buildOptimizer !== undefined) {
+          configs[key].buildOptimizer = false;
+        }
+      });
+
+      ngJson.projects['gah-host'].architect.build.configurations.aot = false;
     }
     this.fileSystemService.saveObjectToFile(ngJsonPath, ngJson, true);
   }
