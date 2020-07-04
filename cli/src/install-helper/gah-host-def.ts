@@ -35,7 +35,7 @@ export class GahHostDef extends GahModuleBase {
         }
       });
     });
-    this._ngOptions.aot = hostCfg.aot;
+    this._ngOptions.aot = hostCfg.aot ?? true; // If not set the default value is true
     this.gahFolder = new GahFolder(this.basePath, this.srcBasePath + '/app');
   }
 
