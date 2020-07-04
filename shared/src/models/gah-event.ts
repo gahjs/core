@@ -19,6 +19,7 @@ export enum GahEvent {
   STYLE_IMPORTS_GENERATED,
   GITIGNORE_ADJUSTED,
   ANGULAR_JSON_ADJUSTED,
+  INDEX_HTML_ADJUSTED,
   PACKAGES_INSTALLED,
 }
 export interface GahEventPayload {
@@ -47,4 +48,5 @@ export type DependenciesMergedEvent = GahModuleDataPayload;
 export type StyleImportsGeneratedEvent = GahModuleDataPayload;
 export type GitignoreAdjustedEvent = GahModuleDataPayload;
 export type AngularJsonAdjustedEvent = GahModuleDataPayload;
+export type IndexHtmlAdjustedEvent = GahModuleDataPayload;
 export type PackagesInstalledEvent = GahModuleDataPayload;

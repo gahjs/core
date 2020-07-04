@@ -3,7 +3,7 @@ import {
   GahHost, PackageJson, GahModuleData, GahEvent, StylesFileGeneratedEvent,
   GahFolderCleanedEvent, TsConfigCleanedEvent, SymlinksCreatedEvent, TsConfigAdjustedEvent,
   TemplateGeneratedEvent, AssetsBaseStylesCopiedEvent, DependenciesMergedEvent, GitignoreAdjustedEvent,
-  AngularJsonAdjustedEvent, StyleImportsGeneratedEvent, PackagesInstalledEvent
+  AngularJsonAdjustedEvent, StyleImportsGeneratedEvent, PackagesInstalledEvent, IndexHtmlAdjustedEvent
 } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
@@ -11,6 +11,9 @@ import readline from 'readline';
 
 export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
+  private readonly _indexHtmlLines: string[];
+  private readonly _title: string;
+  private readonly _baseHref: string;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
@@ -36,6 +39,9 @@ export class GahHostDef extends GahModuleBase {
       });
     });
     this._ngOptions.aot = hostCfg.aot ?? true; // If not set the default value is true
+    this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
+    this._title = hostCfg.title ?? '';
+    this._baseHref = hostCfg.baseHref ?? '/';
     this.gahFolder = new GahFolder(this.basePath, this.srcBasePath + '/app');
   }
 
@@ -88,6 +94,8 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent(GahEvent.GITIGNORE_ADJUSTED, { module: this.data() } as GitignoreAdjustedEvent);
     this.adjustAngularJsonConfig();
     this.pluginService.triggerEvent(GahEvent.ANGULAR_JSON_ADJUSTED, { module: this.data() } as AngularJsonAdjustedEvent);
+    this.adjustIndexHtml();
+    this.pluginService.triggerEvent(GahEvent.INDEX_HTML_ADJUSTED, { module: this.data() } as IndexHtmlAdjustedEvent);
     await this.installPackages();
     this.pluginService.triggerEvent(GahEvent.PACKAGES_INSTALLED, { module: this.data() } as PackagesInstalledEvent);
   }
@@ -252,6 +260,21 @@ export class GahHostDef extends GahModuleBase {
       ngJson.projects['gah-host'].architect.build.configurations.aot = false;
     }
     this.fileSystemService.saveObjectToFile(ngJsonPath, ngJson, true);
+  }
+
+  private adjustIndexHtml() {
+    const indexHtmlPath = this.fileSystemService.join(this.basePath, this.srcBasePath, 'index.html');
+    let htmlContent = this.fileSystemService.readFile(indexHtmlPath);
+
+    if (this._indexHtmlLines.length > 0) {
+      const content = '<!--[custom]-->\n  ' + this._indexHtmlLines.join('\n  ') + '\n  <!--[custom]-->';
+      htmlContent = htmlContent.replace('<!--[htmlHeadContent]-->', content);
+    }
+
+    htmlContent = htmlContent.replace('<!--[title]-->', `<title>${this._title}</title>`);
+    htmlContent = htmlContent.replace('<!--[baseHref]-->', `<base href="${this._baseHref}">`);
+
+    this.fileSystemService.saveFile(indexHtmlPath, htmlContent);
   }
 
 }

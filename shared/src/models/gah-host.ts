@@ -10,12 +10,22 @@ export class GahHost {
   /**
    * Use aot compilation for the host? (Enabled by default)
    */
-  public aot: boolean = true;
+  public aot?: boolean = true;
 
   /**
    * Additional lines in the head section of the index.html file (eg. <link rel="icon" href="assets/[module-name]/favicon.ico" type="image/x-icon"/> )
    */
-  public htmlHeadContent: string | string[];
+  public htmlHeadContent?: string | string[];
+
+  /**
+   * The <title> tag of the website
+   */
+  public title?: string;
+
+  /**
+   * The baseHref that is put into the index html file (defaults to '/')
+   */
+  public baseHref?: string;
 
   public get isHost() { return true; }
 

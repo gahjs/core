@@ -24,4 +24,9 @@ fetch('environment.json')
 
 
   })
-  .catch(err => { throw err; });
+  .catch(err => {
+    const win = window as any as Window & { __env: GahEnvironment };
+    win.__env = {} as GahEnvironment;
+    console.error('environment.json not found or not readable\nTrace:');
+    console.error(err);
+  });
