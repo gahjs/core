@@ -1,6 +1,6 @@
 import { GahConfig } from '../gah-config';
-import { TsConfigFileData } from './ts-config-file';
-import { GahFolderData } from './gah-folder';
+import { TsConfigFileData } from './ts-config-file-data';
+import { GahFolderData } from './gah-folder-data';
 
 export interface GahModuleData {
   readonly basePath: string;

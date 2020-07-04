@@ -1,4 +1,4 @@
-import { GahModuleData } from './gah-module-base';
+import { GahModuleData } from './gah-module-data';
 
 export interface GahFileData {
   readonly isHost: boolean;

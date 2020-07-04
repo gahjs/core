@@ -16,10 +16,10 @@ export * from './models/gah-plugin-dependency-config';
 export * from './models/package-json';
 export * from './models/plugin-update';
 
-export * from './models/install-helper/gah-file';
-export * from './models/install-helper/gah-folder';
-export * from './models/install-helper/gah-module-base';
-export * from './models/install-helper/ts-config-file';
+export * from './models/install-helper/gah-file-data';
+export * from './models/install-helper/gah-folder-data';
+export * from './models/install-helper/gah-module-data';
+export * from './models/install-helper/ts-config-file-data';
 
 export * from './services/configuration.service';
 export * from './services/context.service';

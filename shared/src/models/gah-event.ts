@@ -1,5 +1,5 @@
-import { GahFileData } from './install-helper/gah-file';
-import { GahModuleData } from './install-helper/gah-module-base';
+import { GahFileData } from './install-helper/gah-file-data';
+import { GahModuleData } from './install-helper/gah-module-data';
 
 export enum GahEvent {
   UNKNOWN,
