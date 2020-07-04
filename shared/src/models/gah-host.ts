@@ -12,6 +12,11 @@ export class GahHost {
    */
   public aot: boolean = true;
 
+  /**
+   * Additional lines in the head section of the index.html file (eg. <link rel="icon" href="assets/[module-name]/favicon.ico" type="image/x-icon"/> )
+   */
+  public htmlHeadContent: string | string[];
+
   public get isHost() { return true; }
 
   constructor() {
