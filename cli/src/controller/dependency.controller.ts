@@ -1,65 +1,69 @@
 import { injectable } from 'inversify';
 
-import { ModuleReference } from '@awdware/gah-shared';
+import { ModuleReference, GahModuleType } from '@awdware/gah-shared';
 
 import { Controller } from './controller';
+import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 
 @injectable()
 export class DependencyController extends Controller {
 
-  public async remove(args: string[]): Promise<void> {
-    throw new Error('Not yet implemented\n' + args);
+  public async remove(dependencyNames?: string[], moduleName?: string): Promise<void> {
+
+    if (this._configService.getGahModuleType() === GahModuleType.HOST) {
+      this._loggerService.error('This command is unavailable for hosts');
+      this._loggerService.error('Please use the "reference" command instead');
+      return;
+    }
+
+    const msgModule = 'Select a module you want to remove a dependency from';
+    moduleName = await ModuleReferenceHelper.askForModule(this._configService, this._promptService, this._loggerService, false, msgModule, moduleName);
+    if (!moduleName) {
+      return;
+    }
+
+    dependencyNames = await ModuleReferenceHelper.askForModuleDependencies(this._configService, this._promptService, this._loggerService, false, moduleName, dependencyNames);
+
+    if (!dependencyNames || dependencyNames.length === 0) {
+      return;
+    }
+
+    for (const depName of dependencyNames) {
+      const mod = this._configService.getGahModule().modules.find(x => x.name === moduleName);
+      const idx = mod?.dependencies?.findIndex(x => x.names.some(y => y === depName))!;
+      const dep = mod?.dependencies?.[idx];
+      if (dep!.names.length! > 1) {
+        const depIdx = dep?.names.findIndex(x => x === depName)!;
+        dep?.names.splice(depIdx, 1);
+      } else {
+        mod?.dependencies?.splice(idx, 1);
+      }
+    }
+
+    this._configService.saveGahModuleConfig();
   }
 
   public async add(moduleName?: string, dependencyConfigPath?: string, dependencyModuleNames?: string[]): Promise<void> {
-    let cancelled = false;
-
-    this._loggerService.log('Adding new dependency to module');
-    const availableModules = this._configService.getGahModule().modules.map(x => x.name);
-    if (moduleName && !availableModules.includes(moduleName)) {
-      throw new Error('Cannot find module ' + moduleName);
+    if (this._configService.getGahModuleType() === GahModuleType.HOST) {
+      this._loggerService.error('This command is unavailable for hosts');
+      this._loggerService.error('Please use the "reference" command instead');
+      return;
     }
 
-    const moduleName_ = await this._promptService
-      .list({
-        msg: 'Select a module to add a dependency to',
-        cancelled: cancelled,
-        enabled: () => !moduleName && availableModules.length > 1,
-        choices: () => availableModules
-      });
+    this._loggerService.log('Adding new dependency to module');
 
-    if (availableModules.length === 1) { moduleName = availableModules[0]; }
+    const msgFilePath = 'Path to the gah-module.json of the new dependency';
+    const dependencyConfigPath_ = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, msgFilePath, dependencyConfigPath);
 
-    cancelled = cancelled || !(moduleName || moduleName_);
-    moduleName = moduleName ?? moduleName_;
-    const dependencyConfigPath_ = await this._promptService.input({
-      msg: 'Path to the gah-config.json of the new dependency',
-      enabled: () => !dependencyConfigPath,
-      cancelled: cancelled,
-      validator: (val: string) => {
-        if (!val.endsWith('gah-config.json')) { return false; }
-        return this._fileSystemService.fileExists(val);
-      }
-    });
-
-    cancelled = cancelled || !(dependencyConfigPath || dependencyConfigPath_);
+    if (!(dependencyConfigPath || dependencyConfigPath_)) {
+      this._loggerService.warn('No file provided...');
+      return;
+    }
     dependencyConfigPath = (dependencyConfigPath ?? dependencyConfigPath_).replace(/"/g, '');
 
     this._configService.readExternalConfig(dependencyConfigPath);
 
-    const availableExternalModules = this._configService.externalConfig.modules.map(x => x.name);
-    if (dependencyModuleNames && dependencyModuleNames.length > 0) {
-      const invalidModule = dependencyModuleNames.find(x => !availableExternalModules.includes(x));
-      if (invalidModule) { throw new Error('Cannot find the module ' + invalidModule); }
-    }
-    if (availableExternalModules.length === 1) { dependencyModuleNames = availableExternalModules; }
-
-    const dependencyModuleNames_ = await this._promptService.checkbox({
-      msg: 'Which of the modules do you want to add as a dependency?',
-      choices: () => availableExternalModules,
-      enabled: () => !dependencyModuleNames || dependencyModuleNames.length === 0,
-      cancelled: cancelled
-    });
+    const dependencyModuleNames_ = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
 
     if (!dependencyModuleNames || dependencyModuleNames.length === 0) { dependencyModuleNames = dependencyModuleNames_; }
 

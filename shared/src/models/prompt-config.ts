@@ -4,7 +4,6 @@ export class PromptConfig {
   msg: string;
   default?: any;
   enabled: () => boolean = () => true;
-  cancelled: boolean = false;
   validator?: (val: any) => boolean;
 }
 

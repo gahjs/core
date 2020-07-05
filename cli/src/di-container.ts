@@ -3,7 +3,7 @@ import { Container } from 'inversify';
 import { InitController } from './controller/init.controller';
 import { MainController } from './controller/main.controller';
 import { DependencyController } from './controller/dependency.controller';
-import { HostModuleController } from './controller/host-module.controller';
+import { ReferenceController } from './controller/reference.controller';
 import { InstallController } from './controller/install.controller';
 
 import { FileSystemService } from './services/file-system.service';
@@ -23,7 +23,7 @@ const DIContainer = new Container();
 DIContainer.bind<MainController>(MainController).toSelf().inSingletonScope();
 DIContainer.bind<InitController>(InitController).toSelf().inSingletonScope();
 DIContainer.bind<DependencyController>(DependencyController).toSelf().inSingletonScope();
-DIContainer.bind<HostModuleController>(HostModuleController).toSelf().inSingletonScope();
+DIContainer.bind<ReferenceController>(ReferenceController).toSelf().inSingletonScope();
 DIContainer.bind<InstallController>(InstallController).toSelf().inSingletonScope();
 DIContainer.bind<PluginController>(PluginController).toSelf().inSingletonScope();
 DIContainer.bind<RunController>(RunController).toSelf().inSingletonScope();

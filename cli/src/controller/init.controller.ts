@@ -16,17 +16,17 @@ export class InitController extends Controller {
     }
 
     const alreadyInitialized = this._configService.gahConfigExists();
-    let canceled = false;
 
     const overwriteHost = await this._promptService
       .confirm({
         msg: 'This folder already contains a GAH configuration. A host has to be in its own workspace. Do you want to overwrite the existing configuration for this workspace?',
-        cancelled: canceled,
         enabled: () => {
           return (isHost ?? false) && alreadyInitialized;
         }
       });
-    canceled = canceled || (isHost ?? false) && alreadyInitialized && !overwriteHost;
+    if ((isHost ?? false) && alreadyInitialized && !overwriteHost) {
+      return;
+    }
 
     let guessedModuleName: string = '';
     const packageJson = this._fileSystemService.tryReadFile('package.json');
@@ -42,11 +42,13 @@ export class InitController extends Controller {
     const newModuleName = await this._promptService
       .input({
         msg: 'Enter a unique name for this ' + (isHost ? 'host' : 'module'),
-        cancelled: canceled,
         enabled: () => !isHost,
         default: guessedModuleName
       });
-    canceled = canceled || !newModuleName && !isHost;
+    if (!newModuleName && !isHost) {
+      this._loggerService.warn('No module name provided...');
+      return;
+    }
 
     let guessedPackageName: string = '';
     if (packageJson) {
@@ -62,28 +64,30 @@ export class InitController extends Controller {
     const packageName = await this._promptService
       .input({
         msg: 'Enter the name of the package prefix of this module',
-        cancelled: canceled,
         enabled: () => !isHost,
         default: guessedPackageName || null
       });
-    canceled = canceled || !packageName && !isHost;
+    if (!packageName && !isHost) {
+      this._loggerService.warn('No package name provided...');
+      return;
+    }
 
     const overwrite = await this._promptService
       .confirm({
         msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
-        cancelled: canceled,
         enabled: () => {
           this.doesNameExist(this._configService.getGahModule(), newModuleName!);
           return this.nameExists;
         }
       });
-    canceled = canceled || (this.nameExists && !overwrite);
+    if (this.nameExists && !overwrite) {
+      return;
+    }
 
 
     const hasFacadeFolderPath = await this._promptService
       .confirm({
         msg: 'Does this module contain a folder for facade files?',
-        cancelled: canceled,
         enabled: () => !isHost,
       });
 
@@ -99,7 +103,6 @@ export class InitController extends Controller {
     const facadeFolderPath = await this._promptService
       .fuzzyPath({
         msg: 'Enter the path to the folder containing the facade files',
-        cancelled: canceled,
         enabled: () => !isHost && hasFacadeFolderPath,
         itemType: 'directory',
         excludePattern: ['.gah', 'dist'],
@@ -115,8 +118,7 @@ export class InitController extends Controller {
 
     const publicApiPath = await this._promptService
       .fuzzyPath({
-        msg: 'Enter the path to the public-api.ts file',
-        cancelled: canceled,
+        msg: 'Enter the path to the public-api file (public-api.ts / index.ts / ...)',
         enabled: () => !isHost,
         itemType: 'file',
         exclude: (val) => !val.endsWith('.ts') || val.endsWith('.d.ts'),
@@ -124,19 +126,17 @@ export class InitController extends Controller {
         default: defaultPublicApiPath
       });
 
-    canceled = canceled || (!publicApiPath && !isHost);
+    if (!publicApiPath && !isHost) {
+      this._loggerService.warn('No public-api path provided...');
+      return;
+    }
 
     const baseModuleName = await this._promptService
       .input({
         msg: 'Enter the class name of the base NgModule for this GahModule (empty if there is none)',
-        cancelled: canceled,
         enabled: () => !isHost,
         default: this.tryGuessbaseModuleName()
       });
-
-    if (canceled) {
-      return;
-    }
 
     const newModule = new ModuleDefinition();
 

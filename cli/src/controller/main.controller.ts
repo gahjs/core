@@ -8,7 +8,7 @@ import { DependencyController } from './dependency.controller';
 import { InstallController } from './install.controller';
 import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
-import { HostModuleController } from './host-module.controller';
+import { ReferenceController } from './reference.controller';
 import { GahModuleType } from '@awdware/gah-shared';
 import { CopyHost } from '../install-helper/copy-host';
 import { RunController } from './run.controller';
@@ -19,8 +19,8 @@ export class MainController extends Controller {
   private readonly _initController: InitController;
   @inject(DependencyController)
   private readonly _dependencyController: DependencyController;
-  @inject(HostModuleController)
-  private readonly _hostModuleController: HostModuleController;
+  @inject(ReferenceController)
+  private readonly _hostModuleController: ReferenceController;
   @inject(InstallController)
   private readonly _installController: InstallController;
   @inject(PluginController)
@@ -76,18 +76,19 @@ export class MainController extends Controller {
       .description('Adds new dependencies to a specified module.')
       .action(async (moduleName, dependencyConfigPath, dependencyModuleNames) => await this._dependencyController.add(moduleName, dependencyConfigPath, dependencyModuleNames));
     cmdDependency
-      .command('remove [moduleName]')
+      .command('remove [dependencyName] [moduleName]')
       .description('Removes dependencies from a specified module.')
-      .action(async (moduleName) => await this._dependencyController.remove(moduleName));
+      .action(async (dependencyName, moduleName) => await this._dependencyController.remove(dependencyName, moduleName));
 
-    const cmdHostModule = program
-      .command('module <add|remove> [options]')
-      .description('Manages modules for the host');
-    cmdHostModule
+    const cmdReference = program
+      .command('reference <add|remove> [options]')
+      .description('Manages modules for the host')
+      .alias('ref');
+    cmdReference
       .command('add [dependencyConfigPath] [dependencyModuleNames...]')
       .description('Adds a new module to the host.')
       .action(async (dependencyConfigPath, dependencyModuleNames) => await this._hostModuleController.add(dependencyConfigPath, dependencyModuleNames));
-    cmdHostModule
+    cmdReference
       .command('remove [moduleName]')
       .description('Removes modules from the host.')
       .action(async (moduleName) => await this._hostModuleController.remove(moduleName));

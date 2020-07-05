@@ -8,7 +8,7 @@ import { FileSystemService } from './file-system.service';
 @injectable()
 export class PromptService implements IPromptService {
   @inject(FileSystemService)
-  private _fileSystemService: IFileSystemService;
+  private readonly _fileSystemService: IFileSystemService;
 
   constructor() {
 
@@ -20,7 +20,7 @@ export class PromptService implements IPromptService {
       name: '_',
       message: cfg.msg,
       initial: cfg.default,
-      skip: cfg.cancelled || !cfg.enabled(),
+      skip: !cfg.enabled(),
       validate: cfg.validator
     }).then(_ => (_ as any)._);
   }
@@ -31,7 +31,7 @@ export class PromptService implements IPromptService {
       name: '_',
       message: cfg.msg,
       initial: cfg.default ?? false,
-      skip: cfg.cancelled || !cfg.enabled()
+      skip: !cfg.enabled()
     }).then(_ => (_ as any)._);
   }
 
@@ -50,24 +50,24 @@ export class PromptService implements IPromptService {
       limit: 8,
       choices: filteredFiles,
       initial: def === -1 ? 0 : def ?? 0,
-      skip: cfg.cancelled || !cfg.enabled()
+      skip: !cfg.enabled()
     } as any).then(_ => (_ as any)._);
   }
 
 
   public async list(cfg: SelectionPromptConfig) {
     return prompt({
-      type: 'list',
+      type: 'select',
       name: '_',
       message: cfg.msg,
       choices: cfg.choices(),
-      skip: cfg.cancelled || !cfg.enabled()
+      skip: !cfg.enabled()
     }).then(_ => (_ as any)._);
   }
 
   public async checkbox(cfg: SelectionPromptConfig) {
     // Workaround for https://github.com/enquirer/enquirer/issues/298
-    if (cfg.cancelled || !cfg.enabled()) {
+    if (!cfg.enabled()) {
       return null;
     }
 
@@ -76,7 +76,7 @@ export class PromptService implements IPromptService {
       name: '_',
       message: cfg.msg,
       choices: cfg.choices(),
-      skip: cfg.cancelled || !cfg.enabled()
+      skip: !cfg.enabled()
     }).then(_ => (_ as any)._);
   }
 }

@@ -6,18 +6,18 @@ import { Controller } from './controller';
 @injectable()
 export class PluginController extends Controller {
   public async add(pluginName?: string) {
-    let canceled: boolean = false;
 
     const pluginName_ = await this._promptService
       .input({
         msg: 'Please enter the name of the plugin you want to add',
-        cancelled: canceled,
         enabled: () => !pluginName
       });
 
     pluginName = pluginName ?? pluginName_;
-    canceled = canceled || !pluginName;
-    if (canceled) { return; }
+    if (!pluginName) {
+      this._loggerService.warn('No plugin name provided...');
+      return;
+    }
 
     const cfg = this._configService.getGahConfig();
     if (!cfg.plugins) { cfg.plugins = new Array<GahPluginDependencyConfig>(); }
@@ -56,7 +56,6 @@ export class PluginController extends Controller {
     if (!pluginName) {
       const resp = await this._promptService.checkbox({
         msg: 'Please select the plugins you want to update',
-        cancelled: false,
         enabled: () => true,
         choices: () => updateablePlugins.map(x => x.name + ' ' + x.fromVersion + ' > ' + x.toVersion)
       });
@@ -75,19 +74,17 @@ export class PluginController extends Controller {
       return null;
     }
 
-    let canceled: boolean = false;
-
     const pluginName_ = await this._promptService
       .list({
         msg: msg,
-        cancelled: canceled,
         enabled: () => !pluginName,
         choices: () => cfg.plugins!.map(x => x.name)
       });
 
     pluginName = pluginName ?? pluginName_;
-    canceled = canceled || !pluginName;
-    if (canceled) { return null; }
+    if (!pluginName) {
+      return null;
+    }
     return pluginName;
   }
 
