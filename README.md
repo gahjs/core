@@ -47,14 +47,21 @@ Then in your entry module you can go ahead and add the dependency with the follo
 ```
 $ gah dependency add
 ```
-If your setup is complete you can go back to the folder for the host and install the previously configured dependencies:
+To add modules to a host, you can use the `reference` command in the host folder.
+```
+$ gah reference add
+```
+If your setup is complete, you can go back to the host folder and install the previously configured dependencies:
 ```
 $ gah install
 ```
-If everything is configured correctly, you will now  be able to run the angular-cli commands for building or serving your application from the host folder.
+If everything is configured correctly, you will now  be able to run the angular-cli commands for building or serving your application from the host folder, by using the `gah run` command:
+```
+$ gah run ng build --prod
+```
 
 ### From Code
-You can also use `gah install` from code. See the example below.
+You can also use `gah install` and `gah run` from code. See the example below.
 ```TypeScript
 // commonJS import style
 const gah = require('@awdware/gah').gah;
@@ -66,4 +73,4 @@ await gah.install();
 
 await gah.run('ng build');
 ```
-Please note that all commands are executed for the current working directory of NodeJS. So for adding dependencies you first have to navigate to that folder and execute the script there. (Not within the script but within your terminal!)
+Please note that all commands are executed for the current working directory of NodeJS. So for adding dependencies you first have to navigate to that folder and execute the commands there.
