@@ -2,8 +2,14 @@ import { IPromptService, IFileSystemService, IConfigurationService, ILoggerServi
 
 export class ModuleReferenceHelper {
 
-  public static async askForGahModuleJson(promptService: IPromptService, fileSystemService: IFileSystemService, msg: string, dependencyConfigPath?: string) {
-    return promptService.input({
+  public static async askForGahModuleJson(
+    promptService: IPromptService,
+    fileSystemService: IFileSystemService,
+    loggerService: ILoggerService,
+    msg: string,
+    dependencyConfigPath?: string
+  ) {
+    const dependencyConfigPath_ = await promptService.input({
       msg,
       enabled: () => !dependencyConfigPath,
       validator: (val: string) => {
@@ -11,6 +17,14 @@ export class ModuleReferenceHelper {
         return fileSystemService.fileExists(val);
       }
     });
+
+    if (!(dependencyConfigPath || dependencyConfigPath_)) {
+      loggerService.warn('No file provided...');
+      return;
+    }
+    dependencyConfigPath = (dependencyConfigPath ?? dependencyConfigPath_).replace(/"/g, '');
+
+    return dependencyConfigPath;
   }
 
   public static async askForModulesToAdd(configService: IConfigurationService, promptService: IPromptService, dependencyModuleNames?: string[]) {

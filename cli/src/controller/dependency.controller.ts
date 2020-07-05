@@ -53,14 +53,10 @@ export class DependencyController extends Controller {
     this._loggerService.log('Adding new dependency to module');
 
     const msgFilePath = 'Path to the gah-module.json of the new dependency';
-    const dependencyConfigPath_ = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, msgFilePath, dependencyConfigPath);
-
-    if (!(dependencyConfigPath || dependencyConfigPath_)) {
-      this._loggerService.warn('No file provided...');
+    dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath, dependencyConfigPath);
+    if (!dependencyConfigPath) {
       return;
     }
-    dependencyConfigPath = (dependencyConfigPath ?? dependencyConfigPath_).replace(/"/g, '');
-
     this._configService.readExternalConfig(dependencyConfigPath);
 
     dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);

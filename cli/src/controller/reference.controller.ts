@@ -50,14 +50,11 @@ export class ReferenceController extends Controller {
     this._loggerService.log('Adding new module to host');
 
     const msgFilePath = 'Path to the gah-module.json of the module that should be added to the host';
-    const dependencyConfigPath_ = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, msgFilePath, dependencyConfigPath);
+    dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath, dependencyConfigPath);
 
-    if (!(dependencyConfigPath || dependencyConfigPath_)) {
-      this._loggerService.warn('No file path provided.');
+    if (!dependencyConfigPath) {
       return;
     }
-    dependencyConfigPath = (dependencyConfigPath ?? dependencyConfigPath_).replace(/"/g, '');
-
     this._configService.readExternalConfig(dependencyConfigPath);
 
     dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
