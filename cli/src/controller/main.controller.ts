@@ -67,18 +67,18 @@ export class MainController extends Controller {
       // .option('--facadeFolderPath <path>', 'The relative path to the facade files')
       // .option('--publicApiPath <path>', 'The relative path public api file (public-api.ts / index.ts / etc.)')
       // .option('--baseModuleName <name>', 'The name of the base NgModule of the new module')
-      .action(async (cmdObj) => await this._initController.init(cmdObj.host, cmdObj.entry));
+      .action(async (cmdObj) => this._initController.init(cmdObj.host, cmdObj.entry));
 
     const cmdDependency = program
       .command('dependency <add|remove> [options]');
     cmdDependency
       .command('add [moduleName] [dependencyConfigPath] [dependencyModuleNames...]')
       .description('Adds new dependencies to a specified module.')
-      .action(async (moduleName, dependencyConfigPath, dependencyModuleNames) => await this._dependencyController.add(moduleName, dependencyConfigPath, dependencyModuleNames));
+      .action(async (moduleName, dependencyConfigPath, dependencyModuleNames) => this._dependencyController.add(moduleName, dependencyConfigPath, dependencyModuleNames));
     cmdDependency
       .command('remove [dependencyName] [moduleName]')
       .description('Removes dependencies from a specified module.')
-      .action(async (dependencyName, moduleName) => await this._dependencyController.remove(dependencyName, moduleName));
+      .action(async (dependencyName, moduleName) => this._dependencyController.remove(dependencyName, moduleName));
 
     const cmdReference = program
       .command('reference <add|remove> [options]')
@@ -87,33 +87,33 @@ export class MainController extends Controller {
     cmdReference
       .command('add [dependencyConfigPath] [dependencyModuleNames...]')
       .description('Adds a new module to the host.')
-      .action(async (dependencyConfigPath, dependencyModuleNames) => await this._hostModuleController.add(dependencyConfigPath, dependencyModuleNames));
+      .action(async (dependencyConfigPath, dependencyModuleNames) => this._hostModuleController.add(dependencyConfigPath, dependencyModuleNames));
     cmdReference
       .command('remove [moduleName]')
       .description('Removes modules from the host.')
-      .action(async (moduleName) => await this._hostModuleController.remove(moduleName));
+      .action(async (moduleName) => this._hostModuleController.remove(moduleName));
 
     const cmdPlugin = program
       .command('plugin <add|remove|update> [options]');
     cmdPlugin
       .command('add [pluginName]')
       .description('Adds and installs a new plugin.')
-      .action(async (pluginName) => await this._pluginController.add(pluginName));
+      .action(async (pluginName) => this._pluginController.add(pluginName));
     cmdPlugin
       .command('remove [pluginName]')
       .description('Removes and uninstalls a plugin.')
-      .action(async (pluginName) => await this._pluginController.remove(pluginName));
+      .action(async (pluginName) => this._pluginController.remove(pluginName));
     cmdPlugin
       .command('update [pluginName]')
       .description('Updates plugin to its newest version.')
-      .action(async (pluginName) => await this._pluginController.update(pluginName));
+      .action(async (pluginName) => this._pluginController.update(pluginName));
 
     program
       .command('run  <command...>')
       .description('Executes a command.')
       .option('-e --environment <name>', 'The name of the environment that should be used')
       .allowUnknownOption()
-      .action(async (command, cmdObj) => await this._runController.exec(command, cmdObj.environment));
+      .action(async (command, cmdObj) => this._runController.exec(command, cmdObj.environment));
 
     program
       .command('install')
