@@ -74,7 +74,7 @@ export class PluginService implements IPluginService {
   private async loadInstalledPlugin(pluginDepCfg: GahPluginDependencyConfig) {
     const success = this.tryLoadInstalledPlugin(pluginDepCfg);
     if (!success) {
-      this._loggerService.log('Plugin ' + pluginDepCfg.name + ' has not been installed');
+      this._loggerService.log(`Plugin ${pluginDepCfg.name} has not been installed`);
       await this.installPlugin(pluginDepCfg.name).then(success => {
         if (!success) {
           throw new Error(`Could not load plugin ${pluginDepCfg.name}`);
@@ -112,7 +112,7 @@ export class PluginService implements IPluginService {
         try {
           handler.handler(payload);
         } catch (error) {
-          this._loggerService.error('Error in plugin ' + handler.pluginName + '.\nCallstack from plugin:');
+          this._loggerService.error(`Error in plugin ${handler.pluginName}.\nCallstack from plugin:`);
           this._loggerService.error(error);
           this._loggerService.log('--------------------------------------------------------------------------------');
           this._loggerService.log('Trying to continue with execution...\n');
@@ -135,7 +135,7 @@ export class PluginService implements IPluginService {
     const alreadyInstalled = (packageJson.dependencies?.[pluginName] || packageJson.devDependencies?.[pluginName]) && true;
 
     this._loggerService.startLoadingAnimation('Downloading Plugin');
-    const success = await this._executionService.execute('yarn add ' + pluginName + ' -D -E', false, undefined, this.cwd);
+    const success = await this._executionService.execute(`yarn add ${pluginName} -D -E`, false, undefined, this.cwd);
     if (!success) {
       this._loggerService.stopLoadingAnimation(false, false, 'Downloading Plugin failed');
       return false;
@@ -201,7 +201,7 @@ export class PluginService implements IPluginService {
 
   private async removePackage(pluginName: string) {
     this._loggerService.startLoadingAnimation('Cleaning up downloaded packages.');
-    const success = await this._executionService.execute('yarn remove ' + pluginName, false, undefined, this.cwd);
+    const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this.cwd);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, 'Cleaned up downloaded packages.');
     } else {
@@ -211,8 +211,8 @@ export class PluginService implements IPluginService {
   }
 
   public async removePlugin(pluginName: string): Promise<boolean> {
-    this._loggerService.startLoadingAnimation('Uninstalling plugin: ' + pluginName);
-    const success = await this._executionService.execute('yarn remove ' + pluginName, false, undefined, this.cwd);
+    this._loggerService.startLoadingAnimation(`Uninstalling plugin: ${pluginName}`);
+    const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this.cwd);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, `Plugin '${pluginName}' has been uninstalled.`);
       return true;
@@ -233,7 +233,7 @@ export class PluginService implements IPluginService {
     const searchForPkugins = pluginName ?? cfg.plugins.map(x => x.name).join(' ');
 
     this._loggerService.startLoadingAnimation('Searching for plugin updates');
-    await this._executionService.execute('yarn outdated ' + searchForPkugins, false, undefined, this.cwd);
+    await this._executionService.execute(`yarn outdated ${searchForPkugins}`, false, undefined, this.cwd);
     const yarnOutput = this._executionService.executionResult;
     const updates = new Array<PlguinUpdate>();
     yarnOutput.split('\n').forEach(yarnOutputLine => {
@@ -254,12 +254,12 @@ export class PluginService implements IPluginService {
 
   public async updatePlugins(pluginUpdates: PlguinUpdate[]) {
     this._loggerService.startLoadingAnimation('Updating plugins');
-    const success = await this._executionService.execute('yarn add ' + pluginUpdates.map(x => x.name).join(' ') + ' -D -E', false, undefined, this.cwd);
+    const success = await this._executionService.execute(`yarn add ${pluginUpdates.map(x => x.name).join(' ')} -D -E`, false, undefined, this.cwd);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, 'Updated plugins');
     } else {
       this._loggerService.stopLoadingAnimation(false, false, 'Updating plugin(s) failed');
-      throw new Error('Updating plugin(s) failed\n' + this._executionService.executionErrorResult);
+      throw new Error(`Updating plugin(s) failed\n${this._executionService.executionErrorResult}`);
     }
     const gahCfg = this._configService.getGahConfig();
     pluginUpdates.forEach(pluginUpdate => {

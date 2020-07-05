@@ -26,7 +26,7 @@ export class GahHostDef extends GahModuleBase {
 
     const hostCfg = this.fileSystemService.parseFile<GahHost>(gahCfgPath);
     if (!hostCfg) {
-      throw new Error('Cannot find host in file "' + gahCfgPath + '"');
+      throw new Error(`Cannot find host in file "${gahCfgPath}"`);
     }
     hostCfg.modules?.forEach(moduleDependency => {
       moduleDependency.names.forEach(depModuleName => {
@@ -42,7 +42,7 @@ export class GahHostDef extends GahModuleBase {
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
     this._title = hostCfg.title ?? '';
     this._baseHref = hostCfg.baseHref ?? '/';
-    this.gahFolder = new GahFolder(this.basePath, this.srcBasePath + '/app');
+    this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`);
   }
 
   public specificData(): Partial<GahModuleData> {
@@ -206,7 +206,7 @@ export class GahHostDef extends GahModuleBase {
     const blocklistPackages = new Array<string>();
 
     for (const dep of this.allRecursiveDependencies) {
-      blocklistPackages.push('@' + dep.packageName + '/' + dep.moduleName!);
+      blocklistPackages.push(`@${dep.packageName}/${dep.moduleName!}`);
     }
 
     for (const dep of this.allRecursiveDependencies) {
@@ -267,7 +267,7 @@ export class GahHostDef extends GahModuleBase {
     let htmlContent = this.fileSystemService.readFile(indexHtmlPath);
 
     if (this._indexHtmlLines.length > 0) {
-      const content = '<!--[custom]-->\n  ' + this._indexHtmlLines.join('\n  ') + '\n  <!--[custom]-->';
+      const content = `<!--[custom]-->\n  ${this._indexHtmlLines.join('\n  ')}\n  <!--[custom]-->`;
       htmlContent = htmlContent.replace('<!--[htmlHeadContent]-->', content);
     }
 

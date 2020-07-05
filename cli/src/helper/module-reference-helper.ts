@@ -32,7 +32,7 @@ export class ModuleReferenceHelper {
     if (dependencyModuleNames && dependencyModuleNames.length > 0) {
       const invalidModule = dependencyModuleNames.find(x => !availableExternalModules.includes(x));
       if (invalidModule) {
-        throw new Error('Cannot find the module ' + invalidModule);
+        throw new Error(`Cannot find the module ${invalidModule}`);
       }
     }
     if (availableExternalModules.length === 1) {
@@ -62,7 +62,7 @@ export class ModuleReferenceHelper {
     const availableModules = isHost ? configService.getGahHost().modules.map(x => x.names).reduce((a, b) => a.concat(b)) : configService.getGahModule().modules.map(x => x.name);
 
     if (moduleName && !availableModules.includes(moduleName)) {
-      throw new Error('Cannot find module ' + moduleName);
+      throw new Error(`Cannot find module ${moduleName}`);
     }
 
     const moduleName_ = await promptService
@@ -103,7 +103,7 @@ export class ModuleReferenceHelper {
         ?.map(x => x.names).reduce((a, b) => a.concat(b));
 
     if (!existingDependencies || existingDependencies.length === 0) {
-      loggerService.warn('The module "' + moduleName + '" has no references to other modules');
+      loggerService.warn(`The module "${moduleName}" has no references to other modules`);
     }
 
     const dependencyNames_ = await promptService

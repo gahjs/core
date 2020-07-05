@@ -5,7 +5,7 @@ import { IWorkspaceService, IFileSystemService } from '@awdware/gah-shared';
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
   @inject(FileSystemService)
-  private _fileSystemService: IFileSystemService;
+  private readonly _fileSystemService: IFileSystemService;
 
   ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string) {
     const gitIgnorePath = baseDir ? this._fileSystemService.join(baseDir, '.gitignore') : '.gitignore';

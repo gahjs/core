@@ -4,7 +4,7 @@ import { GahContext } from '@awdware/gah-shared/lib/models/gah-context';
 
 @injectable()
 export class ContextService implements IContextService {
-  private _ctx: GahContext;
+  private readonly _ctx: GahContext;
 
   constructor() {
     this._ctx = {};

@@ -23,7 +23,7 @@ export class FileSystemService implements IFileSystemService {
   readFile(path: string): string {
     const content = this.tryReadFile(path);
     if (content === null) {
-      throw new Error('File could not be found at: ' + path);
+      throw new Error(`File could not be found at: ${path}`);
     }
     return content;
   }
@@ -54,9 +54,9 @@ export class FileSystemService implements IFileSystemService {
   }
 
   ensureRelativePath(path: string, relativeFrom?: string, dontCheck = false) {
-    if (!dontCheck && !this.directoryExists(path)) { throw new Error('Could not find path ' + path); }
+    if (!dontCheck && !this.directoryExists(path)) { throw new Error(`Could not find path ${path}`); }
     relativeFrom = relativeFrom ?? process.cwd();
-    if (!dontCheck && !this.directoryExists(relativeFrom)) { throw new Error('Could not find path ' + relativeFrom); }
+    if (!dontCheck && !this.directoryExists(relativeFrom)) { throw new Error(`Could not find path ${relativeFrom}`); }
 
     path = path_.relative(relativeFrom, path).replace(/\\/g, '/');
     return path;
@@ -111,7 +111,7 @@ export class FileSystemService implements IFileSystemService {
 
   async createDirLink(linkPath: string, realPath: string) {
     if (platform() === 'win32') {
-      const cmd = 'mklink /j "' + linkPath + '" "' + realPath + '"';
+      const cmd = `mklink /j "${linkPath}" "${realPath}"`;
       await this._executionService.execute(cmd, false).then(success => {
         if (!success) { throw new Error(this._executionService.executionErrorResult); }
       });
@@ -122,7 +122,7 @@ export class FileSystemService implements IFileSystemService {
 
   async createFileLink(linkPath: string, realPath: string) {
     if (platform() === 'win32') {
-      const cmd = 'mklink /h "' + linkPath + '" "' + realPath + '"';
+      const cmd = `mklink /h "${linkPath}" "${realPath}"`;
       await this._executionService.execute(cmd, false).then(success => {
         if (!success) { throw new Error(this._executionService.executionErrorResult); }
       });

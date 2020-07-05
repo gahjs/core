@@ -62,7 +62,7 @@ export class DependencyController extends Controller {
     dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
 
     const module = this._configService.getGahModule().modules.find(x => x.name === moduleName);
-    if (!module) { throw new Error('Module \'' + moduleName + '\' could not be found'); }
+    if (!module) { throw new Error(`Module '${moduleName}' could not be found`); }
 
     const newDep = new ModuleReference();
 

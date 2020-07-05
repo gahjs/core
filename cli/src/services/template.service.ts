@@ -8,7 +8,7 @@ import { FileSystemService } from './file-system.service';
 @injectable()
 export class TemplateService implements ITemplateService {
   @inject(FileSystemService)
-  private _fileSystemService: IFileSystemService;
+  private readonly _fileSystemService: IFileSystemService;
 
   public renderFile<T>(sourceFilePath: string, data: T, outputFilePath: string) {
     ejs.renderFile(sourceFilePath, data).then(renderedString => {

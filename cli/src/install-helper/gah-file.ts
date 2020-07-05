@@ -98,7 +98,7 @@ export class GahFile {
       this.isHost = false;
     }
     else {
-      throw new Error('The provided file is not a gah module or gah host file!\npath: "' + filePath + '"');
+      throw new Error(`The provided file is not a gah module or gah host file!\npath: "${filePath}"`);
     }
   }
 
@@ -116,8 +116,8 @@ export class GahFile {
     if (entryModuleNames.length === 0) {
       throw new Error('You do not have any entry modules defined! You need at exactly one entry module for the system to work!');
     } else if (entryModuleNames.length > 1) {
-      throw new Error('You have too many entry modules defined! You need at exactly one entry module for the system to work!'
-        + ' The following modules are configured as entry modules: ' + entryModuleNames.join(', '));
+      throw new Error(`${'You have too many entry modules defined! You need at exactly one entry module for the system to work!'
+        + ' The following modules are configured as entry modules: '}${entryModuleNames.join(', ')}`);
     }
   }
 }

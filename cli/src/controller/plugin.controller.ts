@@ -40,12 +40,12 @@ export class PluginController extends Controller {
     if (success) {
       const cfg = this._configService.getGahConfig();
       const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
-      if (idx === -1) { throw new Error('Error uninstalling plugin ' + pluginName); }
+      if (idx === -1) { throw new Error(`Error uninstalling plugin ${pluginName}`); }
 
       cfg.plugins?.splice(idx, 1);
       this._configService.saveGahConfig();
     } else {
-      throw new Error('Error uninstalling plugin ' + pluginName);
+      throw new Error(`Error uninstalling plugin ${pluginName}`);
     }
   }
 
@@ -57,7 +57,7 @@ export class PluginController extends Controller {
       const resp = await this._promptService.checkbox({
         msg: 'Please select the plugins you want to update',
         enabled: () => true,
-        choices: () => updateablePlugins.map(x => x.name + ' ' + x.fromVersion + ' > ' + x.toVersion)
+        choices: () => updateablePlugins.map(x => `${x.name} ${x.fromVersion} > ${x.toVersion}`)
       });
       pluginsToUpdate = resp.map(x => x.split(' ')[0]).map(name => updateablePlugins.find(x => x.name === name)!);
     } else {

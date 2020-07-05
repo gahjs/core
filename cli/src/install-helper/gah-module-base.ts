@@ -123,7 +123,7 @@ export abstract class GahModuleBase {
       const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(0, publicApiPathRelativeToBaseSrcPath.length - 3);
 
       const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, publicApiRelativePathWithoutExtention);
-      const aliasName = '@' + dep.packageName + '/' + dep.moduleName!;
+      const aliasName = `@${dep.packageName}/${dep.moduleName!}`;
 
       this.tsConfigFile.addPathAlias(aliasName, path);
     }
@@ -135,7 +135,7 @@ export abstract class GahModuleBase {
 
       // Generate scss style files
       // Find all scss files in a folder called styles in the external module
-      const styles = this.fileSystemService.getFilesFromGlob(dep.basePath + '/**/styles/**/*.scss', ['**/dist/**']);
+      const styles = this.fileSystemService.getFilesFromGlob(`${dep.basePath}/**/styles/**/*.scss`, ['**/dist/**']);
       if (styles.length > 0) {
         // Get the path without the path to the module itself (starting at the same point as .gap-dependencies links)
         const shortPaths = styles.map((x) => this.fileSystemService.ensureRelativePath(x, this.fileSystemService.join(dep.basePath, dep.srcBasePath), true));
@@ -144,7 +144,7 @@ export abstract class GahModuleBase {
 
         // Generate all the imports to the found style files (pointing to .gah/dependencies)
         const fileContent = relativePaths.map((s) => `@import "${s}";`).join('\n');
-        this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.gahFolder.stylesPath, dep.moduleName! + '.scss'), fileContent);
+        this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.gahFolder.stylesPath, `${dep.moduleName!}.scss`), fileContent);
       }
     }
   }

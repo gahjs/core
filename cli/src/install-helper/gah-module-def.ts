@@ -11,7 +11,7 @@ export class GahModuleDef extends GahModuleBase {
 
     const moduleCfg = this.fileSystemService.parseFile<GahModule>(gahCfgPath).modules.find(x => x.name === moduleName);
     if (!moduleCfg) {
-      throw new Error('Cannot find module with name "' + moduleName + '" in file "' + gahCfgPath + '"');
+      throw new Error(`Cannot find module with name "${moduleName}" in file "${gahCfgPath}"`);
     }
     this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.srcBasePath = this.fileSystemService.getDirectoryPathFromFilePath(moduleCfg.publicApiPath);

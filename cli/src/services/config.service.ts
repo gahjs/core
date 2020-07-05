@@ -14,7 +14,7 @@ const tsConfigPath = 'tsconfig.json';
 export class ConfigService implements IConfigurationService {
 
   @inject(FileSystemService)
-  private _fileSystemService: IFileSystemService;
+  private readonly _fileSystemService: IFileSystemService;
   private _cfg: GahConfig;
   private _moduleCfg: GahModule | GahHost;
   private _tsCfg: TsConfig;
@@ -75,7 +75,7 @@ export class ConfigService implements IConfigurationService {
 
   public getGahAnyType(inFolder: string) {
     const mType = this.getGahModuleType(inFolder);
-    if (mType === GahModuleType.UNKNOWN) { throw new Error('Could not find any module or host config in folder ' + inFolder); }
+    if (mType === GahModuleType.UNKNOWN) { throw new Error(`Could not find any module or host config in folder ${inFolder}`); }
 
     return this.loadAndParseGahAnyType(mType === GahModuleType.HOST, inFolder);
   }

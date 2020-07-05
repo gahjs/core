@@ -192,7 +192,7 @@ export class InitController extends Controller {
 
     const newModuleName = await this._promptService
       .input({
-        msg: 'Enter a unique name for this ' + (isHost ? 'host' : 'module'),
+        msg: `Enter a unique name for this ${isHost ? 'host' : 'module'}`,
         enabled: () => !isHost,
         default: guessedModuleName
       });
@@ -231,7 +231,7 @@ export class InitController extends Controller {
 
   private tryCopyHostToCwd(hostName: string): boolean {
     let allFilesToCopy: string[];
-    allFilesToCopy = this._fileSystemService.getFilesFromGlob(this._fileSystemService.join(__dirname, '../../assets/host-template') + '/**', undefined, true);
+    allFilesToCopy = this._fileSystemService.getFilesFromGlob(`${this._fileSystemService.join(__dirname, '../../assets/host-template')}/**`, undefined, true);
     const conflictingFiles = allFilesToCopy.filter(x => {
       const relativePathToAssetsFolder = this._fileSystemService.ensureRelativePath(x, this._fileSystemService.join(__dirname, '../../assets/host-template'));
       return this._fileSystemService.fileExists(relativePathToAssetsFolder);

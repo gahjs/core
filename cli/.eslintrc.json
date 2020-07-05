@@ -46,6 +46,7 @@
     "max-len": [
       "warn",
       180
-    ]
+    ],
+    "prefer-template": "warn"
   }
 }

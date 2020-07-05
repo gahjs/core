@@ -15,11 +15,11 @@ export class RunController extends Controller {
 
     if (isHost) {
 
-      const envFileSimpleName = 'environment.' + (configurationName ? configurationName + '.json' : 'json');
-      const envFileName = 'env/' + envFileSimpleName;
+      const envFileSimpleName = `environment.${configurationName ? `${configurationName}.json` : 'json'}`;
+      const envFileName = `env/${envFileSimpleName}`;
 
       if (!this._fileSystemService.fileExists(envFileName)) {
-        throw new Error('Cannot find configuration file "' + envFileSimpleName + '"');
+        throw new Error(`Cannot find configuration file "${envFileSimpleName}"`);
       }
 
       if (this._fileSystemService.fileExists(likedEnvFile)) {

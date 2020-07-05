@@ -49,7 +49,7 @@ export class MainController extends Controller {
     program.on('--help', () => {
       console.log(
         chalk.yellow(
-          figlet.textSync('gah-cli v' + version, { horizontalLayout: fontWidth, font: 'Cricket', verticalLayout: 'full' })
+          figlet.textSync(`gah-cli v${version}`, { horizontalLayout: fontWidth, font: 'Cricket', verticalLayout: 'full' })
         )
       );
     });
