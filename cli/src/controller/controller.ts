@@ -9,7 +9,9 @@ import { TemplateService } from '../services/template.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { ContextService } from '../services/context-service';
 import { injectable } from 'inversify';
-import { IWorkspaceService, ITemplateService, IPromptService, IPluginService, ILoggerService, IFileSystemService, IExecutionService, IConfigurationService, IContextService } from '@awdware/gah-shared';
+import {
+  IWorkspaceService, ITemplateService, IPromptService, IPluginService, ILoggerService, IFileSystemService, IExecutionService, IConfigurationService, IContextService
+} from '@awdware/gah-shared';
 
 @injectable()
 export abstract class Controller {

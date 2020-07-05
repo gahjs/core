@@ -60,9 +60,7 @@ export class ReferenceController extends Controller {
 
     this._configService.readExternalConfig(dependencyConfigPath);
 
-    const dependencyModuleNames_ = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
-
-    if (!dependencyModuleNames || dependencyModuleNames.length === 0) { dependencyModuleNames = dependencyModuleNames_; }
+    dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
 
     this.doAdd(dependencyModuleNames, cfg);
   }

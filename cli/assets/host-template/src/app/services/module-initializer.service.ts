@@ -8,11 +8,11 @@ import { GahEnvironment } from '@awdware/gah-shared';
 
 @Injectable({ providedIn: 'root' })
 export class ModuleInitializerService implements Resolve<null> {
-  private _router: Router;
-  private _modules = new Array<any>();
+  private readonly _router: Router;
+  private readonly _modules = new Array<any>();
   private _facadeRoutes: Routes = [];
-  private _routes: Routes = [];
-  private _env: GahEnvironment;
+  private readonly _routes: Routes = [];
+  private readonly _env: GahEnvironment;
 
   constructor(
     router: Router,
@@ -27,7 +27,7 @@ export class ModuleInitializerService implements Resolve<null> {
     if (env) {
       Object.keys(env).forEach(k => {
         if (this._env[k] === undefined) {
-          console.error('Missing value in host environment: ' + k);
+          console.error(`Missing value in host environment: ${k}`);
         }
         env[k] = this._env[k];
       });

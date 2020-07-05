@@ -27,11 +27,15 @@ export class ModuleReferenceHelper {
     }
     const enabled = !dependencyModuleNames || dependencyModuleNames.length === 0;
 
-    return await promptService.checkbox({
+    const dependencyModuleNames_ = await promptService.checkbox({
       msg: 'Which of the modules do you want to add?',
       choices: () => availableExternalModules,
       enabled: () => enabled,
     });
+
+    if (!dependencyModuleNames || dependencyModuleNames.length === 0) { dependencyModuleNames = dependencyModuleNames_; }
+
+    return dependencyModuleNames;
   }
 
   public static async askForModule(

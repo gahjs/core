@@ -31,8 +31,8 @@ export class DependencyController extends Controller {
     for (const depName of dependencyNames) {
       const mod = this._configService.getGahModule().modules.find(x => x.name === moduleName);
       const idx = mod?.dependencies?.findIndex(x => x.names.some(y => y === depName))!;
-      const dep = mod?.dependencies?.[idx];
-      if (dep!.names.length! > 1) {
+      const dep = mod?.dependencies?.[idx]!;
+      if (dep.names.length > 1) {
         const depIdx = dep?.names.findIndex(x => x === depName)!;
         dep?.names.splice(depIdx, 1);
       } else {
@@ -63,9 +63,7 @@ export class DependencyController extends Controller {
 
     this._configService.readExternalConfig(dependencyConfigPath);
 
-    const dependencyModuleNames_ = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
-
-    if (!dependencyModuleNames || dependencyModuleNames.length === 0) { dependencyModuleNames = dependencyModuleNames_; }
+    dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
 
     const module = this._configService.getGahModule().modules.find(x => x.name === moduleName);
     if (!module) { throw new Error('Module \'' + moduleName + '\' could not be found'); }
@@ -76,11 +74,15 @@ export class DependencyController extends Controller {
 
     const selectedModules = this._configService.externalConfig.modules.filter(x => dependencyModuleNames!.includes(x.name));
 
-    if (!selectedModules || selectedModules.length !== dependencyModuleNames.length) { throw new Error('Some dependencies could not be found'); }
+    if (!selectedModules || selectedModules.length !== dependencyModuleNames.length) {
+      throw new Error('Some dependencies could not be found');
+    }
 
     newDep.names = selectedModules.map(x => x.name);
 
-    if (!module.dependencies) { module.dependencies = new Array<ModuleReference>(); }
+    if (!module.dependencies) {
+      module.dependencies = new Array<ModuleReference>();
+    }
 
     module.dependencies.push(newDep);
 
