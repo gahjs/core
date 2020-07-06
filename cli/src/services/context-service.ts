@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { IContextService } from '@awdware/gah-shared';
-import { GahContext } from '@awdware/gah-shared/lib/models/gah-context';
+import { GahContext } from '@awdware/gah-shared';
 
 @injectable()
 export class ContextService implements IContextService {

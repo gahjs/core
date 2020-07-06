@@ -100,7 +100,7 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent(GahEvent.PACKAGES_INSTALLED, { module: this.data() } as PackagesInstalledEvent);
   }
 
-  adjustGitignoreForHost() {
+  private adjustGitignoreForHost() {
     this.workspaceService.ensureGitIgnoreLine('src/assets/**', 'Ignoring gah generated assets', this.basePath);
   }
 

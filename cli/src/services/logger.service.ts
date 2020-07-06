@@ -1,13 +1,20 @@
-import { injectable } from 'inversify';
-import { ILoggerService } from '@awdware/gah-shared';
+import { injectable, inject } from 'inversify';
+import { ILoggerService, IContextService } from '@awdware/gah-shared';
 import ora, { Ora } from 'ora';
 import chalk from 'chalk';
+import { ContextService } from './context-service';
 
 @injectable()
 export class LoggerService implements ILoggerService {
   private _ora: Ora;
   private _lastOraText: string;
-  public debugLoggingEnabled: boolean;
+
+  @inject(ContextService)
+  private readonly _contextService: IContextService;
+
+  private get debugLoggingEnabled(): boolean {
+    return this._contextService.getContext().debug ?? false;
+  }
 
   public log(text: string) {
     this.interruptLoading(() => {
@@ -36,10 +43,6 @@ export class LoggerService implements ILoggerService {
     this.interruptLoading(() => {
       console.log(chalk.green(' ■ ') + text);
     });
-  }
-
-  public enableDebugLogging(): void {
-    this.debugLoggingEnabled = true;
   }
 
   public startLoadingAnimation(text: string) {

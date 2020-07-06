@@ -29,14 +29,13 @@ export class MainController extends Controller {
   private readonly _runController: RunController;
 
   public async main() {
-
-    // TODO add flag or config or somehting
-    this._loggerService.enableDebugLogging();
-
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
       CopyHost.copy(this._fileSystemService, this._workspaceService);
     }
+
+    // This sets the debug context variable depending on the used options
+    this._contextService.setContext({ debug: process.argv.some(x => x === '--debug') });
 
     await this._pluginService.loadInstalledPlugins();
 
@@ -57,6 +56,9 @@ export class MainController extends Controller {
 
     program
       .version(version);
+
+    program
+      .option('--debug', 'Enables verbose debug logging');
 
     program
       .command('init')

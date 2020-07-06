@@ -86,16 +86,39 @@ export class PluginService implements IPluginService {
     this._loggerService.log(`Plugin '${pluginDepCfg.name}' loaded.`);
   }
 
+  /**
+   * The plugin is loaded by importing a temporaty file that imports the npm package.
+   * This is required because otherwise gah would need to import an absolute path
+   * which would not work great with yarn workspaces. The working directory of dynamic imports
+   * is a miracle to me, this is a save way to make sure everything that the module could import,
+   * can also be imported by this plugin loading mechanic...
+   */
   private tryLoadInstalledPlugin(pluginDepCfg: GahPluginDependencyConfig): boolean {
+    let pluginTmpPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.', 'node_modules');
+    if (!this._fileSystemService.directoryExists(pluginTmpPath)) {
+      pluginTmpPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.');
+    }
+    pluginTmpPath = this._fileSystemService.join(pluginTmpPath, '~tmp-gah-file.js');
+    const pluginTmpContent = ''
+      + '// How did you manage to open this file?\n'
+      + '// It usually only exists for a fraction of a second and should not persist.\n'
+      + '// You can savely delete it!\n'
+      + '// If this file keeps getting created please open an issue here:\n'
+      + '// https://github.com/awdware/gah/issues/new\n\n'
+      + `exports.PluginType = require('${pluginDepCfg.name}').default;`;
+    this._fileSystemService.saveFile(pluginTmpPath, pluginTmpContent);
+
     try {
-      const pluginPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.', 'node_modules', pluginDepCfg.name);
-      const pluginDefinition = require(pluginPath);
-      const plugin = new pluginDefinition.default();
+      const pluginModule = require(pluginTmpPath);
+      const plugin = new pluginModule.PluginType();
       this.registerPlugin(plugin as GahPlugin, pluginDepCfg);
     } catch (error) {
       this._loggerService.debug(error);
       return false;
+    } finally {
+      this._fileSystemService.deleteFile(pluginTmpPath);
     }
+
     return true;
   }
 
@@ -183,7 +206,7 @@ export class PluginService implements IPluginService {
     this._loggerService.log(`Starting settings configuration for '${pluginName}'`);
     pluginCfg.settings = await plugin['onInstall'](pluginCfg.settings);
     this._loggerService.log('Plugin settings configuration finished');
-    await this._executionService.execute('yarn info @awdware/gah-translation-merger version', false);
+    await this._executionService.execute(`yarn info ${pluginCfg.name} version`, false);
     const vOut = this._executionService.executionResult;
     const v = vOut.match(/yarn\sinfo\sv\d+.\d+.\d+\s([\w\d.-]+)\sDone/)?.[1];
     if (!v) {
