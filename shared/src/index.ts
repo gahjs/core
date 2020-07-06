@@ -1,4 +1,5 @@
 export * from './models/gah-config';
+export * from './models/gah-context';
 export * from './models/gah-host';
 export * from './models/gah-module';
 export * from './models/gah-module-type';

@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah-shared",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "Provides types and interfaces for gah",
   "main": "./lib/index.js",
   "scripts": {
