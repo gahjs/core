@@ -60,40 +60,44 @@ export class MainController extends Controller {
     program
       .option('--debug', 'Enables verbose debug logging');
 
-    program
+    const cmdModule = program
+      .command('module')
+      .description('Several commands for working with a module');
+    cmdModule
       .command('init')
-      .description('Initiates a new  module (or host).')
-      .option('-h, --host', 'Initiates a host instead of a module')
+      .description('Initiates a new module')
       .option('-e, --entry', 'Initiates a module as the entry module')
-      // .option('--moduleName <name>', 'The name for the new module')
-      // .option('--facadeFolderPath <path>', 'The relative path to the facade files')
-      // .option('--publicApiPath <path>', 'The relative path public api file (public-api.ts / index.ts / etc.)')
-      // .option('--baseModuleName <name>', 'The name of the base NgModule of the new module')
-      .action(async (cmdObj) => this._initController.init(cmdObj.host, cmdObj.entry));
+      .action(async (cmdObj) => this._initController.init(false, cmdObj.entry));
+    const cmdModuleDependency = cmdModule
+      .command('dependency')
+      .description('A command for managing dependencies of a module');
+    cmdModuleDependency
+      .command('add')
+      .description('Adds new dependencies to a module')
+      .action(async () => this._dependencyController.add());
+    cmdModuleDependency
+      .command('remove')
+      .description('Removes dependencies from a module')
+      .action(async () => this._dependencyController.remove());
 
-    const cmdDependency = program
-      .command('dependency <add|remove> [options]');
-    cmdDependency
-      .command('add [moduleName] [dependencyConfigPath] [dependencyModuleNames...]')
-      .description('Adds new dependencies to a specified module.')
-      .action(async (moduleName, dependencyConfigPath, dependencyModuleNames) => this._dependencyController.add(moduleName, dependencyConfigPath, dependencyModuleNames));
-    cmdDependency
-      .command('remove [dependencyName] [moduleName]')
-      .description('Removes dependencies from a specified module.')
-      .action(async (dependencyName, moduleName) => this._dependencyController.remove(dependencyName, moduleName));
-
-    const cmdReference = program
-      .command('reference <add|remove> [options]')
-      .description('Manages modules for the host')
-      .alias('ref');
-    cmdReference
-      .command('add [dependencyConfigPath] [dependencyModuleNames...]')
-      .description('Adds a new module to the host.')
-      .action(async (dependencyConfigPath, dependencyModuleNames) => this._hostModuleController.add(dependencyConfigPath, dependencyModuleNames));
-    cmdReference
-      .command('remove [moduleName]')
-      .description('Removes modules from the host.')
-      .action(async (moduleName) => this._hostModuleController.remove(moduleName));
+    const cmdHost = program
+      .command('host')
+      .description('Several commands for working with a host');
+    cmdHost
+      .command('init')
+      .description('Initiates a new host')
+      .action(async () => this._initController.init(true));
+    const cmdHostModule = cmdHost
+      .command('module')
+      .description('A command for managing modules of a host');
+    cmdHostModule
+      .command('add')
+      .description('Adds module to a host')
+      .action(async () => this._hostModuleController.add());
+    cmdHostModule
+      .command('remove')
+      .description('Removes a module from a host')
+      .action(async () => this._hostModuleController.remove());
 
     const cmdPlugin = program
       .command('plugin <add|remove|update> [options]');

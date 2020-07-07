@@ -8,14 +8,14 @@ import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 @injectable()
 export class ReferenceController extends Controller {
 
-  public async remove(moduleNames?: string[]): Promise<void> {
+  public async remove(): Promise<void> {
     if (this._configService.getGahModuleType() === GahModuleType.MODULE) {
       this._loggerService.error('This command is only available for hosts');
       this._loggerService.error('Please use the "dependency" command instead');
       return;
     }
 
-    moduleNames = await ModuleReferenceHelper.askForModuleDependencies(this._configService, this._promptService, this._loggerService, true, undefined, moduleNames);
+    const moduleNames = await ModuleReferenceHelper.askForModuleDependencies(this._configService, this._promptService, this._loggerService, true);
 
     if (!moduleNames || moduleNames.length === 0) {
       return;
@@ -36,9 +36,11 @@ export class ReferenceController extends Controller {
     }
 
     this._configService.saveGahModuleConfig();
+
+    this._loggerService.success(`${moduleNames.length === 1 ? 'Module' : 'Modules'} ${moduleNames.join(', ')} removed successfully`);
   }
 
-  public async add(dependencyConfigPath?: string, dependencyModuleNames?: string[]): Promise<void> {
+  public async add(): Promise<void> {
     if (this._configService.getGahModuleType() === GahModuleType.MODULE) {
       this._loggerService.error('This command is only available for hosts');
       this._loggerService.error('Please use the "dependency" command instead');
@@ -50,14 +52,14 @@ export class ReferenceController extends Controller {
     this._loggerService.log('Adding new module to host');
 
     const msgFilePath = 'Path to the gah-module.json of the module that should be added to the host';
-    dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath, dependencyConfigPath);
+    const dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath);
 
     if (!dependencyConfigPath) {
       return;
     }
     this._configService.readExternalConfig(dependencyConfigPath);
 
-    dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
+    const dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService);
 
     this.doAdd(dependencyModuleNames, cfg);
   }

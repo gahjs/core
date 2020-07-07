@@ -8,7 +8,7 @@ import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 @injectable()
 export class DependencyController extends Controller {
 
-  public async remove(dependencyNames?: string[], moduleName?: string): Promise<void> {
+  public async remove(): Promise<void> {
 
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._loggerService.error('This command is unavailable for hosts');
@@ -17,14 +17,16 @@ export class DependencyController extends Controller {
     }
 
     const msgModule = 'Select a module you want to remove a dependency from';
-    moduleName = await ModuleReferenceHelper.askForModule(this._configService, this._promptService, this._loggerService, false, msgModule, moduleName);
+    const moduleName = await ModuleReferenceHelper.askForModule(this._configService, this._promptService, this._loggerService, false, msgModule);
     if (!moduleName) {
+      this._loggerService.warn('No module selected.');
       return;
     }
 
-    dependencyNames = await ModuleReferenceHelper.askForModuleDependencies(this._configService, this._promptService, this._loggerService, false, moduleName, dependencyNames);
+    const dependencyNames = await ModuleReferenceHelper.askForModuleDependencies(this._configService, this._promptService, this._loggerService, false, moduleName);
 
     if (!dependencyNames || dependencyNames.length === 0) {
+      this._loggerService.warn('No dependency selected.');
       return;
     }
 
@@ -41,25 +43,34 @@ export class DependencyController extends Controller {
     }
 
     this._configService.saveGahModuleConfig();
+
+    this._loggerService.success(`${dependencyNames.length === 1 ? 'Depdendency' : 'Dependencies'} ${dependencyNames.join(', ')} removed successfully`);
   }
 
-  public async add(moduleName?: string, dependencyConfigPath?: string, dependencyModuleNames?: string[]): Promise<void> {
+  public async add(): Promise<void> {
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._loggerService.error('This command is unavailable for hosts');
       this._loggerService.error('Please use the "reference" command instead');
       return;
     }
-
     this._loggerService.log('Adding new dependency to module');
 
+    const msgModule = 'Select a module you want to add a dependency to';
+    const moduleName = await ModuleReferenceHelper.askForModule(this._configService, this._promptService, this._loggerService, false, msgModule);
+    if (!moduleName) {
+      this._loggerService.error('No module selected.');
+      return;
+    }
+
     const msgFilePath = 'Path to the gah-module.json of the new dependency';
-    dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath, dependencyConfigPath);
+    const dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath);
     if (!dependencyConfigPath) {
+      this._loggerService.warn('No dependency selected.');
       return;
     }
     this._configService.readExternalConfig(dependencyConfigPath);
 
-    dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService, dependencyModuleNames);
+    const dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService);
 
     const module = this._configService.getGahModule().modules.find(x => x.name === moduleName);
     if (!module) { throw new Error(`Module '${moduleName}' could not be found`); }

@@ -15,13 +15,13 @@
 ✅ CI Support  
 ✅ Reload on save features fully supported for all dependencies  
 ✅ Pluggable: Write your own plugins to add project-specific functionality  
-✅ Use from code: Run the `install` and `run` commands from nodeJS scripts or from build tools like grunt  
+✅ Use from code: Run the `install` and `run` commands from NodeJS scripts or from build tools like grunt  
 
 ## Upcoming
 🆕 Multi-Repository Support  
 
 ## Getting started
-`gah` can be used both as a CLI tool and integrated into your node scripts or JS build systems [WIP].
+`gah` can be used both as a CLI tool and integrated into your NodeJS scripts or JS build systems.
 
 ### From CLI
 To use the `gah`-cli install the `@awdware/gah` package globally.
@@ -33,23 +33,23 @@ $ npm i -g @awdware/gah
 ```
 To get started you can generate an empty host with:
 ```
-$ gah init --host
+$ gah host init
 ```
 Navigate to your angular library containing the entry module. The entry module it the module that provides the basic structure of your application. Usually containing some sort of toolbar or menu and a `<router-outlet>` for the other modules. Initialize the entry module with the interactive CLI:
 ```
-$ gah init --entry
+$ gah module init --entry
 ```
-If the entry module has dependencies on other modules, you have to initialize those modules now. THerfor navigate to the project folder containing the dependency. Beware that the entry module should only have dependencies to shared library modules that do not provide any routing or pages themselves, but rather have some common controls and services. You can initialize any module with the interactive `init` command.
+If the entry module has dependencies on other modules, you have to initialize those modules now. Therefore navigate to the project folder containing the dependency. Beware that the entry module should only have dependencies to shared library modules that do not provide any routing or pages themselves, but rather have some common controls and services. You can initialize any module with the interactive `module init` command.
 ```
-$ gah init
+$ gah module init
 ```
 Then in your entry module you can go ahead and add the dependency with the following interactive CLI command:
 ```
-$ gah dependency add
+$ gah module dependency add
 ```
-To add modules to a host, you can use the `reference` command in the host folder.
+To add modules to a host, you can use the `host module` command in the host folder.
 ```
-$ gah reference add
+$ gah host module add
 ```
 If your setup is complete, you can go back to the host folder and install the previously configured dependencies:
 ```
