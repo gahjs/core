@@ -8,7 +8,7 @@ import { DependencyController } from './dependency.controller';
 import { InstallController } from './install.controller';
 import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
-import { ReferenceController } from './reference.controller';
+import { HostModuleController } from './hostModule.controller';
 import { GahModuleType } from '@awdware/gah-shared';
 import { CopyHost } from '../install-helper/copy-host';
 import { RunController } from './run.controller';
@@ -19,8 +19,8 @@ export class MainController extends Controller {
   private readonly _initController: InitController;
   @inject(DependencyController)
   private readonly _dependencyController: DependencyController;
-  @inject(ReferenceController)
-  private readonly _hostModuleController: ReferenceController;
+  @inject(HostModuleController)
+  private readonly _hostModuleController: HostModuleController;
   @inject(InstallController)
   private readonly _installController: InstallController;
   @inject(PluginController)

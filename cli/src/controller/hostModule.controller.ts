@@ -6,7 +6,7 @@ import { Controller } from './controller';
 import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 
 @injectable()
-export class ReferenceController extends Controller {
+export class HostModuleController extends Controller {
 
   public async remove(): Promise<void> {
     if (this._configService.getGahModuleType() === GahModuleType.MODULE) {
