@@ -1,4 +1,4 @@
-import { injectable, inject } from 'inversify';
+import { injectable } from 'inversify';
 
 import {
   GahEventHandler, GahPlugin, GahEventPayload, GahEvent, IPluginService, GahPluginDependencyConfig,
@@ -14,39 +14,47 @@ import { PromptService } from './prompt.service';
 import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
 import { ContextService } from './context-service';
-
+import DIContainer from '../di-container';
+import { createHash } from 'crypto';
 
 @injectable()
 export class PluginService implements IPluginService {
+
   private readonly _plugins = new Array<GahPlugin>();
   private readonly _handlers = new Array<GahEventHandler>();
+  private readonly _pluginFolder: string;
+  private readonly _pluginPackageJson: string;
 
   public pluginNames: { name: string, version: string }[] = [];
 
-  @inject(FileSystemService)
   private readonly _fileSystemService: IFileSystemService;
-  @inject(LoggerService)
   private readonly _loggerService: ILoggerService;
-  @inject(ConfigService)
   private readonly _configService: IConfigurationService;
-  @inject(TemplateService)
   private readonly _templateService: ITemplateService;
-  @inject(PromptService)
   private readonly _promptService: IPromptService;
-  @inject(WorkspaceService)
   private readonly _workspaceService: IWorkspaceService;
-  @inject(ExecutionService)
   private readonly _executionService: IExecutionService;
-  @inject(ContextService)
   private readonly _contextService: IContextService;
 
-  private get packageJsonPath(): string {
-    return this._contextService.getContext().calledFromHostFolder ? '.gah/package.json' : 'package.json';
-  }
-  private get cwd(): string | undefined {
-    return this._contextService.getContext().calledFromHostFolder ? '.gah' : undefined;
-  }
+  constructor() {
+    this._fileSystemService = DIContainer.get(FileSystemService);
+    this._loggerService = DIContainer.get(LoggerService);
+    this._configService = DIContainer.get(ConfigService);
+    this._templateService = DIContainer.get(TemplateService);
+    this._promptService = DIContainer.get(PromptService);
+    this._workspaceService = DIContainer.get(WorkspaceService);
+    this._executionService = DIContainer.get(ExecutionService);
+    this._contextService = DIContainer.get(ContextService);
 
+    const workspaceHash = createHash('md5').update(process.cwd()).digest('hex').substr(0, 6);
+    this._pluginFolder = this._fileSystemService.join(this._workspaceService.getGlobalGahFolder(), 'plugins', workspaceHash);
+    this._fileSystemService.ensureDirectory(this._pluginFolder);
+    this._pluginPackageJson = this._fileSystemService.join(this._pluginFolder, 'package.json');
+    if (!this._fileSystemService.fileExists(this._pluginPackageJson)) {
+      const packageJsonTemplatePath = this._fileSystemService.join(__dirname, '..', '..', 'assets', 'plugins', 'package.json');
+      this._fileSystemService.copyFile(packageJsonTemplatePath, this._pluginFolder);
+    }
+  }
 
   private initPluginServices(plugin: GahPlugin) {
     plugin['fileSystemService'] = this._fileSystemService;
@@ -59,74 +67,141 @@ export class PluginService implements IPluginService {
     plugin['pluginService'] = this;
   }
 
-  public async loadInstalledPlugins() {
-    if (this._configService.gahConfigExists()) {
-      const cfg = this._configService.getGahConfig();
-      if (cfg.plugins && cfg.plugins.length > 0) {
-        for (const plugin of cfg.plugins) {
-          this.pluginNames.push({ name: plugin.name, version: plugin.version });
-          await this.loadInstalledPlugin(plugin);
-        }
-      }
+
+  public async loadInstalledPlugins(): Promise<void> {
+    if (!this._configService.gahConfigExists()) {
+      return;
+    }
+    const cfg = this._configService.getGahConfig();
+    if (!cfg.plugins || cfg.plugins.length < 1) {
+      return;
+    }
+    for (const pluginCfg of cfg.plugins) {
+      const plugin = await this.ensurePluginIsInstalled(pluginCfg);
+      this.registerPlugin(plugin, pluginCfg);
     }
   }
 
-  private async loadInstalledPlugin(pluginDepCfg: GahPluginDependencyConfig) {
-    const success = this.tryLoadInstalledPlugin(pluginDepCfg);
+  private registerPlugin(plugin: GahPlugin, pluginDepCfg: GahPluginDependencyConfig) {
+    plugin.config = pluginDepCfg.settings;
+    this.initPluginServices(plugin);
+    plugin.onInit();
+    this._plugins.push(plugin);
+    this._loggerService.debug(`loaded plugin ${pluginDepCfg.name}`);
+  }
+
+  private async ensurePluginIsInstalled(pluginDepCfg: GahPluginDependencyConfig): Promise<GahPlugin> {
+    let plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name);
+    if (plugin) {
+      return plugin;
+    }
+
+    const success = await this.doInstallPlugin(pluginDepCfg.name, pluginDepCfg.version);
     if (!success) {
-      this._loggerService.log(`Plugin ${pluginDepCfg.name} has not been installed`);
-      await this.installPlugin(pluginDepCfg.name).then(success => {
-        if (!success) {
-          throw new Error(`Could not load plugin ${pluginDepCfg.name}`);
-        } else {
-          this.tryLoadInstalledPlugin(pluginDepCfg);
-        }
-      });
+      throw new Error('Failed');
     }
-    this._loggerService.log(`Plugin '${pluginDepCfg.name}' loaded.`);
+    plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name);
+    if (plugin) {
+      return plugin;
+    }
+
+    throw new Error('Failed');
   }
 
-  /**
-   * The plugin is loaded by importing a temporaty file that imports the npm package.
-   * This is required because otherwise gah would need to import an absolute path
-   * which would not work great with yarn workspaces. The working directory of dynamic imports
-   * is a miracle to me, this is a save way to make sure everything that the module could import,
-   * can also be imported by this plugin loading mechanic...
-   */
-  private tryLoadInstalledPlugin(pluginDepCfg: GahPluginDependencyConfig): boolean {
-    let pluginTmpPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.', 'node_modules');
-    if (!this._fileSystemService.directoryExists(pluginTmpPath)) {
-      pluginTmpPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.');
+  private async tryLoadInstalledPlugin(pluginName: string): Promise<GahPlugin | undefined> {
+    const pluginFolderPath = this._fileSystemService.join(this._pluginFolder, 'node_modules', pluginName);
+
+    if (!this._fileSystemService.fileExists(pluginFolderPath)) {
+      this._loggerService.debug(`Cannot find plugin folder at ${pluginFolderPath}`);
+      return undefined;
     }
-    pluginTmpPath = this._fileSystemService.join(pluginTmpPath, '~tmp-gah-file.js');
-    const pluginTmpContent = ''
-      + '// How did you manage to open this file?\n'
-      + '// It usually only exists for a fraction of a second and should not persist.\n'
-      + '// You can savely delete it!\n'
-      + '// If this file keeps getting created please open an issue here:\n'
-      + '// https://github.com/awdware/gah/issues/new\n\n'
-      + `exports.PluginType = require('${pluginDepCfg.name}').default;`;
-    this._fileSystemService.saveFile(pluginTmpPath, pluginTmpContent);
+
+    const pkgJsonPathOfPlugin = this._fileSystemService.join(pluginFolderPath, 'package.json');
+    const pkgJsonOfPlugin = this._fileSystemService.parseFile<PackageJson>(pkgJsonPathOfPlugin);
+
+    if (!pkgJsonOfPlugin.main) {
+      this._loggerService.debug('This package does not have the "main" property set');
+      throw new Error('This package is not a valid gah plugin');
+    }
+
+    const entryFileOfPlugin = this._fileSystemService.join(pluginFolderPath, pkgJsonOfPlugin.main);
+    if (!this._fileSystemService.fileExists(entryFileOfPlugin)) {
+      this._loggerService.debug('The "main" property of the package points to a file that does not exist');
+      throw new Error('This package is not a valid gah plugin');
+    }
 
     try {
-      const pluginModule = require(pluginTmpPath);
-      const plugin = new pluginModule.PluginType();
-      this.registerPlugin(plugin as GahPlugin, pluginDepCfg);
+      const pluginModule = require(entryFileOfPlugin);
+      const plugin = new pluginModule.default() as GahPlugin;
+      return plugin;
     } catch (error) {
       this._loggerService.debug(error);
-      return false;
-    } finally {
-      this._fileSystemService.deleteFile(pluginTmpPath);
+      return undefined;
     }
+  }
+
+  private async checkPlugin(plugin: GahPlugin, pluginName: string) {
+    if (!plugin.onInit || !plugin['registerEventListener'] || !plugin.onInstall || !plugin['name']) {
+      if (!plugin.onInit) { this._loggerService.debug('Plugin doesn\'t implement onInit method'); }
+      if (!plugin['registerEventListener']) { this._loggerService.debug('Plugin doesn\'t implement registerEventListener method'); }
+      if (!plugin.onInstall) { this._loggerService.debug('Plugin doesn\'t implement onInstall method'); }
+      if (!plugin['name']) { this._loggerService.debug('Plugin doesn\'t call super constructor with the plugin name'); }
+      return false;
+    }
+    this.initPluginServices(plugin);
+
+    const cfg = this._configService.getGahConfig();
+    const pluginCfg = cfg.plugins!.find(x => x.name === pluginName)!;
+
+    this._loggerService.log(`Starting settings configuration for '${pluginName}'`);
+    pluginCfg.settings = await plugin.onInstall(pluginCfg.settings);
+    this._loggerService.log('Plugin settings configuration finished');
+    this._configService.saveGahConfig();
 
     return true;
   }
 
-  private registerPlugin(plugin: GahPlugin, pluginDepCfg: GahPluginDependencyConfig) {
-    plugin['config'] = pluginDepCfg.settings;
-    this.initPluginServices(plugin);
-    plugin['onInit']();
-    this._plugins.push(plugin);
+  public async doInstallPlugin(pluginName: string, pluginVersion?: string): Promise<boolean> {
+    this._loggerService.startLoadingAnimation('Downloading Plugin');
+    const pluginVersionOrEmpty = pluginVersion ? `@${pluginVersion}` : '';
+    const success = await this._executionService.execute(`yarn add ${pluginName}${pluginVersionOrEmpty} -D -E`, false, undefined, this._pluginFolder);
+    if (!success) {
+      this._loggerService.stopLoadingAnimation(false, false, 'Downloading Plugin failed (check the package name again)');
+      return false;
+    }
+    this._loggerService.stopLoadingAnimation(false, true, 'Downloading Plugin succeeded');
+
+    await this.saveChangesToGahConfig(pluginName);
+    return true;
+  }
+
+  private async saveChangesToGahConfig(pluginName: string) {
+    const cfg = this._configService.getGahConfig();
+    let pluginCfg: GahPluginDependencyConfig;
+    if (!cfg.plugins) {
+      cfg.plugins = new Array<GahPluginDependencyConfig>();
+    }
+    if (cfg.plugins.some(x => x.name === pluginName)) {
+      pluginCfg = cfg.plugins.find(x => x.name === pluginName)!;
+    } else {
+      pluginCfg = new GahPluginDependencyConfig();
+    }
+    pluginCfg.name = pluginName!;
+
+    const vOut = this._executionService.executionResult;
+    const versionRegex = new RegExp(`${pluginName}@([\\w\\d.-]+)$`, 'm');
+    const v = vOut.match(versionRegex)?.[1];
+    if (!v) {
+      throw Error('Could not find version of the newly installed plugin');
+    }
+    pluginCfg.version = v;
+
+    if (!cfg.plugins.some(x => x.name === pluginName)) {
+      cfg.plugins.push(pluginCfg);
+    }
+    this._configService.saveGahConfig();
+
+    return pluginCfg;
   }
 
   public triggerEvent(event: GahEvent, payload: GahEventPayload) {
@@ -153,89 +228,31 @@ export class PluginService implements IPluginService {
   }
 
   public async installPlugin(pluginName: string): Promise<boolean> {
-    const packageJson = this._fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
-
-    const alreadyInstalled = (packageJson.dependencies?.[pluginName] || packageJson.devDependencies?.[pluginName]) && true;
-
-    this._loggerService.startLoadingAnimation('Downloading Plugin');
-    const success = await this._executionService.execute(`yarn add ${pluginName} -D -E`, false, undefined, this.cwd);
-    if (!success) {
-      this._loggerService.stopLoadingAnimation(false, false, 'Downloading Plugin failed');
-      return false;
-    }
-    this._loggerService.stopLoadingAnimation(false, true, 'Downloading Plugin succeeded');
-    this._loggerService.startLoadingAnimation('Checking Plugin');
-    const pluginPath = this._fileSystemService.join(process.cwd(), this.cwd ?? '.', 'node_modules', pluginName);
-    const pluginDefinition = await import(pluginPath);
-    let plugin: GahPlugin;
-    try {
-      plugin = new pluginDefinition.default() as GahPlugin;
-    } catch (error) {
-      this._loggerService.stopLoadingAnimation(false, false, 'This package is not a valid GahPlugin!');
-      if (!alreadyInstalled) {
-        await this.removePackage(pluginName);
+    let plugin = await this.tryLoadInstalledPlugin(pluginName);
+    if (!plugin) {
+      const success = await this.doInstallPlugin(pluginName);
+      if (!success) {
+        throw new Error('Failed to install the plugin');
       }
-      return false;
+      plugin = await this.tryLoadInstalledPlugin(pluginName);
     }
-    if (!plugin['onInit'] || !plugin['registerEventListener'] || !plugin['onInstall'] || !plugin['name']) {
-      this._loggerService.stopLoadingAnimation(false, false, 'This package is not a valid GahPlugin!');
-
-      if (!plugin['onInit']) { this._loggerService.debug('Plugin doesn\'t implement onInit method'); }
-      if (!plugin['registerEventListener']) { this._loggerService.debug('Plugin doesn\'t implement registerEventListener method'); }
-      if (!plugin['onInstall']) { this._loggerService.debug('Plugin doesn\'t implement onInstall method'); }
-      if (!plugin['name']) { this._loggerService.debug('Plugin doesn\'t call super constructor with the plugin name'); }
-
-      if (!alreadyInstalled) {
-        await this.removePackage(pluginName);
-      }
-      return false;
+    if (!plugin) {
+      throw new Error('Failed to install the plugin');
     }
-    this.initPluginServices(plugin);
-    this._loggerService.stopLoadingAnimation(false, true, 'Plugin checked');
-    const cfg = this._configService.getGahConfig();
-    let pluginCfg: GahPluginDependencyConfig;
-    if (!cfg.plugins) {
-      cfg.plugins = new Array<GahPluginDependencyConfig>();
-    }
-    if (cfg.plugins.some(x => x.name === pluginName)) {
-      pluginCfg = cfg.plugins.find(x => x.name === pluginName)!;
-    } else {
-      pluginCfg = new GahPluginDependencyConfig();
-    }
-    pluginCfg.name = pluginName!;
-    this._loggerService.log(`Starting settings configuration for '${pluginName}'`);
-    pluginCfg.settings = await plugin['onInstall'](pluginCfg.settings);
-    this._loggerService.log('Plugin settings configuration finished');
-    await this._executionService.execute(`yarn info ${pluginCfg.name} version`, false);
-    const vOut = this._executionService.executionResult;
-    const v = vOut.match(/yarn\sinfo\sv\d+.\d+.\d+\s([\w\d.-]+)\sDone/)?.[1];
-    if (!v) {
-      throw Error('Could not find version of the newly installed plugin');
-    }
-    pluginCfg.version = v;
-
-
-    if (!cfg.plugins.some(x => x.name === pluginName)) {
-      cfg.plugins.push(pluginCfg);
-    }
-    this._configService.saveGahConfig();
-    return true;
-  }
-
-  private async removePackage(pluginName: string) {
-    this._loggerService.startLoadingAnimation('Cleaning up downloaded packages.');
-    const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this.cwd);
-    if (success) {
-      this._loggerService.stopLoadingAnimation(false, true, 'Cleaned up downloaded packages.');
-    } else {
-      this._loggerService.stopLoadingAnimation(false, false, 'Cleaning up downloaded packages failed! Stacktrace:');
-      this._loggerService.error(this._executionService.executionErrorResult);
-    }
+    return this.checkPlugin(plugin, pluginName);
   }
 
   public async removePlugin(pluginName: string): Promise<boolean> {
     this._loggerService.startLoadingAnimation(`Uninstalling plugin: ${pluginName}`);
-    const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this.cwd);
+
+    const cfg = this._configService.getGahConfig();
+    const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
+    if (idx === -1) { throw new Error(`Error uninstalling plugin ${pluginName}`); }
+
+    cfg.plugins?.splice(idx, 1);
+    this._configService.saveGahConfig();
+
+    const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this._pluginFolder);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, `Plugin '${pluginName}' has been uninstalled.`);
       return true;
@@ -246,6 +263,7 @@ export class PluginService implements IPluginService {
     }
   }
 
+
   public async getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null> {
     const cfg = this._configService.getGahConfig();
     if (!cfg.plugins) {
@@ -253,10 +271,10 @@ export class PluginService implements IPluginService {
       return null;
     }
 
-    const searchForPkugins = pluginName ?? cfg.plugins.map(x => x.name).join(' ');
+    const searchForPlugins = pluginName ?? cfg.plugins.map(x => x.name).join(' ');
 
     this._loggerService.startLoadingAnimation('Searching for plugin updates');
-    await this._executionService.execute(`yarn outdated ${searchForPkugins}`, false, undefined, this.cwd);
+    await this._executionService.execute(`yarn outdated ${searchForPlugins}`, false, undefined, this._pluginFolder);
     const yarnOutput = this._executionService.executionResult;
     const updates = new Array<PlguinUpdate>();
     yarnOutput.split('\n').forEach(yarnOutputLine => {
@@ -277,7 +295,7 @@ export class PluginService implements IPluginService {
 
   public async updatePlugins(pluginUpdates: PlguinUpdate[]) {
     this._loggerService.startLoadingAnimation('Updating plugins');
-    const success = await this._executionService.execute(`yarn add ${pluginUpdates.map(x => x.name).join(' ')} -D -E`, false, undefined, this.cwd);
+    const success = await this._executionService.execute(`yarn add ${pluginUpdates.map(x => x.name).join(' ')} -D -E`, false, undefined, this._pluginFolder);
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, 'Updated plugins');
     } else {
@@ -291,4 +309,5 @@ export class PluginService implements IPluginService {
     });
     this._configService.saveGahConfig();
   }
+
 }

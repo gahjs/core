@@ -234,10 +234,6 @@ export class GahHostDef extends GahModuleBase {
 
     }
 
-    this.pluginService.pluginNames.forEach(x => {
-      hostDevDeps[x.name] = x.version;
-    });
-
     // Saving the file back into the host package.json
     this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
   }

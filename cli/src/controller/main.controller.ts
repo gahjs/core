@@ -31,6 +31,7 @@ export class MainController extends Controller {
   public async main() {
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
+      // TODO: maybe this can be (re)moved...
       CopyHost.copy(this._fileSystemService, this._workspaceService);
     }
 

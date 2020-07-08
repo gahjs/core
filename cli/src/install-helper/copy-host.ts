@@ -15,7 +15,7 @@ export class CopyHost {
     fileSystemService.copyFilesInDirectory(fileSystemService.join(__dirname, '../../assets/host-template'), destinationFolder);
 
     if (platform() === 'win32') {
-      const fswin = require('fswin');
+      const fswin = require('fswin'); //TODO: Move this to fileSystemService!
       fswin.setAttributesSync('.gah', { IS_HIDDEN: true });
     }
   }

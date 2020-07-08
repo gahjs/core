@@ -2,6 +2,9 @@ import { injectable } from 'inversify';
 import { exec, spawn } from 'child_process';
 import { IExecutionService } from '@awdware/gah-shared';
 
+/**
+ * TODO: Use loggerservice to ensure that this works with loading animations, but without any square before the msg
+ */
 @injectable()
 export class ExecutionService implements IExecutionService {
   public executionResult: string = '';

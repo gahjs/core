@@ -9,5 +9,4 @@ export interface IPluginService {
   removePlugin(pluginName: string): Promise<boolean>;
   getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null>;
   updatePlugins(pluginUpdates: PlguinUpdate[]): Promise<void>;
-  pluginNames: { name: string, version: string }[];
 }

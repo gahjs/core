@@ -4,6 +4,11 @@ import ora, { Ora } from 'ora';
 import chalk from 'chalk';
 import { ContextService } from './context-service';
 
+/**
+ * TODO: Add logging to a file (error only or all)
+ * Either flag or property in GahConfig!
+ */
+
 @injectable()
 export class LoggerService implements ILoggerService {
   private _ora: Ora;

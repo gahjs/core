@@ -35,18 +35,9 @@ export class PluginController extends Controller {
 
     const pluginName_ = await this.askForInstalledPlugin('Please select the plugin you want to remove', pluginName);
     if (!pluginName_) { return; }
+    pluginName = pluginName || pluginName_;
 
-    const success = await this._pluginService.removePlugin(pluginName_);
-    if (success) {
-      const cfg = this._configService.getGahConfig();
-      const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
-      if (idx === -1) { throw new Error(`Error uninstalling plugin ${pluginName}`); }
-
-      cfg.plugins?.splice(idx, 1);
-      this._configService.saveGahConfig();
-    } else {
-      throw new Error(`Error uninstalling plugin ${pluginName}`);
-    }
+    await this._pluginService.removePlugin(pluginName);
   }
 
   public async update(pluginName: string) {

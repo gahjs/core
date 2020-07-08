@@ -10,7 +10,7 @@ export class ContextService implements IContextService {
     this._ctx = {};
   }
 
-  setContext(context: GahContext): void {
+  setContext(context: Partial<GahContext>): void {
     Object.keys(context).forEach(k => {
       (this._ctx as any)[k] = (context as any)[k];
     });

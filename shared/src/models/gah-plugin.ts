@@ -11,7 +11,7 @@ import { IExecutionService } from '../services/execution.service';
 
 export abstract class GahPlugin {
   protected readonly name: string;
-  protected config: GahPluginConfig;
+  public config: GahPluginConfig;
 
   protected fileSystemService: IFileSystemService;
   protected loggerService: ILoggerService;
@@ -28,8 +28,8 @@ export abstract class GahPlugin {
     this.name = pluginName;
   }
 
-  protected abstract onInit(): void;
-  protected abstract onInstall(existingSettings?: GahPluginConfig): Promise<GahPluginConfig>;
+  public abstract onInit(): void;
+  public abstract onInstall(existingSettings?: GahPluginConfig): Promise<GahPluginConfig>;
 
   protected registerEventListener(event: GahEvent, handler: (event: GahEventPayload) => void): void {
     this.pluginService.registerEventHandler(this.name, event, handler);
