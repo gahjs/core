@@ -116,25 +116,19 @@ export class PluginService implements IPluginService {
       return undefined;
     }
 
-    const pkgJsonPathOfPlugin = this._fileSystemService.join(pluginFolderPath, 'package.json');
-    const pkgJsonOfPlugin = this._fileSystemService.parseFile<PackageJson>(pkgJsonPathOfPlugin);
-
-    if (!pkgJsonOfPlugin.main) {
-      this._loggerService.debug('This package does not have the "main" property set');
-      throw new Error('This package is not a valid gah plugin');
-    }
-
-    const entryFileOfPlugin = this._fileSystemService.join(pluginFolderPath, pkgJsonOfPlugin.main);
-    if (!this._fileSystemService.fileExists(entryFileOfPlugin)) {
-      this._loggerService.debug('The "main" property of the package points to a file that does not exist');
-      throw new Error('This package is not a valid gah plugin');
+    const importFileName = this._fileSystemService.join(this._pluginFolder, `${pluginName.replace(/\//g, '_')}.js`);
+    if (!this._fileSystemService.fileExists(importFileName)) {
+      const importFileContent = `exports.PluginType = require("${pluginName}").default;`;
+      this._fileSystemService.saveFile(importFileName, importFileContent);
     }
 
     try {
-      const pluginModule = require(entryFileOfPlugin);
-      const plugin = new pluginModule.default() as GahPlugin;
+      // const pluginModule = require(entryFileOfPlugin);
+      const pluginModule = require(importFileName);
+      const plugin = new pluginModule.PluginType() as GahPlugin;
       return plugin;
     } catch (error) {
+      this._loggerService.debug('Plugin package folder exists, but import failed');
       this._loggerService.debug(error);
       return undefined;
     }
