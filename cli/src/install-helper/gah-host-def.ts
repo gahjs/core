@@ -9,6 +9,7 @@ import readline from 'readline';
 export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
   private readonly _indexHtmlLines: string[];
+  private readonly _baseHref: string;
   private readonly _title: string;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
@@ -36,6 +37,7 @@ export class GahHostDef extends GahModuleBase {
     });
     this._ngOptions.aot = hostCfg.aot ?? true; // If not set the default value is true
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
+    this._baseHref = hostCfg.baseHref ? hostCfg.baseHref : '/';
     this._title = hostCfg.title ?? '';
     this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`);
   }
@@ -91,6 +93,8 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('ANGULAR_JSON_ADJUSTED', { module: this.data() });
     this.adjustIndexHtml();
     this.pluginService.triggerEvent('INDEX_HTML_ADJUSTED', { module: this.data() });
+    this.adjustWebConfig();
+    this.pluginService.triggerEvent('WEB_CONFIG_ADJUSTED', { module: this.data() });
     await this.installPackages();
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
   }
@@ -265,6 +269,15 @@ export class GahHostDef extends GahModuleBase {
     htmlContent = htmlContent.replace('<!--[title]-->', `<title>${this._title}</title>`);
 
     this.fileSystemService.saveFile(indexHtmlPath, htmlContent);
+  }
+
+  private adjustWebConfig() {
+    if (this._baseHref) {
+      const webConfigPath = this.fileSystemService.join(this.basePath, this.srcBasePath, 'web.config');
+      let webConfigContent = this.fileSystemService.readFile(webConfigPath);
+      webConfigContent = webConfigContent.replace(/(<action type="Rewrite" url=")([\w/_-]+)(")/, `$1${this._baseHref}$3`);
+      this.fileSystemService.saveFile(webConfigPath, webConfigContent);
+    }
   }
 
 }

@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@awdware/gah-shared@^0.0.31":
-  version "0.0.31"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.31.tgz#f718d3429ca4e4c3ee2361faf5ff9030705da9c4"
-  integrity sha512-HzDbvRKKIkw/PB9y9GgYSTXopYSBz4CvYuNY0ev0SFz8ythAgPyK0JWFlZRlnlh0sEPvgCP5J7eOvPvjgFtisA==
+"@awdware/gah-shared@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.33.tgz#90dca74f9a0cc3bf26410bcf258b0b384c8bdae7"
+  integrity sha512-8+LzKf42ETmmlrq9YZKoywHSYkyduTJGf4cJlGVtT7ehMnItgiCN53xJQ2nd7Bc9qQn0sxrwUXDSaPryhAv5Wg==
 
 "@babel/code-frame@^7.0.0":
   version "7.10.1"
@@ -1574,10 +1574,10 @@ kind-of@^6.0.0, kind-of@^6.0.2, kind-of@^6.0.3:
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
 
-legally@^3.5.2:
-  version "3.5.2"
-  resolved "https://registry.yarnpkg.com/legally/-/legally-3.5.2.tgz#4605bafb91d1003eb0e3523d5c95cb0f142af155"
-  integrity sha512-fUU6+pYMN6ZBiElcbG4B2J+slFCC5Q7QilB3A6ZmOXT/a9A9RDxRB8wZ6WxBgMTVN41BHkLP6aAyE+eURuvYGQ==
+legally@^3.5.6:
+  version "3.5.6"
+  resolved "https://registry.yarnpkg.com/legally/-/legally-3.5.6.tgz#0145849f4466766dfc69c07fbba1b7c7a1b5bc99"
+  integrity sha512-D02rCsi9waSThR7++6QkEQs3bUsam/YPC08GiAyYnK2tNm4eo6rMIo0SnUAsKfjYNVOQIzCqQigjgCipKnJ41g==
 
 levn@^0.3.0, levn@~0.3.0:
   version "0.3.0"

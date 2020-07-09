@@ -19,6 +19,7 @@ export type GahEvent =
   { type: 'GITIGNORE_ADJUSTED', module?: GahModuleData } |
   { type: 'ANGULAR_JSON_ADJUSTED', module?: GahModuleData } |
   { type: 'INDEX_HTML_ADJUSTED', module?: GahModuleData } |
+  { type: 'WEB_CONFIG_ADJUSTED', module?: GahModuleData } |
   { type: 'PACKAGES_INSTALLED', module?: GahModuleData }
 
 export type GahEventType = GahEvent['type'];

@@ -22,6 +22,11 @@ export class GahHost {
    */
   public title?: string;
 
+  /**
+   * The baseHref that is put into the web.config for redirect rules (defaults to '/')
+   */
+  public baseHref?: string;
+
   public get isHost() { return true; }
 
   constructor() {
