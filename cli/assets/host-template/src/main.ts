@@ -4,6 +4,7 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { GahEnvironment } from '@awdware/gah-shared';
+import { init } from './init.app';
 
 if (environment.production) {
   enableProdMode();
@@ -16,17 +17,14 @@ fetch('environment.json')
     if (!environment.production) {
       console.log(env);
     }
-    const win = window as any as Window & { __env: GahEnvironment };
-    win.__env = env;
+
+    init(env);
 
     platformBrowserDynamic().bootstrapModule(AppModule)
       .catch(err => console.error(err));
 
-
   })
   .catch(err => {
-    const win = window as any as Window & { __env: GahEnvironment };
-    win.__env = {} as GahEnvironment;
     console.error('environment.json not found or not readable\nTrace:');
     console.error(err);
   });
