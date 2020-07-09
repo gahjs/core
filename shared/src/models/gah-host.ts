@@ -22,11 +22,6 @@ export class GahHost {
    */
   public title?: string;
 
-  /**
-   * The baseHref that is put into the index html file (defaults to '/')
-   */
-  public baseHref?: string;
-
   public get isHost() { return true; }
 
   constructor() {

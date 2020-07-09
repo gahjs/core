@@ -10,7 +10,6 @@ export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
   private readonly _indexHtmlLines: string[];
   private readonly _title: string;
-  private readonly _baseHref: string;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
@@ -38,7 +37,6 @@ export class GahHostDef extends GahModuleBase {
     this._ngOptions.aot = hostCfg.aot ?? true; // If not set the default value is true
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
     this._title = hostCfg.title ?? '';
-    this._baseHref = hostCfg.baseHref ?? '/';
     this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`);
   }
 
@@ -265,7 +263,6 @@ export class GahHostDef extends GahModuleBase {
     }
 
     htmlContent = htmlContent.replace('<!--[title]-->', `<title>${this._title}</title>`);
-    htmlContent = htmlContent.replace('<!--[baseHref]-->', `<base href="${this._baseHref}">`);
 
     this.fileSystemService.saveFile(indexHtmlPath, htmlContent);
   }
