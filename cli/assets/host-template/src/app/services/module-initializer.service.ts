@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Location } from "@angular/common";
 import { Resolve, Router, Routes } from '@angular/router';
 import { Observable } from 'rxjs';
 
@@ -9,15 +10,18 @@ import { GahEnvironment } from '@awdware/gah-shared';
 @Injectable({ providedIn: 'root' })
 export class ModuleInitializerService implements Resolve<null> {
   private readonly _router: Router;
+  private readonly _location: Location;
   private readonly _modules = new Array<any>();
-  private _facadeRoutes: Routes = [];
   private readonly _routes: Routes = [];
   private readonly _env: GahEnvironment;
+  private _facadeRoutes: Routes = [];
 
   constructor(
     router: Router,
+    location: Location
   ) {
     this._router = router;
+    this._location = location;
     const win: Window & { __env: GahEnvironment } = window as any;
     this._env = win.__env;
     win.__env = undefined; // This is not needed currently, maybe there are usecases?
@@ -54,7 +58,15 @@ export class ModuleInitializerService implements Resolve<null> {
         urlParams.forEach((v, k) => {
           params[k] = v;
         });
-        this._router.navigate(window.location.pathname.split('/'), { queryParams: params });
+
+        const baseHref = document.getElementsByTagName('head')[0].getElementsByTagName('base')[0].getAttribute('href');
+        let location = window.location.pathname;
+        if (baseHref && baseHref.length > 1) {
+          location = location.replace(baseHref, '');
+        }
+
+        this._router.navigate(location.split('/'), { queryParams: params });
+        this._router.config
 
         obs.next(null);
       });
