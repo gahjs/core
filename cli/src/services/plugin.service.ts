@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
 
 import {
-  GahEventHandler, GahPlugin, GahEventPayload, GahEvent, IPluginService, GahPluginDependencyConfig,
-  PackageJson, IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
-  ILoggerService, IFileSystemService, IContextService, PlguinUpdate
+  GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig,
+  IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
+  ILoggerService, IFileSystemService, IContextService, PlguinUpdate, GahEventType, ExtractEventPayload
 } from '@awdware/gah-shared';
 
 import { FileSystemService } from './file-system.service';
@@ -21,7 +21,7 @@ import { createHash } from 'crypto';
 export class PluginService implements IPluginService {
 
   private readonly _plugins = new Array<GahPlugin>();
-  private readonly _handlers = new Array<GahEventHandler>();
+  private readonly _handlers = new Array<GahEventHandler<any>>();
   private readonly _pluginFolder: string;
   private readonly _pluginPackageJson: string;
 
@@ -123,7 +123,6 @@ export class PluginService implements IPluginService {
     }
 
     try {
-      // const pluginModule = require(entryFileOfPlugin);
       const pluginModule = require(importFileName);
       const plugin = new pluginModule.PluginType() as GahPlugin;
       return plugin;
@@ -198,9 +197,9 @@ export class PluginService implements IPluginService {
     return pluginCfg;
   }
 
-  public triggerEvent(event: GahEvent, payload: GahEventPayload) {
+  triggerEvent<T extends GahEventType>(type: T, payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>): void {
     this._handlers.forEach(handler => {
-      if (handler.event === event) {
+      if (handler.eventType === type) {
         try {
           handler.handler(payload);
         } catch (error) {
@@ -213,10 +212,10 @@ export class PluginService implements IPluginService {
     });
   }
 
-  public registerEventHandler(pluginName: string, event: GahEvent, handler: (payload: GahEventPayload) => void) {
-    const newHandler = new GahEventHandler();
+  registerEventHandler<T extends GahEventType>(pluginName: string, type: T, handler: (payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>) => void): void {
+    const newHandler = new GahEventHandler<T>();
     newHandler.pluginName = pluginName;
-    newHandler.event = event;
+    newHandler.eventType = type;
     newHandler.handler = handler;
     this._handlers.push(newHandler);
   }

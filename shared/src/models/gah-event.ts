@@ -1,52 +1,25 @@
 import { GahFileData } from './install-helper/gah-file-data';
 import { GahModuleData } from './install-helper/gah-module-data';
 
-export enum GahEvent {
-  UNKNOWN,
-  INSTALL_FINISHED,
-  INSTALL_STARTED,
-  HOST_COPIED,
-  STARTING_MODULE_INSTALL,
-  FINISHED_MODULE_INSTALL,
-  TS_CONFIG_CLEANED,
-  GAH_FOLDER_CLEANED,
-  STYLES_FILE_GENERATED,
-  SYMLINKS_CREATED,
-  TS_CONFIG_ADJUSTED,
-  TEMPLATE_GENERATED,
-  ASSETS_BASE_STYLES_COPIED,
-  DEPENDENCIES_MERGED,
-  STYLE_IMPORTS_GENERATED,
-  GITIGNORE_ADJUSTED,
-  ANGULAR_JSON_ADJUSTED,
-  INDEX_HTML_ADJUSTED,
-  PACKAGES_INSTALLED,
-}
-export interface GahEventPayload {
-}
+export type GahEvent =
+  { type: 'INSTALL_FINISHED', gahFile?: GahFileData } |
+  { type: 'INSTALL_STARTED', gahFile?: GahFileData } |
+  { type: 'HOST_COPIED', gahFile?: GahFileData } |
+  { type: 'STARTING_MODULE_INSTALL', module?: GahModuleData } |
+  { type: 'FINISHED_MODULE_INSTALL', module?: GahModuleData } |
+  { type: 'TS_CONFIG_CLEANED', module?: GahModuleData } |
+  { type: 'GAH_FOLDER_CLEANED', module?: GahModuleData } |
+  { type: 'STYLES_FILE_GENERATED', module?: GahModuleData } |
+  { type: 'SYMLINKS_CREATED', module?: GahModuleData } |
+  { type: 'TS_CONFIG_ADJUSTED', module?: GahModuleData } |
+  { type: 'TEMPLATE_GENERATED', module?: GahModuleData } |
+  { type: 'ASSETS_BASE_STYLES_COPIED', module?: GahModuleData } |
+  { type: 'DEPENDENCIES_MERGED', module?: GahModuleData } |
+  { type: 'STYLE_IMPORTS_GENERATED', module?: GahModuleData } |
+  { type: 'GITIGNORE_ADJUSTED', module?: GahModuleData } |
+  { type: 'ANGULAR_JSON_ADJUSTED', module?: GahModuleData } |
+  { type: 'INDEX_HTML_ADJUSTED', module?: GahModuleData } |
+  { type: 'PACKAGES_INSTALLED', module?: GahModuleData }
 
-export interface GahFileDataPayload extends GahEventPayload {
-  readonly gahFile?: GahFileData;
-}
-export interface GahModuleDataPayload extends GahEventPayload {
-  readonly module?: GahModuleData;
-}
-
-export type InstallFinishedEvent = GahFileDataPayload;
-export type InstallStartedEvent = GahFileDataPayload;
-export type HostCopiedEvent = GahFileDataPayload;
-export type StartingModuleInstallEvent = GahModuleDataPayload;
-export type FinishedgModuleInstallEvent = GahModuleDataPayload;
-export type TsConfigCleanedEvent = GahModuleDataPayload;
-export type GahFolderCleanedEvent = GahModuleDataPayload;
-export type StylesFileGeneratedEvent = GahModuleDataPayload;
-export type SymlinksCreatedEvent = GahModuleDataPayload;
-export type TsConfigAdjustedEvent = GahModuleDataPayload;
-export type TemplateGeneratedEvent = GahModuleDataPayload;
-export type AssetsBaseStylesCopiedEvent = GahModuleDataPayload;
-export type DependenciesMergedEvent = GahModuleDataPayload;
-export type StyleImportsGeneratedEvent = GahModuleDataPayload;
-export type GitignoreAdjustedEvent = GahModuleDataPayload;
-export type AngularJsonAdjustedEvent = GahModuleDataPayload;
-export type IndexHtmlAdjustedEvent = GahModuleDataPayload;
-export type PackagesInstalledEvent = GahModuleDataPayload;
+export type GahEventType = GahEvent['type'];
+export type ExtractEventPayload<A, T> = A extends { type: T } ? A : never

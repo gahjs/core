@@ -5,7 +5,7 @@ import { ITemplateService } from '../services/template.service';
 import { IPromptService } from '../services/prompt.service';
 import { IWorkspaceService } from '../services/workspace.service';
 import { IPluginService } from '../services/plugin.service';
-import { GahEvent, GahEventPayload } from './gah-event';
+import { GahEvent, ExtractEventPayload, GahEventType } from './gah-event';
 import { GahPluginConfig } from './gah-plugin-config';
 import { IExecutionService } from '../services/execution.service';
 
@@ -31,7 +31,7 @@ export abstract class GahPlugin {
   public abstract onInit(): void;
   public abstract onInstall(existingSettings?: GahPluginConfig): Promise<GahPluginConfig>;
 
-  protected registerEventListener(event: GahEvent, handler: (event: GahEventPayload) => void): void {
-    this.pluginService.registerEventHandler(this.name, event, handler);
+  protected registerEventListener<T extends GahEventType>(type: T, handler: (payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>) => void): void {
+    this.pluginService.registerEventHandler(this.name, type, handler);
   }
 }

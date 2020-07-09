@@ -1,9 +1,6 @@
 import { GahModuleBase } from './gah-module-base';
 import {
-  GahHost, PackageJson, GahModuleData, GahEvent, StylesFileGeneratedEvent,
-  GahFolderCleanedEvent, TsConfigCleanedEvent, SymlinksCreatedEvent, TsConfigAdjustedEvent,
-  TemplateGeneratedEvent, AssetsBaseStylesCopiedEvent, DependenciesMergedEvent, GitignoreAdjustedEvent,
-  AngularJsonAdjustedEvent, StyleImportsGeneratedEvent, PackagesInstalledEvent, IndexHtmlAdjustedEvent
+  GahHost, PackageJson, GahModuleData
 } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
@@ -58,11 +55,11 @@ export class GahHostDef extends GahModuleBase {
     this.installed = true;
 
     this.tsConfigFile.clean();
-    this.pluginService.triggerEvent(GahEvent.TS_CONFIG_CLEANED, { module: this.data() } as TsConfigCleanedEvent);
+    this.pluginService.triggerEvent('TS_CONFIG_CLEANED', { module: this.data() });
     this.gahFolder.cleanGeneratedDirectory();
     this.gahFolder.cleanDependencyDirectory();
     this.gahFolder.cleanStylesDirectory();
-    this.pluginService.triggerEvent(GahEvent.GAH_FOLDER_CLEANED, { module: this.data() } as GahFolderCleanedEvent);
+    this.pluginService.triggerEvent('GAH_FOLDER_CLEANED', { module: this.data() });
 
     this.fileSystemService.deleteFilesInDirectory(this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets'));
     this.fileSystemService.ensureDirectory(this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets'));
@@ -74,30 +71,30 @@ export class GahHostDef extends GahModuleBase {
       + ' *              Check the documentation for how to edit your global styles:              *\n'
       + ' *                          https://github.com/awdware/gah/wiki                          *\n'
       + ' * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n');
-    this.pluginService.triggerEvent(GahEvent.STYLES_FILE_GENERATED, { module: this.data() } as StylesFileGeneratedEvent);
+    this.pluginService.triggerEvent('STYLES_FILE_GENERATED', { module: this.data() });
 
     await this.createSymlinksToDependencies();
-    this.pluginService.triggerEvent(GahEvent.SYMLINKS_CREATED, { module: this.data() } as SymlinksCreatedEvent);
+    this.pluginService.triggerEvent('SYMLINKS_CREATED', { module: this.data() });
 
     this.addDependenciesToTsConfigFile();
-    this.pluginService.triggerEvent(GahEvent.TS_CONFIG_ADJUSTED, { module: this.data() } as TsConfigAdjustedEvent);
+    this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
     this.generateFromTemplate();
-    this.pluginService.triggerEvent(GahEvent.TEMPLATE_GENERATED, { module: this.data() } as TemplateGeneratedEvent);
+    this.pluginService.triggerEvent('TEMPLATE_GENERATED', { module: this.data() });
     this.copyAssetsAndBaseStyles();
-    this.pluginService.triggerEvent(GahEvent.ASSETS_BASE_STYLES_COPIED, { module: this.data() } as AssetsBaseStylesCopiedEvent);
+    this.pluginService.triggerEvent('ASSETS_BASE_STYLES_COPIED', { module: this.data() });
     this.mergePackageDependencies();
-    this.pluginService.triggerEvent(GahEvent.DEPENDENCIES_MERGED, { module: this.data() } as DependenciesMergedEvent);
+    this.pluginService.triggerEvent('DEPENDENCIES_MERGED', { module: this.data() });
     this.generateStyleImports();
-    this.pluginService.triggerEvent(GahEvent.STYLE_IMPORTS_GENERATED, { module: this.data() } as StyleImportsGeneratedEvent);
+    this.pluginService.triggerEvent('STYLE_IMPORTS_GENERATED', { module: this.data() });
     this.adjustGitignore();
     this.adjustGitignoreForHost();
-    this.pluginService.triggerEvent(GahEvent.GITIGNORE_ADJUSTED, { module: this.data() } as GitignoreAdjustedEvent);
+    this.pluginService.triggerEvent('GITIGNORE_ADJUSTED', { module: this.data() });
     this.adjustAngularJsonConfig();
-    this.pluginService.triggerEvent(GahEvent.ANGULAR_JSON_ADJUSTED, { module: this.data() } as AngularJsonAdjustedEvent);
+    this.pluginService.triggerEvent('ANGULAR_JSON_ADJUSTED', { module: this.data() });
     this.adjustIndexHtml();
-    this.pluginService.triggerEvent(GahEvent.INDEX_HTML_ADJUSTED, { module: this.data() } as IndexHtmlAdjustedEvent);
+    this.pluginService.triggerEvent('INDEX_HTML_ADJUSTED', { module: this.data() });
     await this.installPackages();
-    this.pluginService.triggerEvent(GahEvent.PACKAGES_INSTALLED, { module: this.data() } as PackagesInstalledEvent);
+    this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
   }
 
   private adjustGitignoreForHost() {

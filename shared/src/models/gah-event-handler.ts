@@ -1,7 +1,7 @@
-import { GahEvent, GahEventPayload } from './gah-event';
+import { GahEvent, ExtractEventPayload, GahEventType } from './gah-event';
 
-export class GahEventHandler {
-  public event: GahEvent;
-  public handler: (payload: GahEventPayload) => void;
+export class GahEventHandler<T extends GahEventType> {
+  public eventType: GahEventType;
+  public handler: (payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>) => void;
   public pluginName: string;
 }

@@ -1,6 +1,5 @@
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService,
-  GahEvent, HostCopiedEvent, StartingModuleInstallEvent, FinishedgModuleInstallEvent
+  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService
 } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
@@ -61,16 +60,16 @@ export class GahFile {
     if (this.isHost) {
       this.checkValidConfiguration();
       this.copyHostFiles();
-      this._pluginService.triggerEvent(GahEvent.HOST_COPIED, { gahFile: this.data() } as HostCopiedEvent);
+      this._pluginService.triggerEvent('HOST_COPIED', { gahFile: this.data() });
     }
     let i = 0;
     for (const x of this._modules) {
-      this._pluginService.triggerEvent(GahEvent.STARTING_MODULE_INSTALL, { module: x.data() } as StartingModuleInstallEvent);
+      this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: x.data() });
       this._loggerService.stopLoadingAnimation(true);
       this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, i)} ${i}/${this._modules.length}`);
       await x.install();
       i++;
-      this._pluginService.triggerEvent(GahEvent.FINISHED_MODULE_INSTALL, { module: x.data() } as FinishedgModuleInstallEvent);
+      this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: x.data() });
     }
     this._loggerService.stopLoadingAnimation(false, true, `All modules installed ${i}/${i}!`);
   }
