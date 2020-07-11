@@ -38,7 +38,8 @@ export class InitController extends Controller {
     }
 
 
-    const facadeFolderPath = await this.askForFacadeFolderPath(isHost);
+    const assetsFolderPath = await this.askForAssetsFolderPath(isHost);
+    const stylesFolderPath = await this.askForGlobalStylesPath(isHost);
 
     let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist'])?.[0]
       ?? this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist'])?.[0];
@@ -50,10 +51,19 @@ export class InitController extends Controller {
       return;
     }
 
-    this.doInit(isHost ?? false, newModuleName, facadeFolderPath, packageName, publicApiPath, isEntry ?? false, overwrite);
+    this.doInit(isHost ?? false, newModuleName, assetsFolderPath, stylesFolderPath, packageName, publicApiPath, isEntry ?? false, overwrite);
   }
 
-  private async doInit(isHost: boolean, newModuleName: string, facadeFolderPath: string, packageName: string, publicApiPath: string, isEntry: boolean, overwrite: boolean) {
+  private async doInit(
+    isHost: boolean,
+    newModuleName: string,
+    assetsFolderPath: string,
+    stylesFilePath: string,
+    packageName: string,
+    publicApiPath: string,
+    isEntry: boolean,
+    overwrite: boolean
+  ) {
     const baseModuleName = await this.askBaseModuleName(isHost);
 
     const newModule = new ModuleDefinition();
@@ -69,8 +79,11 @@ export class InitController extends Controller {
       gahCfg = this._configService.getGahHost(true);
     } else {
       gahCfg = this._configService.getGahModule();
-      if (facadeFolderPath) {
-        newModule.facadePath = this._fileSystemService.ensureRelativePath(facadeFolderPath);
+      if (assetsFolderPath) {
+        newModule.assetsPath = this._fileSystemService.ensureRelativePath(assetsFolderPath);
+      }
+      if (assetsFolderPath) {
+        newModule.stylesPath = this._fileSystemService.ensureRelativePath(stylesFilePath);
       }
       newModule.packageName = packageName;
       newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
@@ -121,31 +134,36 @@ export class InitController extends Controller {
     return publicApiPath;
   }
 
-  private async askForFacadeFolderPath(isHost: boolean | undefined) {
-    const hasFacadeFolderPath = await this._promptService
-      .confirm({
-        msg: 'Does this module contain a folder for facade files?',
+  private async askForAssetsFolderPath(isHost: boolean | undefined) {
+    const assetsFolderPath = await this._promptService
+      .input({
+        msg: 'Enter the path to the assets folder. Leave empty for none',
         enabled: () => !isHost,
       });
+    return assetsFolderPath;
+  }
 
-    let defaultFacadePath: string | null = null;
-    if (hasFacadeFolderPath) {
-      defaultFacadePath = this._fileSystemService.getFilesFromGlob('**/facade', ['.gah', 'dist'])?.[0];
-
-      if (process.platform === 'win32') {
-        defaultFacadePath = defaultFacadePath?.replace(/\//g, '\\');
-      }
+  private async askForGlobalStylesPath(isHost: boolean | undefined) {
+    let defaultStylesPath: string | null = null;
+    defaultStylesPath = this._fileSystemService.getFilesFromGlob('**/styles.scss', ['.gah', 'dist'])?.[0];
+    if (!defaultStylesPath) {
+      defaultStylesPath = this._fileSystemService.getFilesFromGlob('**/index.scss', ['.gah', 'dist'])?.[0];
     }
 
-    const facadeFolderPath = await this._promptService
+    if (process.platform === 'win32') {
+      defaultStylesPath = defaultStylesPath?.replace(/\//g, '\\');
+    }
+
+    const stylesFilePath = await this._promptService
       .fuzzyPath({
-        msg: 'Enter the path to the folder containing the facade files',
-        enabled: () => !isHost && hasFacadeFolderPath,
-        itemType: 'directory',
+        msg: 'Enter the path to the global styles file. Leave empty for none',
+        enabled: () => !isHost,
+        itemType: 'file',
         excludePattern: ['.gah', 'dist'],
-        default: defaultFacadePath
+        default: defaultStylesPath,
+        optional: true
       });
-    return facadeFolderPath;
+    return stylesFilePath;
   }
 
   private async askForModuleOverwrite(newModuleName: string) {

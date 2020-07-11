@@ -31,7 +31,7 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@awdware/gah-shared": "^0.0.33",
+    "@awdware/gah-shared": "^0.0.34",
     "chalk": "^4.0.0",
     "change-case": "^4.1.1",
     "commander": "^5.1.0",

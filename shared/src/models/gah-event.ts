@@ -13,7 +13,8 @@ export type GahEvent =
   { type: 'SYMLINKS_CREATED', module?: GahModuleData } |
   { type: 'TS_CONFIG_ADJUSTED', module?: GahModuleData } |
   { type: 'TEMPLATE_GENERATED', module?: GahModuleData } |
-  { type: 'ASSETS_BASE_STYLES_COPIED', module?: GahModuleData } |
+  { type: 'ASSETS_COPIED', module?: GahModuleData } |
+  { type: 'STYLES_REFERENCED', module?: GahModuleData } |
   { type: 'DEPENDENCIES_MERGED', module?: GahModuleData } |
   { type: 'STYLE_IMPORTS_GENERATED', module?: GahModuleData } |
   { type: 'GITIGNORE_ADJUSTED', module?: GahModuleData } |

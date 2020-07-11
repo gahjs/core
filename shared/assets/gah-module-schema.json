@@ -28,8 +28,22 @@
                     "description": "The package name of the module. This determins the prefix of the import statement to this module. \"import {...} from '@packageName/moduleName'\"",
                     "type": "string"
                 },
-                "facadePath": {
-                    "description": "The path to the folder containing facade files. This is optional and the path is relative to the folder this config file is in.",
+                "assetsPath": {
+                    "description": "The path(s) to the assets folder(s) that should get served by the host. This is optional and relative to this config's directory.",
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ]
+                },
+                "stylesPath": {
+                    "description": "The path to the file containing global styles. This is optional and relative to this config's directory.",
                     "type": "string"
                 },
                 "publicApiPath": {

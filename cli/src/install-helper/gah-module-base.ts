@@ -22,7 +22,8 @@ export abstract class GahModuleBase {
 
   public basePath: string;
   public srcBasePath: string;
-  public facadePathRelativeToBasePath?: string;
+  public assetsFolderRelativeTobasePaths?: string | string[];
+  public stylesFilePathRelativeToBasePath?: string;
   public publicApiPathRelativeToBasePath: string;
   public baseNgModuleName?: string;
   protected isHost: boolean;
@@ -70,7 +71,8 @@ export abstract class GahModuleBase {
       srcBasePath: this.srcBasePath,
       tsConfigFile: this.tsConfigFile.data(),
       baseNgModuleName: this.baseNgModuleName,
-      facadePathRelativeToBasePath: this.facadePathRelativeToBasePath,
+      assetsGlobbingPath: this.assetsFolderRelativeTobasePaths,
+      stylesPathRelativeToBasePath: this.stylesFilePathRelativeToBasePath,
       moduleName: this.moduleName ?? undefined,
       packageName: this.packageName ?? undefined
     };

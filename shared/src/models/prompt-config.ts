@@ -11,6 +11,7 @@ export class FuzzyPathPromptConfig extends PromptConfig {
   itemType?: FileSystemType = 'any';
   excludePattern?: string[];
   exclude?: (val: string) => boolean;
+  optional?: boolean = false;
 }
 
 export class SelectionPromptConfig extends PromptConfig {

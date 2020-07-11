@@ -35,6 +35,10 @@
             "description": "The <title> tag of the website",
             "type": "string"
         },
+        "baseHref": {
+            "description": "The baseHref that is put into the web.config for redirect rules (defaults to '/')",
+            "type": "string"
+        },
         "isHost": {
             "type": "boolean"
         }

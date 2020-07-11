@@ -3,7 +3,6 @@ import { GahModule, GahModuleData } from '@awdware/gah-shared';
 import { GahFolder } from './gah-folder';
 
 export class GahModuleDef extends GahModuleBase {
-
   constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, moduleName);
     this.isHost = false;
@@ -19,7 +18,8 @@ export class GahModuleDef extends GahModuleBase {
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
     this.packageName = moduleCfg.packageName;
-    this.facadePathRelativeToBasePath = moduleCfg.facadePath;
+    this.assetsFolderRelativeTobasePaths = moduleCfg.assetsPath;
+    this.stylesFilePathRelativeToBasePath = moduleCfg.stylesPath;
     this.publicApiPathRelativeToBasePath = moduleCfg.publicApiPath;
     this.baseNgModuleName = moduleCfg.baseNgModuleName;
     this.isEntry = moduleCfg.isEntry || false;

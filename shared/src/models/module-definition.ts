@@ -10,9 +10,13 @@ export class ModuleDefinition {
    */
   public packageName: string;
   /**
-   * The path to the folder containing facade files. This is optional and the path is relative to the folder this config file is in.
+   * The path(s) to the assets folder(s) that should get served by the host. This is optional and relative to this config's directory.
    */
-  public facadePath?: string;
+  public assetsPath?: string | string[];
+  /**
+   * The path to the file containing global styles. This is optional and relative to this config's directory.
+   */
+  public stylesPath?: string;
   /**
    * The path to the public-api.ts file. The path is relative to the folder this config file is in.
    */

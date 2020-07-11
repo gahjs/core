@@ -5,7 +5,8 @@ import { GahFolderData } from './gah-folder-data';
 export interface GahModuleData {
   readonly basePath: string;
   readonly srcBasePath: string;
-  readonly facadePathRelativeToBasePath?: string;
+  readonly assetsGlobbingPath?: string | string[];
+  readonly stylesPathRelativeToBasePath?: string;
   readonly publicApiPathRelativeToBasePath: string;
   readonly baseNgModuleName?: string;
   readonly isHost: boolean;

@@ -41,7 +41,14 @@ export class PromptService implements IPromptService {
 
     const filteredFiles = (cfg.exclude ? allFiles.filter(x => !cfg.exclude!(x)) : allFiles).map(x => x.replace(/\\/g, '/'));
 
-    const def = cfg.default && filteredFiles.findIndex(x => x === cfg.default.replace(/\\/g, '/')) || undefined;
+    const defaultIndex = filteredFiles.findIndex(x => x === cfg.default.replace(/\\/g, '/'));
+
+    const def = cfg.optional ? 0 : cfg.default && defaultIndex || undefined;
+
+    if (cfg.optional) {
+      filteredFiles.splice(0, 0, '');
+      filteredFiles.splice(1, 0, filteredFiles.splice(defaultIndex, 1)[0]);
+    }
 
     return prompt({
       type: 'autocomplete',

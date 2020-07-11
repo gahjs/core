@@ -80,8 +80,10 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
     this.generateFromTemplate();
     this.pluginService.triggerEvent('TEMPLATE_GENERATED', { module: this.data() });
-    this.copyAssetsAndBaseStyles();
-    this.pluginService.triggerEvent('ASSETS_BASE_STYLES_COPIED', { module: this.data() });
+    this.copyAssets();
+    this.pluginService.triggerEvent('ASSETS_COPIED', { module: this.data() });
+    this.referenceGlobalStyles();
+    this.pluginService.triggerEvent('STYLES_REFERENCED', { module: this.data() });
     this.mergePackageDependencies();
     this.pluginService.triggerEvent('DEPENDENCIES_MERGED', { module: this.data() });
     this.generateStyleImports();
@@ -158,40 +160,53 @@ export class GahHostDef extends GahModuleBase {
     }
   }
 
-  private copyAssetsAndBaseStyles() {
+  private copyAssets() {
+    for (const dep of this.allRecursiveDependencies) {
+      if (!dep.assetsFolderRelativeTobasePaths || (Array.isArray(dep.assetsFolderRelativeTobasePaths) && dep.assetsFolderRelativeTobasePaths.length === 0)) {
+        continue;
+      }
+
+      const assetsFolderRelativeTobasePaths = Array.isArray(dep.assetsFolderRelativeTobasePaths) ? dep.assetsFolderRelativeTobasePaths : [dep.assetsFolderRelativeTobasePaths];
+
+      assetsFolderRelativeTobasePaths.forEach(p => {
+        const assetsDirectoryPath = this.fileSystemService.join(dep.basePath, p);
+
+        // Copying assets
+        if (this.fileSystemService.directoryExists(assetsDirectoryPath)) {
+          const hostAssetsFolder = this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets', dep.moduleName!);
+          this.fileSystemService.copyFilesInDirectory(assetsDirectoryPath, hostAssetsFolder);
+          // Symlinks are not copied to dist folder (bug ?)
+          // this.fileSystemService.createDirLink(hostAssetsFolder, absoluteAssetsFolderOfDep);
+          // Possible fix: Include symlinked folder directly in assets config in angular json
+        }
+      });
+    }
+  }
+
+  private referenceGlobalStyles() {
     const stylesScss = this.fileSystemService.readFileLineByLine(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'));
 
     for (const dep of this.allRecursiveDependencies) {
-      if (!dep.facadePathRelativeToBasePath) {
+      if (!dep.stylesFilePathRelativeToBasePath) {
         continue;
       }
-      // Copying assets
-      const absoluteFacadePathOfDep = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath);
-      const absoluteAssetsFolderOfDep = this.fileSystemService.join(absoluteFacadePathOfDep, 'assets');
-      if (this.fileSystemService.directoryExists(absoluteAssetsFolderOfDep)) {
-        const hostAssetsFolder = this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets', dep.moduleName!);
-        this.fileSystemService.copyFilesInDirectory(absoluteAssetsFolderOfDep, hostAssetsFolder);
-        // Symlinks are not copied to dist folder (bug ?)
-        // this.fileSystemService.createDirLink(hostAssetsFolder, absoluteAssetsFolderOfDep);
-        // Possible fix: Include symlinked folder directly in assets config in angular json
-      }
 
-      const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath, 'styles.scss');
+      const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.stylesFilePathRelativeToBasePath);
 
       // Copying base styles if they exist
       if (this.fileSystemService.fileExists(absoluteStylesFilePathOfDep)) {
 
         const depAbsoluteSrcFolder = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
-        const depAbsoluteFacadeFolder = this.fileSystemService.join(dep.basePath, dep.facadePathRelativeToBasePath);
 
-        const depFacadeFolderRelativeToSrcBase = this.fileSystemService.ensureRelativePath(depAbsoluteFacadeFolder, depAbsoluteSrcFolder, true);
+        const depStylesPathRelativeToSrcBase = this.fileSystemService.ensureRelativePath(absoluteStylesFilePathOfDep, depAbsoluteSrcFolder, true);
         const dependencyPathRelativeFromSrcBase = this.fileSystemService.ensureRelativePath(this.gahFolder.dependencyPath, this.srcBasePath, true);
 
-        const moduleFacadePath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depFacadeFolderRelativeToSrcBase, 'styles.scss');
+        const moduleFacadePath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depStylesPathRelativeToSrcBase);
         stylesScss.push(`@import "${moduleFacadePath}";`);
+      } else {
+        this.loggerService.warn(`Could not find styles file "${dep.stylesFilePathRelativeToBasePath}" defined by module "${dep.moduleName}"`);
       }
     }
-
     this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'), stylesScss.join('\n'));
   }
 
