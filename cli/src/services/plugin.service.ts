@@ -109,6 +109,12 @@ export class PluginService implements IPluginService {
   }
 
   private async tryLoadInstalledPlugin(pluginName: string): Promise<GahPlugin | undefined> {
+    const cfg = this._configService.getGahConfig();
+    if (!cfg?.plugins?.some(x => x.name === pluginName)) {
+      this._loggerService.debug(`Plugin ${pluginName} not yet specified in gah config`);
+      return undefined;
+    }
+
     const pluginFolderPath = this._fileSystemService.join(this._pluginFolder, 'node_modules', pluginName);
 
     if (!this._fileSystemService.fileExists(pluginFolderPath)) {
