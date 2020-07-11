@@ -102,7 +102,22 @@ export class GahFile {
   }
 
   private copyHostFiles() {
-    CopyHost.copy(this._fileSystemService, this._workspaceService, true);
+    const entryPackageJson = this._modules.find(x => x.isEntry)!.packageJson;
+    let angularCoreVersion = entryPackageJson.dependencies?.['@angular/core']?.match(/(\d+)\.\d+\.\d+/)?.[1];
+
+    switch (angularCoreVersion) {
+    case '8':
+      break;
+    case '9':
+      angularCoreVersion = '8';
+      break;
+    default:
+      angularCoreVersion = '10';
+      break;
+    }
+
+
+    CopyHost.copy(this._fileSystemService, this._workspaceService, angularCoreVersion, true);
   }
 
   private checkValidConfiguration() {

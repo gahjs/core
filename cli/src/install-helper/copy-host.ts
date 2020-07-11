@@ -2,7 +2,7 @@ import { IFileSystemService, IWorkspaceService } from '@awdware/gah-shared';
 import { platform } from 'os';
 
 export class CopyHost {
-  public static copy(fileSystemService: IFileSystemService, workspaceService: IWorkspaceService, force: boolean = false) {
+  public static copy(fileSystemService: IFileSystemService, workspaceService: IWorkspaceService, ngVersion: string, force: boolean = false) {
     const destinationFolder = './.gah';
 
     workspaceService.ensureGitIgnoreLine('.gah', 'Ignoring the automatically generated .gah folder');
@@ -12,7 +12,8 @@ export class CopyHost {
       return;
     }
 
-    fileSystemService.copyFilesInDirectory(fileSystemService.join(__dirname, '../../assets/host-template'), destinationFolder);
+    const templatePath = fileSystemService.join(__dirname, '../../assets/host-templates', ngVersion);
+    fileSystemService.copyFilesInDirectory(templatePath, destinationFolder);
 
     if (platform() === 'win32') {
       const fswin = require('fswin'); //TODO: Move this to fileSystemService!

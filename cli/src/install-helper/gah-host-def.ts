@@ -19,7 +19,6 @@ export class GahHostDef extends GahModuleBase {
     const gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.basePath = this.fileSystemService.join(gahCfgFolder, '.gah');
     this.srcBasePath = './src';
-    this.initTsConfigObject();
 
     const hostCfg = this.fileSystemService.parseFile<GahHost>(gahCfgPath);
     if (!hostCfg) {
@@ -52,6 +51,7 @@ export class GahHostDef extends GahModuleBase {
     if (this.installed) {
       return;
     }
+    this.initTsConfigObject();
     this.installed = true;
 
     this.tsConfigFile.clean();
@@ -225,7 +225,7 @@ export class GahHostDef extends GahModuleBase {
 
     for (const dep of this.allRecursiveDependencies) {
       // Get package.json from module to installed into host
-      const externalPackageJson = this.fileSystemService.parseFile<PackageJson>(this.fileSystemService.join(dep.basePath, 'package.json'));
+      const externalPackageJson = dep.packageJson;
 
       // Getting (dev-)dependency objects from host and module
       const externalDeps = externalPackageJson.dependencies!;

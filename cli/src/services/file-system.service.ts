@@ -6,6 +6,7 @@ import globby from 'globby';
 import { platform } from 'os';
 import { ExecutionService } from './execution.service';
 import { LoggerService } from './logger.service';
+import {parse, stringify} from 'comment-json';
 
 @injectable()
 export class FileSystemService implements IFileSystemService {
@@ -41,7 +42,7 @@ export class FileSystemService implements IFileSystemService {
 
   parseFile<T>(path: string): T {
     const str = this.readFile(path);
-    return JSON.parse(str) as T;
+    return parse(str) as T;
   }
 
   saveFile(path: string, content: string): void {
@@ -49,7 +50,7 @@ export class FileSystemService implements IFileSystemService {
   }
 
   saveObjectToFile<T>(path: string, obj: T, beautify = true): void {
-    const objStr = JSON.stringify(obj, null, beautify ? 2 : 0);
+    const objStr = stringify(obj, null, beautify ? 2 : 0);
     this.saveFile(path, objStr);
   }
 

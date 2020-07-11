@@ -1,4 +1,7 @@
-import { IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, IPluginService, GahConfig, GahModuleData } from '@awdware/gah-shared';
+import { 
+  IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
+  IPluginService, GahConfig, GahModuleData, PackageJson 
+} from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
@@ -69,7 +72,7 @@ export abstract class GahModuleBase {
       isHost: this.isHost,
       publicApiPathRelativeToBasePath: this.publicApiPathRelativeToBasePath,
       srcBasePath: this.srcBasePath,
-      tsConfigFile: this.tsConfigFile.data(),
+      tsConfigFile: this.tsConfigFile?.data(),
       baseNgModuleName: this.baseNgModuleName,
       assetsGlobbingPath: this.assetsFolderRelativeTobasePaths,
       stylesPathRelativeToBasePath: this.stylesFilePathRelativeToBasePath,
@@ -83,7 +86,17 @@ export abstract class GahModuleBase {
   }
 
   protected initTsConfigObject() {
-    this.tsConfigFile = new TsConfigFile(this.fileSystemService.join(this.basePath, 'tsconfig.json'), this.fileSystemService);
+    const op1 = this.fileSystemService.join(this.basePath, 'tsconfig.base.json');
+    const op2 = this.fileSystemService.join(this.basePath, 'tsconfig.json');
+
+    if(this.fileSystemService.fileExists(op1))
+    {
+      this.tsConfigFile = new TsConfigFile(op1, this.fileSystemService);
+    } else if (this.fileSystemService.fileExists(op2)) {
+      this.tsConfigFile = new TsConfigFile(op2, this.fileSystemService);
+    } else {
+      throw new Error('Cannot find a tsconfig.base.json or tsconfig.json');
+    }
   }
 
   public abstract async install(): Promise<void>;
@@ -153,5 +166,10 @@ export abstract class GahModuleBase {
 
   protected adjustGitignore() {
     this.workspaceService.ensureGitIgnoreLine('**/.gah', 'Ignoring gah generated files', this.basePath);
+  }
+
+  public get packageJson(): PackageJson {
+    const pkgJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
+    return this.fileSystemService.parseFile<PackageJson>(pkgJsonPath);
   }
 }
