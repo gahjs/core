@@ -266,8 +266,6 @@ export class GahHostDef extends GahModuleBase {
           configs[key].buildOptimizer = false;
         }
       });
-
-      ngJson.projects['gah-host'].architect.build.configurations.aot = false;
     }
     this.fileSystemService.saveObjectToFile(ngJsonPath, ngJson, true);
   }

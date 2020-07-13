@@ -24,7 +24,7 @@ export class AppModule {
     console.log('constructor: AppModule')
 
     if (!(window as any).__gah__routes) {
-      throw new Error('Routes could not be builded');
+      throw new Error('Routes could not be built');
     }
 
     router.resetConfig((window as any).__gah__routes);

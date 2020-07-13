@@ -122,7 +122,7 @@ export class PluginService implements IPluginService {
       return undefined;
     }
 
-    const importFileName = this._fileSystemService.join(this._pluginFolder, `${pluginName.replace(/\//g, '_')}.js`);
+    const importFileName = this.calculatePluginImportFileName(pluginName);
     if (!this._fileSystemService.fileExists(importFileName)) {
       const importFileContent = `exports.PluginType = require("${pluginName}").default;`;
       this._fileSystemService.saveFile(importFileName, importFileContent);
@@ -137,6 +137,10 @@ export class PluginService implements IPluginService {
       this._loggerService.debug(error);
       return undefined;
     }
+  }
+
+  private calculatePluginImportFileName(pluginName: string) {
+    return this._fileSystemService.join(this._pluginFolder, `${pluginName.replace(/\//g, '_')}.js`);
   }
 
   private async checkPlugin(plugin: GahPlugin, pluginName: string) {
@@ -253,6 +257,11 @@ export class PluginService implements IPluginService {
 
     const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this._pluginFolder);
     if (success) {
+      const pluginFileName = this.calculatePluginImportFileName(pluginName);
+      if(this._fileSystemService.fileExists(pluginFileName)) {
+        this._fileSystemService.deleteFile(pluginFileName);
+      }
+
       this._loggerService.stopLoadingAnimation(false, true, `Plugin '${pluginName}' has been uninstalled.`);
       return true;
     } else {
