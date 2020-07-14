@@ -18,53 +18,59 @@ export class InitController extends Controller {
       return;
     }
 
-    const packageJson = this.getPackageJson();
+    if(!isHost) {
+  
 
-    const newModuleName = await this.askModuleName(isHost, packageJson);
-    if (!newModuleName && !isHost) {
-      this._loggerService.warn('No module name provided...');
-      return;
+      const packageJson = this.getPackageJson();
+
+      const newModuleName = await this.askModuleName(isHost, packageJson);
+      if (!newModuleName && !isHost) {
+        this._loggerService.warn('No module name provided...');
+        return;
+      }
+    
+      const packageName = await this.askPackageName(packageJson, isHost);
+      if (!packageName && !isHost) {
+        this._loggerService.warn('No package name provided...');
+        return;
+      }
+    
+      const overwrite = await this.askForModuleOverwrite(newModuleName, packageName);
+      if (this.nameExists && !overwrite) {
+        return;
+      }
+    
+
+      const assetsFolderPath = await this.askForAssetsFolderPath(isHost);
+      const stylesFolderPath = await this.askForGlobalStylesPath(isHost);
+
+
+      const publicApiPath = await this.askForPublicApiPath(isHost);
+
+      if (!publicApiPath && !isHost) {
+        this._loggerService.warn('No public-api path provided...');
+        return;
+      }
+
+      const baseModuleName = await this.askBaseModuleName();
+
+      this.doInitModule(newModuleName, assetsFolderPath, stylesFolderPath, packageName, publicApiPath, baseModuleName, isEntry ?? false, overwrite);
+    } else {
+      this.doInitHost();
     }
 
-    const packageName = await this.askPackageName(packageJson, isHost);
-    if (!packageName && !isHost) {
-      this._loggerService.warn('No package name provided...');
-      return;
-    }
-
-    const overwrite = await this.askForModuleOverwrite(newModuleName);
-    if (this.nameExists && !overwrite) {
-      return;
-    }
-
-
-    const assetsFolderPath = await this.askForAssetsFolderPath(isHost);
-    const stylesFolderPath = await this.askForGlobalStylesPath(isHost);
-
-    let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist'])?.[0]
-      ?? this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist'])?.[0];
-
-    const publicApiPath = await this.askForPublicApiPath(defaultPublicApiPath, isHost);
-
-    if (!publicApiPath && !isHost) {
-      this._loggerService.warn('No public-api path provided...');
-      return;
-    }
-
-    this.doInit(isHost ?? false, newModuleName, assetsFolderPath, stylesFolderPath, packageName, publicApiPath, isEntry ?? false, overwrite);
   }
 
-  private async doInit(
-    isHost: boolean,
+  private async doInitModule(
     newModuleName: string,
     assetsFolderPath: string,
     stylesFilePath: string,
     packageName: string,
     publicApiPath: string,
+    baseModuleName: string,
     isEntry: boolean,
     overwrite: boolean
   ) {
-    const baseModuleName = await this.askBaseModuleName(isHost);
 
     const newModule = new ModuleDefinition();
 
@@ -72,39 +78,41 @@ export class InitController extends Controller {
 
     let gahCfg: GahModule | GahHost;
 
-    if (isHost) {
-      if (this._configService.gahConfigExists()) {
-        this._configService.deleteGahConfig();
-      }
-      gahCfg = this._configService.getGahHost(true);
+    gahCfg = this._configService.getGahModule();
+    if (assetsFolderPath) {
+      newModule.assetsPath = this._fileSystemService.ensureRelativePath(assetsFolderPath);
+    }
+    if (assetsFolderPath) {
+      newModule.stylesPath = this._fileSystemService.ensureRelativePath(stylesFilePath);
+    }
+    newModule.packageName = packageName;
+    newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
+    newModule.baseNgModuleName = baseModuleName;
+    newModule.isEntry = isEntry;
+    if (overwrite) {
+      const idx = (gahCfg as GahModule).modules.findIndex(x => x.name === newModule.name);
+      (gahCfg as GahModule).modules[idx] = newModule;
     } else {
-      gahCfg = this._configService.getGahModule();
-      if (assetsFolderPath) {
-        newModule.assetsPath = this._fileSystemService.ensureRelativePath(assetsFolderPath);
-      }
-      if (assetsFolderPath) {
-        newModule.stylesPath = this._fileSystemService.ensureRelativePath(stylesFilePath);
-      }
-      newModule.packageName = packageName;
-      newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
-      newModule.baseNgModuleName = baseModuleName;
-      newModule.isEntry = isEntry;
-      if (overwrite) {
-        const idx = (gahCfg as GahModule).modules.findIndex(x => x.name === newModule.name);
-        (gahCfg as GahModule).modules[idx] = newModule;
-      } else {
-        (gahCfg as GahModule).modules.push(newModule);
-      }
+      (gahCfg as GahModule).modules.push(newModule);
     }
 
     this._configService.saveGahModuleConfig();
   }
 
-  private async askBaseModuleName(isHost: boolean | undefined) {
+  private async doInitHost() {
+    if (this._configService.gahConfigExists()) {
+      this._configService.deleteGahConfig();
+    }
+    this._configService.getGahHost(true);
+
+    this._configService.saveGahModuleConfig();
+  }
+
+  private async askBaseModuleName() {
     return await this._promptService
       .input({
         msg: 'Enter the class name of the base NgModule for this GahModule (empty if there is none)',
-        enabled: () => !isHost,
+        enabled: () => true,
         default: this.tryGuessbaseModuleName()
       });
   }
@@ -117,8 +125,12 @@ export class InitController extends Controller {
     return undefined;
   }
 
-  private async askForPublicApiPath(defaultPublicApiPath: string, isHost: boolean | undefined) {
-    if (process.platform === 'win32') {
+  private async askForPublicApiPath(isHost: boolean | undefined) {
+    let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist'])?.[0]
+      ?? this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist'])?.[0];
+
+
+    if (process.platform === 'win32' && defaultPublicApiPath) {
       defaultPublicApiPath = defaultPublicApiPath.replace(/\//g, '\\');
     }
 
@@ -166,12 +178,12 @@ export class InitController extends Controller {
     return stylesFilePath;
   }
 
-  private async askForModuleOverwrite(newModuleName: string) {
+  private async askForModuleOverwrite(newModuleName: string, packageName: string) {
     return await this._promptService
       .confirm({
         msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
         enabled: () => {
-          this.doesNameExist(this._configService.getGahModule(), newModuleName!);
+          this.doesNameAndPackageExist(this._configService.getGahModule(), newModuleName, packageName);
           return this.nameExists;
         }
       });
@@ -226,8 +238,8 @@ export class InitController extends Controller {
     return { alreadyInitialized, overwriteHost };
   }
 
-  private doesNameExist(cfg: GahModule, newName: string) {
-    this.nameExists = cfg.modules.some(x => x.name === newName);
+  private doesNameAndPackageExist(cfg: GahModule, newName: string, packageName: string) {
+    this.nameExists = cfg.modules.some(x => x.name === newName && x.packageName === packageName);
     return this.nameExists;
   }
 

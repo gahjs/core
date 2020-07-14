@@ -41,7 +41,7 @@ export class PromptService implements IPromptService {
 
     const filteredFiles = (cfg.exclude ? allFiles.filter(x => !cfg.exclude!(x)) : allFiles).map(x => x.replace(/\\/g, '/'));
 
-    const defaultIndex = filteredFiles.findIndex(x => x === cfg.default.replace(/\\/g, '/'));
+    const defaultIndex = filteredFiles.findIndex(x => x === cfg.default?.replace(/\\/g, '/'));
 
     const def = cfg.optional ? 0 : cfg.default && defaultIndex || undefined;
 
