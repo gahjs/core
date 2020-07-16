@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@awdware/gah-shared@^0.0.34":
-  version "0.0.34"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.34.tgz#05d9143195ac147a4c61d954591fe1d743579e9d"
-  integrity sha512-nPWLalyNPab6u5Wc3heHArFVIWCTUUCOHimzdLO4rO07qgMCU58b+q+PNswRC65PFmgj19a4dt7XiGuowKUIXw==
+"@awdware/gah-shared@^0.0.35":
+  version "0.0.35"
+  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.35.tgz#2b1be7d9f58ac5f01f880faba6096af9fc72f38c"
+  integrity sha512-aF6e237ocd1jn+ygtV399juYnRpm+AEvEkKjI8J0wO/hueYGp7F5hY5Vc1MWvQ1qRDNRqcXNSAQ98hT4SdLWWQ==
 
 "@babel/code-frame@^7.0.0":
   version "7.10.1"

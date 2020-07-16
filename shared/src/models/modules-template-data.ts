@@ -14,4 +14,5 @@ export class ModuleTemplateData {
   publicApiImportPath: string;
   baseModuleName?: string;
   isLibraryOnly: boolean;
+  staticModuleInit?: string;
 }

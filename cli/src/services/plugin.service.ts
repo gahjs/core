@@ -56,6 +56,17 @@ export class PluginService implements IPluginService {
     }
   }
 
+  public isPluginConfigured(pluginName: string): boolean {
+    if (!this._configService.gahConfigExists()) {
+      return false;
+    }
+    const cfg = this._configService.getGahConfig();
+    if (!cfg.plugins || cfg.plugins.length === 0) {
+      return false;
+    }
+    return cfg.plugins.some(x => x.name === pluginName);
+  }
+
   private initPluginServices(plugin: GahPlugin) {
     plugin['fileSystemService'] = this._fileSystemService;
     plugin['loggerService'] = this._loggerService;

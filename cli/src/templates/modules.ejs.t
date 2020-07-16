@@ -15,5 +15,5 @@ return `  {
 ];
 
 export const gahModules = [
-<%- modules.filter(x => !x.isLibraryOnly).map(x => '  ' + x.saveName + '.' + x.baseModuleName).join(',\n') %>
+<%- modules.filter(x => !x.isLibraryOnly).map(x => '  ' + x.saveName + '.' + x.baseModuleName + x.staticModuleInit).join(',\n') %>
 ];

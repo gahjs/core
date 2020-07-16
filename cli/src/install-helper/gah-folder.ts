@@ -77,6 +77,7 @@ export class GahFolder {
     newTemplateData.isLibraryOnly = !baseNgModuleName;
     newTemplateData.baseModuleName = baseNgModuleName;
     newTemplateData.saveName = saveModuleName;
+    newTemplateData.staticModuleInit = '';
     this._modulesTemplateData.modules.push(newTemplateData);
   }
 

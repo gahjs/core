@@ -40,9 +40,12 @@ export class PluginController extends Controller {
     await this._pluginService.removePlugin(pluginName);
   }
 
-  public async update(pluginName: string) {
+  public async update(pluginName?: string) {
     const updateablePlugins = await this._pluginService.getUpdateablePlugins(pluginName);
-    if (!updateablePlugins || updateablePlugins.length === 0) { return; }
+    if (!updateablePlugins || updateablePlugins.length === 0) {
+      this._loggerService.log('No plugins can be updated.');
+      return; }
+
     let pluginsToUpdate: PlguinUpdate[];
     if (!pluginName) {
       const resp = await this._promptService.checkbox({
@@ -51,8 +54,22 @@ export class PluginController extends Controller {
         choices: () => updateablePlugins.map(x => `${x.name} ${x.fromVersion} > ${x.toVersion}`)
       });
       pluginsToUpdate = resp.map(x => x.split(' ')[0]).map(name => updateablePlugins.find(x => x.name === name)!);
+      if(pluginsToUpdate.length === 0) {
+        this._loggerService.log('No plugins selected.');
+        return;
+      }
     } else {
+      const pluginInstalled = this._pluginService.isPluginConfigured(pluginName);
+      if(!pluginInstalled) {
+        this._loggerService.log(`The plugin '${  pluginName  }' is not installed`);
+        return;
+      }
+
       pluginsToUpdate = [updateablePlugins.find(x => x.name === pluginName)!];
+      if(pluginsToUpdate.length === 0) {
+        this._loggerService.log(`No updates available for the plugin '${  pluginName  }'`);
+        return;
+      }
     }
 
     await this._pluginService.updatePlugins(pluginsToUpdate);
