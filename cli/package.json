@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.75",
+  "version": "0.0.76",
   "homepage": "https://github.com/awdware/gah",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prebuild": "del-cli lib",
-    "postbuild": "cpy src/templates lib/templates",
+    "postbuild": "cpy src/templates lib/templates && cpy ../README.md ./",
     "start": "yarn run build && yarn run global",
     "global": "yarn global add file:F:/git/@awdware/gah/cli",
     "lint": "tslint -p . --fix",
