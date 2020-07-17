@@ -12,6 +12,7 @@ export type GahEvent =
   { type: 'STYLES_FILE_GENERATED', module?: GahModuleData } |
   { type: 'SYMLINKS_CREATED', module?: GahModuleData } |
   { type: 'TS_CONFIG_ADJUSTED', module?: GahModuleData } |
+  { type: 'TEMPLATE_DATA_GENERATED', module?: GahModuleData } |
   { type: 'TEMPLATE_GENERATED', module?: GahModuleData } |
   { type: 'ASSETS_COPIED', module?: GahModuleData } |
   { type: 'STYLES_REFERENCED', module?: GahModuleData } |

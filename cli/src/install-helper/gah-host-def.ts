@@ -109,6 +109,8 @@ export class GahHostDef extends GahModuleBase {
     for (const dep of this.allRecursiveDependencies) {
       this.gahFolder.addGeneratedFileTemplateData(dep.moduleName!, dep.packageName!, dep.isEntry, dep.baseNgModuleName);
     }
+    this.pluginService.triggerEvent('TEMPLATE_DATA_GENERATED', { module: this.data() });
+
     this.gahFolder.generateFileFromTemplate();
   }
 
