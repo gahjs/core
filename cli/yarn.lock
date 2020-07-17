@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@awdware/eslint-config-nodejs/-/eslint-config-nodejs-0.0.2.tgz#5c35af1db87a0f7def65d00b9460a89759cc1d6b"
   integrity sha512-F1O/OOml6pAmR0UUEQEdydxRaOGjq9Sp5Oc8TbytL8ljErGt2BEtLko0sWUIodYsKof2fH1LEyaynquGYApsmQ==
 
-"@awdware/gah-shared@^0.0.35":
-  version "0.0.35"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.35.tgz#2b1be7d9f58ac5f01f880faba6096af9fc72f38c"
-  integrity sha512-aF6e237ocd1jn+ygtV399juYnRpm+AEvEkKjI8J0wO/hueYGp7F5hY5Vc1MWvQ1qRDNRqcXNSAQ98hT4SdLWWQ==
+"@awdware/gah-shared@^0.0.36":
+  version "0.0.36"
+  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.36.tgz#49532dee37b44fd7385d5d3e3b4b0fe29303f0dd"
+  integrity sha512-HwrKEiwT40Dq8+KtYFaOdIhiQkaFQvNNAnrGfyvTwoh0m6OGs3fyqZpyQ+e0km1485CqWG0vIGjnSezWKSKflw==
 
 "@babel/code-frame@^7.0.0":
   version "7.10.4"
