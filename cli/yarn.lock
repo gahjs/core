@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@awdware/eslint-config-nodejs@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-nodejs/-/eslint-config-nodejs-0.0.2.tgz#5c35af1db87a0f7def65d00b9460a89759cc1d6b"
+  integrity sha512-F1O/OOml6pAmR0UUEQEdydxRaOGjq9Sp5Oc8TbytL8ljErGt2BEtLko0sWUIodYsKof2fH1LEyaynquGYApsmQ==
+
 "@awdware/gah-shared@^0.0.35":
   version "0.0.35"
   resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.35.tgz#2b1be7d9f58ac5f01f880faba6096af9fc72f38c"

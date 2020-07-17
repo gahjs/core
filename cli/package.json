@@ -20,7 +20,7 @@
     "postbuild": "cpy src/templates lib/templates && cpy ../README.md ./",
     "start": "yarn run build && yarn run global",
     "global": "yarn global add file:F:/git/@awdware/gah/cli",
-    "lint": "tslint -p . --fix",
+    "lint": "yarn eslint ./src/**",
     "build": "yarn run prebuild && tsc -p . && yarn run postbuild",
     "drop": "yarn run build && yarn publish --access public --no-git-tag-version "
   },
@@ -47,6 +47,7 @@
     "reflect-metadata": "~0.1.13"
   },
   "devDependencies": {
+    "@awdware/eslint-config-nodejs": "^0.0.2",
     "@types/clear": "^0.1.0",
     "@types/ejs": "^3.0.2",
     "@types/figlet": "^1.2.0",
