@@ -18,6 +18,8 @@ fetch('environment.json')
       console.log(env);
     }
 
+    (window as any).__gah__env = env;
+
     init(env);
 
     platformBrowserDynamic().bootstrapModule(AppModule)
