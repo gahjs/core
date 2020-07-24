@@ -43,7 +43,7 @@ export class ModuleReferenceHelper {
 
     const dependencyModuleNames_ = await promptService.checkbox({
       msg: 'Which of the modules do you want to add?',
-      choices: () => availableExternalModules,
+      choices: () => [...availableExternalModules],
       enabled: () => enabled,
     });
 
@@ -69,7 +69,7 @@ export class ModuleReferenceHelper {
       .list({
         msg,
         enabled: () => !moduleName && availableModules.length > 1,
-        choices: () => availableModules
+        choices: () => [...availableModules]
       });
 
     if (availableModules.length === 1) { moduleName = availableModules[0]; }
@@ -110,7 +110,7 @@ export class ModuleReferenceHelper {
       .checkbox({
         msg: 'Select one or multiple dependencies to remove',
         enabled: () => !dependencyNames || dependencyNames.length === 0,
-        choices: () => existingDependencies!
+        choices: () => [...existingDependencies!]
       });
 
     dependencyNames = (dependencyNames?.length === 0 ? dependencyNames_ : dependencyNames) ?? dependencyNames_;
