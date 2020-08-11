@@ -7,7 +7,7 @@ import chalk from 'chalk';
 import path from 'path';
 import { ContextService } from './services/context-service';
 
-var pjson = require(path.join(__dirname, '../package.json'));
+const pjson = require(path.join(__dirname, '../package.json'));
 console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
 
 (async () => {
@@ -20,6 +20,7 @@ console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
   await mainController.main();
 
 })().catch(err => {
+  console.log();
   console.error(chalk.red(' ■ ') + err);
   console.error(err);
   process.exit(1);

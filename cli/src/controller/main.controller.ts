@@ -10,7 +10,6 @@ import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
 import { HostModuleController } from './hostModule.controller';
 import { GahModuleType } from '@awdware/gah-shared';
-import { CopyHost } from '../install-helper/copy-host';
 import { RunController } from './run.controller';
 
 @injectable()
@@ -38,7 +37,7 @@ export class MainController extends Controller {
 
     await this._pluginService.loadInstalledPlugins();
 
-    var pjson = require(this._fileSystemService.join(__dirname, '../../package.json'));
+    const pjson = require(this._fileSystemService.join(__dirname, '../../package.json'));
     const version = pjson.version;
 
     // This is so useless, I love it.

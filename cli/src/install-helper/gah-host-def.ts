@@ -54,6 +54,7 @@ export class GahHostDef extends GahModuleBase {
     this.initTsConfigObject();
     this.installed = true;
 
+    await this.executePreinstallScripts();
     this.tsConfigFile.clean();
     this.pluginService.triggerEvent('TS_CONFIG_CLEANED', { module: this.data() });
     this.gahFolder.cleanGeneratedDirectory();
@@ -99,6 +100,8 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('WEB_CONFIG_ADJUSTED', { module: this.data() });
     await this.installPackages();
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
+
+    await this.executePostinstallScripts();
   }
 
   private adjustGitignoreForHost() {

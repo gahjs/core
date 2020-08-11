@@ -2,10 +2,17 @@
 # yarn lockfile v1
 
 
-"@awdware/eslint-config-nodejs@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-nodejs/-/eslint-config-nodejs-0.0.2.tgz#5c35af1db87a0f7def65d00b9460a89759cc1d6b"
-  integrity sha512-F1O/OOml6pAmR0UUEQEdydxRaOGjq9Sp5Oc8TbytL8ljErGt2BEtLko0sWUIodYsKof2fH1LEyaynquGYApsmQ==
+"@awdware/eslint-config-base@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-base/-/eslint-config-base-0.0.4.tgz#248d4175444dc05f1a92d61cb21779e1ee991c63"
+  integrity sha512-bkICaxMDBY8nUnAObIKKAaTNqqPpSepsGWWgSLv7Z8bfniM2hIHQJBvvo+rzpPa9LfWyB7lmroVPYoGFwsUKSQ==
+
+"@awdware/eslint-config-nodejs@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-nodejs/-/eslint-config-nodejs-0.0.6.tgz#f112eb5c9779659f9db166c1b21681e2eaa9dafb"
+  integrity sha512-ugp219UQJd6crL+AGQ1D3+8i6vR8vNLCRx2yG1t5/faZF7SDtQ4mGG7i3QuXHFheEmbtraTsSqBTsP1h+qob/A==
+  dependencies:
+    "@awdware/eslint-config-base" "^0.0.4"
 
 "@awdware/gah-shared@^0.0.36":
   version "0.0.36"

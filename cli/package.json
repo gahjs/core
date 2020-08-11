@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.82",
+  "version": "0.0.83",
   "homepage": "https://github.com/awdware/gah",
   "repository": {
     "type": "git",
@@ -47,7 +47,7 @@
     "reflect-metadata": "~0.1.13"
   },
   "devDependencies": {
-    "@awdware/eslint-config-nodejs": "^0.0.2",
+    "@awdware/eslint-config-nodejs": "^0.0.6",
     "@types/clear": "^0.1.0",
     "@types/ejs": "^3.0.2",
     "@types/figlet": "^1.2.0",

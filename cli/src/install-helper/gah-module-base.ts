@@ -1,6 +1,6 @@
-import { 
+import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
-  IPluginService, GahConfig, GahModuleData, PackageJson 
+  IPluginService, GahConfig, GahModuleData, PackageJson
 } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -89,8 +89,7 @@ export abstract class GahModuleBase {
     const op1 = this.fileSystemService.join(this.basePath, 'tsconfig.base.json');
     const op2 = this.fileSystemService.join(this.basePath, 'tsconfig.json');
 
-    if(this.fileSystemService.fileExists(op1))
-    {
+    if (this.fileSystemService.fileExists(op1)) {
       this.tsConfigFile = new TsConfigFile(op1, this.fileSystemService);
     } else if (this.fileSystemService.fileExists(op2)) {
       this.tsConfigFile = new TsConfigFile(op2, this.fileSystemService);
@@ -171,5 +170,31 @@ export abstract class GahModuleBase {
   public get packageJson(): PackageJson {
     const pkgJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
     return this.fileSystemService.parseFile<PackageJson>(pkgJsonPath);
+  }
+
+  private async executeScripts(preinstall: boolean) {
+    const scriptName = preinstall ? 'gah-preinstall' : 'gah-postinstall';
+    if (this.packageJson.scripts?.[scriptName]) {
+
+      this.loggerService.log(`Executing ${preinstall ? 'pre' : 'post'}-install script.`);
+
+      const success = await this.executionService.execute(`yarn run ${scriptName}`, false, undefined, this.basePath);
+
+      if (success) {
+        this.loggerService.success(`Finnished ${preinstall ? 'pre' : 'post'}-install script.`);
+      } else {
+        this.loggerService.error(this.executionService.executionErrorResult);
+
+        throw new Error(`Error during ${preinstall ? 'pre' : 'post'}-install script.`);
+      }
+    }
+  }
+
+  public async executePreinstallScripts() {
+    return this.executeScripts(true);
+  }
+
+  public async executePostinstallScripts() {
+    return this.executeScripts(false);
   }
 }

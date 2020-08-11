@@ -47,6 +47,7 @@ export class GahModuleDef extends GahModuleBase {
       return;
     }
     this.installed = true;
+    await this.executePreinstallScripts();
     this.tsConfigFile.clean();
     this.gahFolder.cleanDependencyDirectory();
     this.gahFolder.cleanStylesDirectory();
@@ -55,6 +56,7 @@ export class GahModuleDef extends GahModuleBase {
     this.addDependenciesToTsConfigFile();
     this.generateStyleImports();
     this.adjustGitignore();
+    await this.executePostinstallScripts();
   }
 
 }
