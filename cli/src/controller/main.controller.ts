@@ -150,7 +150,7 @@ export class MainController extends Controller {
     const versionString = this._executionService.executionResult;
     const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
     const newestVersion = versionString.match(versionMatcher);
-    if (newestVersion?.[0] !== this._version) {
+    if (newestVersion?.[1] !== this._version) {
       this._loggerService.warn(`
       * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
       *               ${chalk.green('A new version of gah is available.')}                  *
