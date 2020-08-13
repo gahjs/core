@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import {
   GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig,
   IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
-  ILoggerService, IFileSystemService, IContextService, PlguinUpdate, GahEventType, ExtractEventPayload
+  ILoggerService, IFileSystemService, IContextService, PlguinUpdate, GahEventType, ExtractEventPayload, PackageJson
 } from '@awdware/gah-shared';
 
 import { FileSystemService } from './file-system.service';
@@ -102,7 +102,7 @@ export class PluginService implements IPluginService {
   }
 
   private async ensurePluginIsInstalled(pluginDepCfg: GahPluginDependencyConfig): Promise<GahPlugin> {
-    let plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name);
+    let plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version);
     if (plugin) {
       return plugin;
     }
@@ -111,7 +111,7 @@ export class PluginService implements IPluginService {
     if (!success) {
       throw new Error('Failed');
     }
-    plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name);
+    plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version);
     if (plugin) {
       return plugin;
     }
@@ -119,11 +119,23 @@ export class PluginService implements IPluginService {
     throw new Error('Failed');
   }
 
-  private async tryLoadInstalledPlugin(pluginName: string): Promise<GahPlugin | undefined> {
+  private async tryLoadInstalledPlugin(pluginName: string, pluginVersion?: string): Promise<GahPlugin | undefined> {
     const cfg = this._configService.getGahConfig();
     if (!cfg?.plugins?.some(x => x.name === pluginName)) {
       this._loggerService.debug(`Plugin ${pluginName} not yet specified in gah config`);
       return undefined;
+    }
+
+    const pluginPkgJsonPath = this._fileSystemService.join(this._pluginFolder, 'package.json');
+    const pluginPkgJson = this._fileSystemService.parseFile<PackageJson>(pluginPkgJsonPath);
+    if (!pluginPkgJson || !pluginPkgJson.devDependencies || !pluginPkgJson.devDependencies[pluginName]) {
+      return;
+    }
+
+    const actualPluginVersion = pluginPkgJson.devDependencies[pluginName];
+
+    if (pluginVersion && pluginVersion !== actualPluginVersion) {
+      return;
     }
 
     const pluginFolderPath = this._fileSystemService.join(this._pluginFolder, 'node_modules', pluginName);
@@ -269,7 +281,7 @@ export class PluginService implements IPluginService {
     const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this._pluginFolder);
     if (success) {
       const pluginFileName = this.calculatePluginImportFileName(pluginName);
-      if(this._fileSystemService.fileExists(pluginFileName)) {
+      if (this._fileSystemService.fileExists(pluginFileName)) {
         this._fileSystemService.deleteFile(pluginFileName);
       }
 

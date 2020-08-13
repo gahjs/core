@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { FileSystemService } from './file-system.service';
-import { IWorkspaceService, IFileSystemService } from '@awdware/gah-shared';
+import { IWorkspaceService, IFileSystemService, GlobalGahData } from '@awdware/gah-shared';
 import { platform, homedir } from 'os';
 
 @injectable()
@@ -34,5 +34,17 @@ export class WorkspaceService implements IWorkspaceService {
     } else {
       return this._fileSystemService.join(homedir(), 'awdware', 'gah');
     }
+  }
+
+  public getGlobalData(): GlobalGahData {
+    const globalDataPath = this._fileSystemService.join(this.getGlobalGahFolder(), 'data.json');
+    if (!this._fileSystemService.fileExists(globalDataPath)) {
+      return {} as GlobalGahData;
+    }
+    return this._fileSystemService.parseFile<GlobalGahData>(globalDataPath);
+  }
+  public saveGlobalGahData(data: GlobalGahData) {
+    const globalDataPath = this._fileSystemService.join(this.getGlobalGahFolder(), 'data.json');
+    return this._fileSystemService.saveObjectToFile(globalDataPath, data);
   }
 }

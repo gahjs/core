@@ -26,6 +26,13 @@ export class MainController extends Controller {
   private readonly _pluginController: PluginController;
   @inject(RunController)
   private readonly _runController: RunController;
+  private readonly _version: string;
+
+  constructor() {
+    super();
+    const pjson = require(this._fileSystemService.join(__dirname, '../../package.json'));
+    this._version = pjson.version;
+  }
 
   public async main() {
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
@@ -35,10 +42,11 @@ export class MainController extends Controller {
     // This sets the debug context variable depending on the used options
     this._contextService.setContext({ debug: process.argv.some(x => x === '--debug') });
 
-    await this._pluginService.loadInstalledPlugins();
 
-    const pjson = require(this._fileSystemService.join(__dirname, '../../package.json'));
-    const version = pjson.version;
+    await this.checkForUpdates();
+
+
+    await this._pluginService.loadInstalledPlugins();
 
     // This is so useless, I love it.
     const fontWidth = process.stdout.columns > 111 ? 'full' : process.stdout.columns > 96 ? 'fitted' : 'controlled smushing';
@@ -46,14 +54,14 @@ export class MainController extends Controller {
     program.on('--help', () => {
       console.log(
         chalk.yellow(
-          figlet.textSync(`gah-cli v${version}`, { horizontalLayout: fontWidth, font: 'Cricket', verticalLayout: 'full' })
+          figlet.textSync(`gah-cli v${this._version}`, { horizontalLayout: fontWidth, font: 'Cricket', verticalLayout: 'full' })
         )
       );
     });
     console.log();
 
     program
-      .version(version);
+      .version(this._version);
 
     program
       .option('--debug', 'Enables verbose debug logging');
@@ -128,5 +136,29 @@ export class MainController extends Controller {
     await program.parseAsync(process.argv);
   }
 
+
+  private async checkForUpdates() {
+    const gahData = this._workspaceService.getGlobalData();
+    if (gahData.lastUpdateCheck) {
+      const hoursPassed = Math.abs(new Date().getTime() - new Date(gahData.lastUpdateCheck).getTime()) / 36e5;
+      if (hoursPassed < 1) {
+        return;
+      }
+    }
+
+    await this._executionService.execute('yarn info --json @awdware/gah version', false);
+    const versionString = this._executionService.executionResult;
+    const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
+    const newestVersion = versionString.match(versionMatcher);
+    if (newestVersion?.[0] !== this._version) {
+      this._loggerService.warn(`
+      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+      *               ${chalk.green('A new version of gah is available.')}                  *
+      *        Please install it via ${chalk.gray('yarn global add @awdware/gah')}         *
+      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *`);
+    }
+    gahData.lastUpdateCheck = new Date();
+    this._workspaceService.saveGlobalGahData(gahData);
+  }
 
 }
