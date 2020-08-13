@@ -1,6 +1,6 @@
 {
   "name": "@awdware/gah",
-  "version": "0.0.87",
+  "version": "0.1.2",
   "homepage": "https://github.com/awdware/gah",
   "repository": {
     "type": "git",
@@ -31,11 +31,12 @@
   "license": "MIT",
   "private": false,
   "dependencies": {
-    "@awdware/gah-shared": "^0.0.38",
+    "@awdware/gah-shared": "^0.0.39",
     "chalk": "^4.1.0",
     "change-case": "^4.1.1",
     "commander": "^5.1.0",
     "comment-json": "^3.0.2",
+    "compare-versions": "^3.6.0",
     "ejs": "^3.1.2",
     "enquirer": "^2.3.6",
     "figlet": "^1.5.0",

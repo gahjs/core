@@ -14,10 +14,10 @@
   dependencies:
     "@awdware/eslint-config-base" "^0.0.4"
 
-"@awdware/gah-shared@^0.0.38":
-  version "0.0.38"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.38.tgz#617fc0a2cbad293217ad48eb1e81f0bee34c0769"
-  integrity sha512-6pXfiBt44q28UvEk2rWFP5uK6jroXKsqiECZkmDVQadyp83SbqN1Ec0QKQ7BhIm+D8IJ/ddYvQgqtuHMAt378Q==
+"@awdware/gah-shared@^0.0.39":
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.39.tgz#05645305253677a95f0634d48fb3b882159b1baa"
+  integrity sha512-AAlEj7pcdaAydTj3UeR/mtrHXz1M9H/hbMnAh0pZ2TNXWQi0eCzupMNG9UlpITAszIf9BocCXUhY5ER83EwXrA==
 
 "@babel/code-frame@^7.0.0":
   version "7.10.4"
@@ -580,6 +580,11 @@ comment-json@^3.0.2:
     esprima "^4.0.1"
     has-own-prop "^2.0.0"
     repeat-string "^1.6.1"
+
+compare-versions@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-3.6.0.tgz#1a5689913685e5a87637b8d3ffca75514ec41d62"
+  integrity sha512-W6Af2Iw1z4CB7q4uU4hv646dW9GQuBM+YpC0UvUCWSD8w90SJjp+ujJuXaEMtAXBtSqGfMPuFOVn4/+FlaqfBA==
 
 component-emitter@^1.2.1:
   version "1.3.0"

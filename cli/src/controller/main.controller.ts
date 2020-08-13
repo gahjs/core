@@ -2,6 +2,7 @@ import { injectable, inject } from 'inversify';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import { program } from 'commander';
+import compareVersions from 'compare-versions';
 
 import { InitController } from './init.controller';
 import { DependencyController } from './dependency.controller';
@@ -141,25 +142,29 @@ export class MainController extends Controller {
     const gahData = this._workspaceService.getGlobalData();
     if (gahData.lastUpdateCheck) {
       const hoursPassed = Math.abs(new Date().getTime() - new Date(gahData.lastUpdateCheck).getTime()) / 36e5;
-      if (hoursPassed < 1) {
-        return;
+      if (hoursPassed > 1 || !gahData.latestGahVersion) {
+        const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
+        if (success) {
+          const versionString = this._executionService.executionResult;
+          const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
+          const newestVersion = versionString.match(versionMatcher);
+          gahData.latestGahVersion = newestVersion?.[1];
+          gahData.lastUpdateCheck = new Date();
+        }
       }
     }
 
-    const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
-    if (success) {
-      const versionString = this._executionService.executionResult;
-      const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
-      const newestVersion = versionString.match(versionMatcher);
-      if (newestVersion?.[1] !== this._version) {
-        this._loggerService.warn(`
-        * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-        *               ${chalk.green('A new version of gah is available.')}                  *
-        *        Please install it via ${chalk.gray('yarn global add @awdware/gah')}         *
-        * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *`);
-      }
+    if (!gahData.latestGahVersion) {
+      return;
     }
-    gahData.lastUpdateCheck = new Date();
+
+    if (compareVersions(gahData.latestGahVersion, this._version) === 1) {
+      this._loggerService.warn('  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *');
+      this._loggerService.warn(`  *               ${chalk.green('A new version of gah is available.')}                  *`);
+      this._loggerService.warn(`  *        Please install it via ${chalk.gray('yarn global add @awdware/gah')}         *`);
+      this._loggerService.warn('  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *');
+    }
+
     this._workspaceService.saveGlobalGahData(gahData);
   }
 
