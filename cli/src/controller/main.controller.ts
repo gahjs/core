@@ -146,16 +146,18 @@ export class MainController extends Controller {
       }
     }
 
-    await this._executionService.execute('yarn info --json @awdware/gah version', false);
-    const versionString = this._executionService.executionResult;
-    const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
-    const newestVersion = versionString.match(versionMatcher);
-    if (newestVersion?.[1] !== this._version) {
-      this._loggerService.warn(`
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-      *               ${chalk.green('A new version of gah is available.')}                  *
-      *        Please install it via ${chalk.gray('yarn global add @awdware/gah')}         *
-      * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *`);
+    const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
+    if (success) {
+      const versionString = this._executionService.executionResult;
+      const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
+      const newestVersion = versionString.match(versionMatcher);
+      if (newestVersion?.[1] !== this._version) {
+        this._loggerService.warn(`
+        * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+        *               ${chalk.green('A new version of gah is available.')}                  *
+        *        Please install it via ${chalk.gray('yarn global add @awdware/gah')}         *
+        * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *`);
+      }
     }
     gahData.lastUpdateCheck = new Date();
     this._workspaceService.saveGlobalGahData(gahData);
