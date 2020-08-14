@@ -18,7 +18,7 @@ steps:
 - task: YarnInstaller@3
   inputs:
     versionSpec: '1.x'
-  displayName: ''\U0001F4E5 Install Node.js'
+  displayName: '\U0001F4E5 Install Node.js'
 
 - task: Yarn@3
   inputs:
