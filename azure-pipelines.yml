@@ -13,59 +13,59 @@ steps:
 - task: NodeTool@0
   inputs:
     versionSpec: '10.x'
-  displayName: '\U0001F4E5 Install Node.js'
+  displayName: "\U0001F4E5 Install Node.js"
 
 - task: YarnInstaller@3
   inputs:
     versionSpec: '1.x'
-  displayName: '\U0001F4E5 Install Node.js'
+  displayName: "\U0001F4E5 Install Node.js"
 
 - task: Yarn@3
   inputs:
     arguments: 'install'
     projectDirectory: 'shared'
-  displayName: '\U0001F4E6 Install packages for shared'
+  displayName: "\U0001F4E6 Install packages for shared"
 
 - task: Yarn@3
   inputs:
     arguments: 'run build'
     projectDirectory: 'shared'
-  displayName: '\U0001F6E0 Build shared'
+  displayName: "\U0001F6E0 Build shared"
   
 - task: Yarn@3
   inputs:
     arguments: 'link'
     projectDirectory: 'shared'
-  displayName: '\U0001F503 link shared'
+  displayName: "\U0001F503 link shared"
 
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(Build.SourcesDirectory)/shared'
     artifact: 'gah-shared'
     publishLocation: 'pipeline'
-  displayName: '\U0001F680 Publish shared'
+  displayName: "\U0001F680 Publish shared"
 
 - task: Yarn@3
   inputs:
     arguments: 'install'
     projectDirectory: 'cli'
-  displayName: '\U0001F4E6 Install packages for cli'
+  displayName: "\U0001F4E6 Install packages for cli"
   
 - task: Yarn@3
   inputs:
     arguments: 'link @awdware/gah-shared'
     projectDirectory: 'cli'
-  displayName: '\U0001F503 use linked shared'
+  displayName: "\U0001F503 use linked shared"
 
 - task: Yarn@3
   inputs:
     arguments: 'run build'
     projectDirectory: 'cli'
-  displayName: '\U0001F6E0 Build cli'
+  displayName: "\U0001F6E0 Build cli"
 
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(Build.SourcesDirectory)/cli'
     artifact: 'gah'
     publishLocation: 'pipeline'
-  displayName: '\U0001F680 Publish cli'
+  displayName: "\U0001F680 Publish cli"
