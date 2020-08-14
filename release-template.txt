@@ -1,0 +1,14 @@
+%T
+
+*Released %cD*
+
+**Breaking Changes:**
+ - The syntax of the `module` command changed. See [here](https://github.com/awdware/gah/wiki).
+
+**BugFixes:**
+ - Some exeption does not happen anymore. Fixes #1234.
+ - This error is also fixed. Fixes #1235.
+
+**Features:**
+ - Added the functionality to add stuff. Closes #123. See [here](https://github.com/awdware/gah/wiki).
+ - This new feature. Closes #124.
