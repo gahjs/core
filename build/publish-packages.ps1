@@ -1,9 +1,11 @@
+$inputVersionShared = "$evn:versionShared";
+$inputVersionCli = "$evn:versionCli";
 
 $sharedVersion = '';
 $cliVersion = '';
 
-if (-not [string]::IsNullOrEmpty("$evn:versionShared") -and "$evn:versionShared" -ne '0.0.0') {
-    $sharedVersion = "$evn:versionShared"
+if (-not [string]::IsNullOrEmpty($inputVersionShared) -and $inputVersionShared -ne '0.0.0') {
+    $sharedVersion = $inputVersionShared
     Write-Output "NEW SHARED VERSION: $sharedVersion"
 }
 else {
@@ -13,8 +15,8 @@ else {
     Write-Output "NEW SHARED VERSION: $sharedVersion"
 }
 
-if (-not [string]::IsNullOrEmpty("$(versionCli)") -and "$(versionCli)" -ne '0.0.0') {
-    $cliVersion = "$(versionCli)"
+if (-not [string]::IsNullOrEmpty($inputVersionCli) -and $inputVersionCli -ne '0.0.0') {
+    $cliVersion = $inputVersionCli
     Write-Output "NEW SHARED VERSION: $cliVersion"
 }
 else {
