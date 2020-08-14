@@ -1,5 +1,5 @@
-$newCliVersion = "v$(releasescript.newCliVersion)"
-$sourceVersion = "v$(Build.SourceVersion)"
+$newCliVersion = "v$env:releasescript_newCliVersion"
+$sourceVersion = "$env:Build_SourceVersion"
 $date = Get-Date -Format "MM/dd/yyyy"
 
 git clone https://github.com/awdware/gah.git
