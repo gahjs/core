@@ -2,8 +2,8 @@
 $sharedVersion = '';
 $cliVersion = '';
 
-if (-not [string]::IsNullOrEmpty("$(versionShared)") -and "$(versionShared)" -ne '0.0.0') {
-    $sharedVersion = "$(versionShared)"
+if (-not [string]::IsNullOrEmpty("$evn:versionShared") -and "$evn:versionShared" -ne '0.0.0') {
+    $sharedVersion = "$evn:versionShared"
     Write-Output "NEW SHARED VERSION: $sharedVersion"
 }
 else {
