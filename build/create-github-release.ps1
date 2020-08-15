@@ -3,13 +3,11 @@ $newSharedVersion = "v$env:RELEASESCRIPT_NEWSHAREDVERSION"
 $sourceVersion = "$env:BUILD_SOURCEVERSION"
 $now = Get-Date -Format "MM\/dd\/yyyy"
 
-# (gci env:*).GetEnumerator() | Sort-Object Name | Out-String
-
 $releaseTemplate = Get-Content -Raw -Path release-template.txt
 
 $releaseTemplate = $releaseTemplate.Replace('{{tag}}', $newCliVersion).Replace('{{date}}', $now).Replace('{{tag-shared}}', $newSharedVersion)
 
-$gitHubToken = "$(GITHUB_TOKEN)";
+$gitHubToken = "$env:GITHUB_TOKEN";
 
 $postHeaders = @{
   Authorization = "token $gitHubToken"; 
