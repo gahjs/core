@@ -1,3 +1,4 @@
+
 {{tag}}
 
 *Released {{date}}*
@@ -12,3 +13,7 @@
 **Features:**
  - Added the functionality to add stuff. Closes #123. See [here](https://github.com/awdware/gah/wiki).
  - This new feature. Closes #124.
+
+**Download:**
+ - *gah*-CLI [{{tag}}](https://www.npmjs.com/package/@awdware/gah)
+ - *gah*-shared [{{tag-shared}}](https://www.npmjs.com/package/@awdware/gah-shared)
