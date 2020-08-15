@@ -9,7 +9,7 @@
       "type": "PowerShell",
       "request": "launch",
       "script": "${file}",
-      "cwd": "F:\\git\\@awdware\\gah"
+      "cwd": "${file}"
     }
   ]
 }

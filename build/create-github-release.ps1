@@ -1,21 +1,31 @@
-$newCliVersion = "v$env:releasescript_newCliVersion"
-$newCliVersion = "v$env:releasescript_newSharedVersion"
-$sourceVersion = "$env:Build_SourceVersion"
+$newCliVersion = "v0.1.3"
+$newSharedVersion = "v0.1.0"
+$sourceVersion = "5d8f1a76753a6fe9c42ecee3c5f8e7e075504715"
+
+# $newCliVersion = "v$env:releasescript_newCliVersion"
+# $newCliVersion = "v$env:releasescript_newSharedVersion"
+# $sourceVersion = "$env:Build_SourceVersion"
 $now = Get-Date -Format "MM\/dd\/yyyy"
 
-Write-Host $now
+$releaseTemplate = Get-Content -Raw -Path release-template.txt
 
-brew install hub
+$releaseTemplate = $releaseTemplate.Replace('{{tag}}', $newCliVersion).Replace('{{date}}', $now).Replace('{{tag-shared}}', $newSharedVersion)
 
-git clone https://github.com/awdware/gah.git
-Set-Location gah
+$env:GITHUB_TOKEN = "c4d44ad8d969ec14ac6079901d4664a742f766ce";
 
-$releaseTemplate = Get-Content -Raw -Path .\build\release-template.txt
+$postHeaders = @{
+  Authorization = "token $env:GITHUB_TOKEN"; 
+}
 
-$releaseTemplate = $releaseTemplate.Replace('{{tag}}', $newCliVersion).Replace('{{date}}', $now).Replace('{{tag-shared}}', $newSharedVersion);
-$releaseTemplate | Out-File .\build\release-template.txt -Encoding utf8
 
-$env:GITHUB_TOKEN = "$env:GITHUB_TOKEN"
-$env:GITHUB_USER = "$env:GITHUB_USER"
+$postParams = @{
+  tag_name         = "$newCliVersion";
+  target_commitish = "$sourceVersion";
+  name             = "$newCliVersion"; 
+  body             = "$releaseTemplate"; 
+  draft            = $true;
+} | ConvertTo-Json
 
-hub release create $newCliVersion --draft --commitish $sourceVersion --file .\build\release-template.txt
+Write-Host ($postParams | ConvertTo-Json)
+
+Invoke-WebRequest -Uri https://api.github.com/repos/awdware/gah/releases -Method POST -Headers $postHeaders -Body $postParams
