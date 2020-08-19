@@ -26,6 +26,10 @@ else {
     Write-Output "NEW CLI VERSION: $cliVersion"
 }
 
+
+"//registry.npmjs.org/:_authToken=$env:NPM_AUTH_TOKEN" | Out-File .npmrc -Encoding utf8
+
+
 yarn publish ./gah-shared --new-version $sharedVersion
 
 
