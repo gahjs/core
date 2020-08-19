@@ -121,16 +121,16 @@ export class GahFile {
   }
 
   private checkValidConfiguration() {
-    let entryModuleNames: string[] = [];
+    const entryModuleNames: string[] = [];
     this._modules.forEach(x => {
       if (x.isEntry) {
         entryModuleNames.push(x.moduleName!);
       }
     });
     if (entryModuleNames.length === 0) {
-      throw new Error('You do not have any entry modules defined! You need at exactly one entry module for the system to work!');
+      throw new Error('You do not have any entry modules defined! You need exactly one entry module for the system to work!');
     } else if (entryModuleNames.length > 1) {
-      throw new Error(`${'You have too many entry modules defined! You need at exactly one entry module for the system to work!'
+      throw new Error(`${'You have too many entry modules defined! You need exactly one entry module for the system to work!'
         + ' The following modules are configured as entry modules: '}${entryModuleNames.join(', ')}`);
     }
   }

@@ -76,13 +76,11 @@ export class InitController extends Controller {
 
     newModule.name = newModuleName;
 
-    let gahCfg: GahModule | GahHost;
-
-    gahCfg = this._configService.getGahModule();
+    const gahCfg = this._configService.getGahModule();
     if (assetsFolderPath) {
       newModule.assetsPath = this._fileSystemService.ensureRelativePath(assetsFolderPath);
     }
-    if (assetsFolderPath) {
+    if (stylesFilePath) {
       newModule.stylesPath = this._fileSystemService.ensureRelativePath(stylesFilePath);
     }
     newModule.packageName = packageName;
@@ -90,10 +88,10 @@ export class InitController extends Controller {
     newModule.baseNgModuleName = baseModuleName;
     newModule.isEntry = isEntry;
     if (overwrite) {
-      const idx = (gahCfg as GahModule).modules.findIndex(x => x.name === newModule.name);
-      (gahCfg as GahModule).modules[idx] = newModule;
+      const idx = gahCfg.modules.findIndex(x => x.name === newModule.name);
+      gahCfg.modules[idx] = newModule;
     } else {
-      (gahCfg as GahModule).modules.push(newModule);
+      gahCfg.modules.push(newModule);
     }
 
     this._configService.saveGahModuleConfig();
@@ -147,10 +145,16 @@ export class InitController extends Controller {
   }
 
   private async askForAssetsFolderPath(isHost: boolean | undefined) {
+    const defaultAssetsFolder = this._fileSystemService.getFilesFromGlob('**/assets', ['.gah', 'dist'])?.[0];
+    
     const assetsFolderPath = await this._promptService
-      .input({
+      .fuzzyPath({
         msg: 'Enter the path to the assets folder. Leave empty for none',
+        itemType: 'directory',
+        excludePattern: ['.gah', 'dist'],
+        default: defaultAssetsFolder,
         enabled: () => !isHost,
+        optional: true
       });
     return assetsFolderPath;
   }

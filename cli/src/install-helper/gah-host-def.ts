@@ -11,13 +11,14 @@ export class GahHostDef extends GahModuleBase {
   private readonly _indexHtmlLines: string[];
   private readonly _baseHref: string;
   private readonly _title: string;
+  private readonly _gahCfgFolder: string;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
     this.isHost = true;
 
-    const gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
-    this.basePath = this.fileSystemService.join(gahCfgFolder, '.gah');
+    this._gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
+    this.basePath = this.fileSystemService.join(this._gahCfgFolder, '.gah');
     this.srcBasePath = './src';
 
     const hostCfg = this.fileSystemService.parseFile<GahHost>(gahCfgPath);
@@ -100,6 +101,8 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('WEB_CONFIG_ADJUSTED', { module: this.data() });
     await this.installPackages();
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
+
+    this.generateEnvFolderIfNeeded();
 
     await this.executePostinstallScripts();
   }
@@ -295,6 +298,19 @@ export class GahHostDef extends GahModuleBase {
       let webConfigContent = this.fileSystemService.readFile(webConfigPath);
       webConfigContent = webConfigContent.replace(/(<action type="Rewrite" url=")([\w/_-]+)(")/, `$1${this._baseHref}$3`);
       this.fileSystemService.saveFile(webConfigPath, webConfigContent);
+    }
+  }
+
+  private generateEnvFolderIfNeeded() {
+    const envDirPath = this.fileSystemService.join(this._gahCfgFolder, 'env');
+    this.fileSystemService.ensureDirectory(envDirPath);
+    const envFilePath = this.fileSystemService.join(envDirPath, 'environment.json');
+    if(!this.fileSystemService.fileExists(envFilePath)) {
+      this.fileSystemService.saveObjectToFile(envFilePath, {production: false});
+      const envProdFilePath = this.fileSystemService.join(envDirPath, 'environment.prod.json');
+      if(!this.fileSystemService.fileExists(envProdFilePath)) {
+        this.fileSystemService.saveObjectToFile(envProdFilePath, {production: true});
+      }
     }
   }
 

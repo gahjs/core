@@ -24,8 +24,8 @@ export class WorkspaceService implements IWorkspaceService {
         gitIgnoreLines.push(`# ${description}`);
       }
       gitIgnoreLines.push(gitIgnorePattern);
+      this._fileSystemService.saveFile(gitIgnorePath, gitIgnoreLines.join('\n'));
     }
-    this._fileSystemService.saveFile(gitIgnorePath, gitIgnoreLines.join('\n'));
   }
 
   public getGlobalGahFolder(): string {
