@@ -26,7 +26,7 @@ else {
     Write-Output "NEW CLI VERSION: $cliVersion"
 }
 
-##yarn publish ./gah-shared --new-version $sharedVersion
+yarn publish ./gah-shared --new-version $sharedVersion
 
 
 
@@ -36,7 +36,7 @@ $pkgJsonCli.dependencies.'@awdware/gah-shared' = $sharedVersion;
 
 $pkgJsonCli | ConvertTo-Json -depth 2 | Out-File ./gah/package.json -Encoding utf8
 
-## yarn publish ./gah --new-version $cliVersion
+yarn publish ./gah --new-version $cliVersion
 
 
 Write-Host "##vso[task.setvariable variable=newSharedVersion;isOutput=true]$sharedVersion"
