@@ -176,6 +176,7 @@ export class InitController extends Controller {
         enabled: () => !isHost,
         itemType: 'file',
         excludePattern: ['.gah', 'dist'],
+        exclude: (val) => !val.endsWith('.scss'),
         default: defaultStylesPath,
         optional: true
       });
