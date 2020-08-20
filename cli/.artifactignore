@@ -1,8 +1,8 @@
 node_modules
-./src/**
 .vscode
 .eslintignore
 .eslintrc.json
 tsconfig.json
 azure-pipelines.yml
-!assets
+src
+!assets/**/src
