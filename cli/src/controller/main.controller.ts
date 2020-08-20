@@ -140,17 +140,24 @@ export class MainController extends Controller {
 
   private async checkForUpdates() {
     const gahData = this._workspaceService.getGlobalData();
+    let checkNewVersion = false;
     if (gahData.lastUpdateCheck) {
       const hoursPassed = Math.abs(new Date().getTime() - new Date(gahData.lastUpdateCheck).getTime()) / 36e5;
       if (hoursPassed > 1 || !gahData.latestGahVersion) {
-        const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
-        if (success) {
-          const versionString = this._executionService.executionResult;
-          const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
-          const newestVersion = versionString.match(versionMatcher);
-          gahData.latestGahVersion = newestVersion?.[1];
-          gahData.lastUpdateCheck = new Date();
-        }
+        checkNewVersion = true;
+      }
+    } else {
+      checkNewVersion = true;
+    }
+
+    if(checkNewVersion) {
+      const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
+      if (success) {
+        const versionString = this._executionService.executionResult;
+        const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
+        const newestVersion = versionString.match(versionMatcher);
+        gahData.latestGahVersion = newestVersion?.[1];
+        gahData.lastUpdateCheck = new Date();
       }
     }
 

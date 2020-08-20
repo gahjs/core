@@ -46,8 +46,8 @@ export class PromptService implements IPromptService {
     const def = cfg.optional ? 0 : cfg.default && defaultIndex || undefined;
 
     if (cfg.optional) {
+      filteredFiles.splice(0, 0, filteredFiles.splice(defaultIndex, 1)[0]);
       filteredFiles.splice(0, 0, '');
-      filteredFiles.splice(1, 0, filteredFiles.splice(defaultIndex, 1)[0]);
     }
 
     return prompt({
