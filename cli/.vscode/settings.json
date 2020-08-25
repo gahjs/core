@@ -1,5 +1,6 @@
 {
   "files.associations": {
     // "**/assets/**": "plaintext"
-  }
+  },
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }
