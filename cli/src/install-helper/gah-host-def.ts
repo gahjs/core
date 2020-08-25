@@ -5,7 +5,6 @@ import {
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 import readline from 'readline';
-import { stringify } from 'querystring';
 
 export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
