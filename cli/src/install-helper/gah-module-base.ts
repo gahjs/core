@@ -168,8 +168,11 @@ export abstract class GahModuleBase {
   }
 
   public get packageJson(): PackageJson {
-    const pkgJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
-    return this.fileSystemService.parseFile<PackageJson>(pkgJsonPath);
+    return this.fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
+  }
+
+  public get packageJsonPath(): string {
+    return this.fileSystemService.join(this.basePath, 'package.json');
   }
 
   private async executeScripts(preinstall: boolean) {

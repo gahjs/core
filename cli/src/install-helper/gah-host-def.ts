@@ -5,6 +5,7 @@ import {
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 import readline from 'readline';
+import { stringify } from 'querystring';
 
 export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
@@ -99,6 +100,9 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('INDEX_HTML_ADJUSTED', { module: this.data() });
     this.adjustWebConfig();
     this.pluginService.triggerEvent('WEB_CONFIG_ADJUSTED', { module: this.data() });
+
+    this.collectModuleScripts();
+
     await this.installPackages();
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
 
@@ -311,6 +315,50 @@ export class GahHostDef extends GahModuleBase {
       if(!this.fileSystemService.fileExists(envProdFilePath)) {
         this.fileSystemService.saveObjectToFile(envProdFilePath, {production: true});
       }
+    }
+  }
+
+  private collectModuleScripts() {
+    type ScriptDef = {name: string, script: string, moduleName: string};
+
+    const allGahScripts = new Array<ScriptDef>();
+    this.allRecursiveDependencies.forEach(m => {
+      if(!m.packageJson.scripts) {
+        return;
+      }
+      Object.keys(m.packageJson.scripts).forEach(scriptName => {
+        if(scriptName.startsWith('gah-') && scriptName !== 'gah-preinstall' && scriptName !== 'gah-postinstall') {
+          const simpleScriptName = scriptName.substring(4);
+
+          const existingScript = allGahScripts.find(x => x.name === simpleScriptName);
+
+          if(existingScript) {
+            this.loggerService.warn(`The gah-script named "${simpleScriptName}" is declared multiple times. (${existingScript.moduleName} & ${m.moduleName!})`);
+          } else {
+            allGahScripts.push(
+              {
+                name: simpleScriptName,
+                script: m.packageJson.scripts![scriptName]!,
+                moduleName: m.moduleName!
+              }
+            );
+          }
+        }
+      });
+    });
+
+    const pkgJson = this.packageJson;
+
+    if(allGahScripts.length > 0) {
+      if(!pkgJson.scripts) {
+        pkgJson.scripts = {};
+      }
+
+      allGahScripts.forEach(script => {
+        pkgJson.scripts![script.name] = script.script;
+      });
+
+      this.fileSystemService.saveObjectToFile(this.packageJsonPath, pkgJson);
     }
   }
 
