@@ -31,6 +31,9 @@ export class RunController extends Controller {
 
     const opts = ['run', ...command];
 
-    await this._executionService.executeAndForget('yarn', opts, true, isHost ? '.gah' : undefined);
+    const success = await this._executionService.executeAndForget('yarn', opts, true, isHost ? '.gah' : undefined);
+    if (!success) {
+      process.exit(1);
+    }
   }
 }
