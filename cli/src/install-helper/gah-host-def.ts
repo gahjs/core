@@ -97,8 +97,6 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('ANGULAR_JSON_ADJUSTED', { module: this.data() });
     this.adjustIndexHtml();
     this.pluginService.triggerEvent('INDEX_HTML_ADJUSTED', { module: this.data() });
-    this.adjustWebConfig();
-    this.pluginService.triggerEvent('WEB_CONFIG_ADJUSTED', { module: this.data() });
 
     this.collectModuleScripts();
 
@@ -295,43 +293,34 @@ export class GahHostDef extends GahModuleBase {
     this.fileSystemService.saveFile(indexHtmlPath, htmlContent);
   }
 
-  private adjustWebConfig() {
-    if (this._baseHref) {
-      const webConfigPath = this.fileSystemService.join(this.basePath, this.srcBasePath, 'web.config');
-      let webConfigContent = this.fileSystemService.readFile(webConfigPath);
-      webConfigContent = webConfigContent.replace(/(<action type="Rewrite" url=")([\w/_-]+)(")/, `$1${this._baseHref}$3`);
-      this.fileSystemService.saveFile(webConfigPath, webConfigContent);
-    }
-  }
-
   private generateEnvFolderIfNeeded() {
     const envDirPath = this.fileSystemService.join(this._gahCfgFolder, 'env');
     this.fileSystemService.ensureDirectory(envDirPath);
     const envFilePath = this.fileSystemService.join(envDirPath, 'environment.json');
-    if(!this.fileSystemService.fileExists(envFilePath)) {
-      this.fileSystemService.saveObjectToFile(envFilePath, {production: false});
+    if (!this.fileSystemService.fileExists(envFilePath)) {
+      this.fileSystemService.saveObjectToFile(envFilePath, { production: false });
       const envProdFilePath = this.fileSystemService.join(envDirPath, 'environment.prod.json');
-      if(!this.fileSystemService.fileExists(envProdFilePath)) {
-        this.fileSystemService.saveObjectToFile(envProdFilePath, {production: true});
+      if (!this.fileSystemService.fileExists(envProdFilePath)) {
+        this.fileSystemService.saveObjectToFile(envProdFilePath, { production: true });
       }
     }
   }
 
   private collectModuleScripts() {
-    type ScriptDef = {name: string, script: string, moduleName: string};
+    type ScriptDef = { name: string, script: string, moduleName: string };
 
     const allGahScripts = new Array<ScriptDef>();
     this.allRecursiveDependencies.forEach(m => {
-      if(!m.packageJson.scripts) {
+      if (!m.packageJson.scripts) {
         return;
       }
       Object.keys(m.packageJson.scripts).forEach(scriptName => {
-        if(scriptName.startsWith('gah-') && scriptName !== 'gah-preinstall' && scriptName !== 'gah-postinstall') {
+        if (scriptName.startsWith('gah-') && scriptName !== 'gah-preinstall' && scriptName !== 'gah-postinstall') {
           const simpleScriptName = scriptName.substring(4);
 
           const existingScript = allGahScripts.find(x => x.name === simpleScriptName);
 
-          if(existingScript) {
+          if (existingScript) {
             this.loggerService.warn(`The gah-script named "${simpleScriptName}" is declared multiple times. (${existingScript.moduleName} & ${m.moduleName!})`);
           } else {
             allGahScripts.push(
@@ -348,8 +337,8 @@ export class GahHostDef extends GahModuleBase {
 
     const pkgJson = this.packageJson;
 
-    if(allGahScripts.length > 0) {
-      if(!pkgJson.scripts) {
+    if (allGahScripts.length > 0) {
+      if (!pkgJson.scripts) {
         pkgJson.scripts = {};
       }
 
