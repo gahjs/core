@@ -45,6 +45,7 @@ export class WorkspaceService implements IWorkspaceService {
   }
   public saveGlobalGahData(data: GlobalGahData) {
     const globalDataPath = this._fileSystemService.join(this.getGlobalGahFolder(), 'data.json');
+	this._fileSystemService.ensureDirectory(this.getGlobalGahFolder());
     return this._fileSystemService.saveObjectToFile(globalDataPath, data);
   }
 }
