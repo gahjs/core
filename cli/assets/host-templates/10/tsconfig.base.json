@@ -23,7 +23,6 @@
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true,
-    "noImplicitAny": true
+    "strictInjectionParameters": true
   }
 }

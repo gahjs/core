@@ -5,6 +5,7 @@ import {
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 import readline from 'readline';
+import { GahAngularCompilerOptions } from '@awdware/gah-shared/lib/models/gah-angular-compiler-options';
 
 export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
@@ -12,6 +13,7 @@ export class GahHostDef extends GahModuleBase {
   private readonly _baseHref: string;
   private readonly _title: string;
   private readonly _gahCfgFolder: string;
+  private readonly _ngCompilerOptions: GahAngularCompilerOptions;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
@@ -36,6 +38,7 @@ export class GahHostDef extends GahModuleBase {
       });
     });
     this._ngOptions.aot = hostCfg.aot ?? true; // If not set the default value is true
+    this._ngCompilerOptions = hostCfg.angularCompilerOptions ?? {} as GahAngularCompilerOptions;
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
     this._baseHref = hostCfg.baseHref ? hostCfg.baseHref : '/';
     this._title = hostCfg.title ?? '';
@@ -79,6 +82,7 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('SYMLINKS_CREATED', { module: this.data() });
 
     this.addDependenciesToTsConfigFile();
+    this.setAngularCompilerOptionsInTsConfig();
     this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
     this.generateFromTemplate();
     this.pluginService.triggerEvent('TEMPLATE_GENERATED', { module: this.data() });
@@ -348,6 +352,10 @@ export class GahHostDef extends GahModuleBase {
 
       this.fileSystemService.saveObjectToFile(this.packageJsonPath, pkgJson);
     }
+  }
+
+  private setAngularCompilerOptionsInTsConfig() {
+    this.tsConfigFile.setAngularCompilerOptions(this._ngCompilerOptions);
   }
 
 }
