@@ -39,6 +39,10 @@
             "description": "The baseHref that is put into the web.config for redirect rules (defaults to '/')",
             "type": "string"
         },
+        "angularCompilerOptions": {
+            "description": "Some of the Angular compiler options",
+            "$ref": "#/definitions/GahAngularCompilerOptions"
+        },
         "isHost": {
             "type": "boolean"
         }
@@ -58,6 +62,32 @@
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "GahAngularCompilerOptions": {
+            "type": "object",
+            "properties": {
+                "strictPropertyInitialization": {
+                    "type": "boolean"
+                },
+                "strictNullChecks": {
+                    "type": "boolean"
+                },
+                "noImplicitAny": {
+                    "type": "boolean"
+                },
+                "strictBindCallApply": {
+                    "type": "boolean"
+                },
+                "strictFunctionTypes": {
+                    "type": "boolean"
+                },
+                "noImplicitReturns": {
+                    "type": "boolean"
+                },
+                "forceConsistentCasingInFileNames": {
+                    "type": "boolean"
                 }
             }
         }

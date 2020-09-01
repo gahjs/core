@@ -1,4 +1,5 @@
 import { ModuleReference } from './module-reference';
+import { GahAngularCompilerOptions } from './gah-angular-compiler-options';
 
 export class GahHost {
   protected $schema: string = 'https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-host-schema.json';
@@ -26,6 +27,11 @@ export class GahHost {
    * The baseHref that is put into the web.config for redirect rules (defaults to '/')
    */
   public baseHref?: string;
+
+  /**
+   * Some of the Angular compiler options
+   */
+  public angularCompilerOptions?: GahAngularCompilerOptions;
 
   public get isHost() { return true; }
 

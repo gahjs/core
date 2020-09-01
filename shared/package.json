@@ -29,7 +29,7 @@
   },
   "types": "lib/index.d.ts",
   "typesVersions": {
-    "<3.9": {
+    "<4.0": {
       "*": [
         "type-compat/ts3.4/index.d.ts"
       ]
