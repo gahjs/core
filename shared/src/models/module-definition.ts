@@ -33,4 +33,8 @@ export class ModuleDefinition {
    * Describes whether a module is the entry module for the host. This has to be set to true for exactly one module that is referenced by a host.
    */
   public isEntry?: boolean;
+  /**
+   * Configures the parent of this module. Must be the name of a gah module which has a router outlet containing a route with the path 'gah-outlet'.
+   */
+  public parentGahModule?: string;
 }
