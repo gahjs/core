@@ -23,6 +23,7 @@ export class GahModuleDef extends GahModuleBase {
     this.publicApiPathRelativeToBasePath = moduleCfg.publicApiPath;
     this.baseNgModuleName = moduleCfg.baseNgModuleName;
     this.isEntry = moduleCfg.isEntry || false;
+    this.parentGahModule = moduleCfg.parentGahModule;
     moduleCfg.dependencies?.forEach(moduleDependency => {
       moduleDependency.names.forEach(depModuleName => {
         const depAbsoluteBasepath = this.fileSystemService.join(this.basePath, moduleDependency.path);
