@@ -8,7 +8,15 @@ export class GahModuleDef extends GahModuleBase {
     this.isHost = false;
     initializedModules.push(this);
 
-    const moduleCfg = this.fileSystemService.parseFile<GahModule>(gahCfgPath).modules.find(x => x.name === moduleName);
+    let moduleCfgData: GahModule;
+    try {
+      moduleCfgData = this.fileSystemService.parseFile<GahModule>(gahCfgPath);
+    } catch (error) {
+      this.loggerService.error(`could not parse module file at ${gahCfgPath}`);
+      throw error;
+    }
+
+    const moduleCfg = moduleCfgData.modules.find(x => x.name === moduleName);
     if (!moduleCfg) {
       throw new Error(`Cannot find module with name "${moduleName}" in file "${gahCfgPath}"`);
     }

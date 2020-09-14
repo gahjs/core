@@ -38,10 +38,22 @@ export class GahFile {
     this.setModuleType(filePath);
 
     if (this.isHost) {
-      const hostCfg = this._fileSystemService.parseFile<GahHost>(filePath);
+      let hostCfg: GahHost;
+      try {
+        hostCfg = this._fileSystemService.parseFile<GahHost>(filePath);
+      } catch (error) {
+        this._loggerService.error(`could not parse host file at ${filePath}`);
+        throw error;
+      }
       this.loadHost(hostCfg, filePath, initializedModules);
     } else {
-      const moduleCfg = this._fileSystemService.parseFile<GahModule>(filePath);
+      let moduleCfg: GahModule;
+      try {
+        moduleCfg = this._fileSystemService.parseFile<GahModule>(filePath);
+      } catch (error) {
+        this._loggerService.error(`could not parse module file at ${filePath}`);
+        throw error;
+      }
       this.loadModule(moduleCfg, filePath, initializedModules);
     }
   }
@@ -106,14 +118,14 @@ export class GahFile {
     let angularCoreVersion = entryPackageJson.dependencies?.['@angular/core']?.match(/(\d+)\.\d+\.\d+/)?.[1];
 
     switch (angularCoreVersion) {
-    case '8':
-      break;
-    case '9':
-      angularCoreVersion = '8';
-      break;
-    default:
-      angularCoreVersion = '10';
-      break;
+      case '8':
+        break;
+      case '9':
+        angularCoreVersion = '8';
+        break;
+      default:
+        angularCoreVersion = '10';
+        break;
     }
 
 
