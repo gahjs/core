@@ -1,5 +1,4 @@
-import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData } from '@awdware/gah-shared';
-import { GahAngularCompilerOptions } from '@awdware/gah-shared/lib/models/gah-angular-compiler-options';
+import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData, GahAngularCompilerOptions } from '@awdware/gah-shared';
 
 export class TsConfigFile {
   private readonly _fileSystemService: IFileSystemService;
@@ -44,7 +43,12 @@ export class TsConfigFile {
   }
 
   public save() {
-    this._fileSystemService.saveObjectToFile(this._path, this._tsConfig);
+    const oldData = this._fileSystemService.parseFile<TsConfig>(this._path);
+
+    const equals = JSON.stringify(oldData) === JSON.stringify(this._tsConfig);
+    if(!equals) { 
+      this._fileSystemService.saveObjectToFile(this._path, this._tsConfig);
+    }
   }
 
   public addPathAlias(aliasName: string, path: string) {
