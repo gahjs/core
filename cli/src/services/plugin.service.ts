@@ -96,9 +96,13 @@ export class PluginService implements IPluginService {
   private registerPlugin(plugin: GahPlugin, pluginDepCfg: GahPluginDependencyConfig) {
     plugin.config = pluginDepCfg.settings;
     this.initPluginServices(plugin);
-    plugin.onInit();
-    this._plugins.push(plugin);
-    this._loggerService.debug(`loaded plugin ${pluginDepCfg.name}`);
+    if(plugin.config.enabled === undefined || plugin.config.enabled) {
+      plugin.onInit();
+      this._plugins.push(plugin);
+      this._loggerService.debug(`loaded plugin ${pluginDepCfg.name}`);
+    } else {
+      this._loggerService.debug(`plugin ${pluginDepCfg.name} is disabled`);
+    }
   }
 
   private async ensurePluginIsInstalled(pluginDepCfg: GahPluginDependencyConfig): Promise<GahPlugin> {
