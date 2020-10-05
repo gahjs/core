@@ -1,7 +1,7 @@
 $inputVersionShared = "$evn:versionShared";
 $inputVersionCli = "$evn:versionCli";
-$updateShared = ("$evn:updateShared" -eq "true");
-$updateCli = ("$evn:updateCli" -eq "true");
+$updateShared = ("$evn:updateShared" -eq 'true');
+$updateCli = ("$evn:updateCli" -eq 'true');
 
 $sharedVersion = '';
 $cliVersion = '';
