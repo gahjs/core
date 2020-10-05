@@ -1,8 +1,8 @@
-$inputVersionShared = $evn:versionShared;
-$inputVersionCli = $evn:versionCli;
+$inputVersionShared = "$(versionShared)";
+$inputVersionCli = "$(versionCli)";
 
-$inputUpdateShared = $evn:updateShared;
-$inputUpdateCli = $evn:updateCli;
+$inputUpdateShared = "$(updateShared)";
+$inputUpdateCli = "$(updateCli)";
 
 
 Write-output " inputVersionShared: $inputVersionShared"
@@ -43,6 +43,9 @@ if ($updateCli) {
         $cliVersion = $cliVersion.Split('.')[0] + "." + $cliVersion.Split('.')[1] + "." + ([int]$cliVersion.Split('.')[2] + 1)
         Write-Output "NEW CLI VERSION: $cliVersion"
     }
+}
+else {
+    $cliVersion = ((yarn info @awdware/gah --json version) | Out-String | ConvertFrom-Json).data
 }
 
 "//registry.npmjs.org/:_authToken=$env:NPM_AUTH_TOKEN" | Out-File .npmrc -Encoding utf8
