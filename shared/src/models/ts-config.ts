@@ -8,6 +8,7 @@ export class TsConfig {
 export class TsConfigCompilerOptions {
   paths: TsConfigCompilerOptionsPaths;
   baseUrl: string;
+  target: string;
 }
 
 export class TsConfigCompilerOptionsPaths {

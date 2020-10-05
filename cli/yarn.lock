@@ -14,10 +14,10 @@
   dependencies:
     "@awdware/eslint-config-base" "^0.0.4"
 
-"@awdware/gah-shared@^0.0.48":
-  version "0.0.48"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.48.tgz#089c26be6355d2c818820f014570a68dc31acae7"
-  integrity sha512-3u0FDOmVkKj9R4X9NjrU9MIPmLq0OO+5bMfKxbb4dbRvzJ3X//h0OXMYDEQeofKGXRNdIlMz/Fnq+zdO/Sw6DA==
+"@awdware/gah-shared@^0.0.49":
+  version "0.0.49"
+  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.0.49.tgz#6fe8a40e1041ceb64bddc1138fd7ed7db26f5c08"
+  integrity sha512-M8EX5df4MFfjVYEWXEMRzAjG8SXnsR7CToQ40VA6NuVg5ulYwVUHe+n5TU7CyZdcOAk/uk2llvNraQbjVrWKZg==
 
 "@babel/code-frame@^7.0.0":
   version "7.10.4"
