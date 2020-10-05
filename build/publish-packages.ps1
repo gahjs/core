@@ -1,8 +1,8 @@
-$inputVersionShared = "$evn:versionShared";
-$inputVersionCli = "$evn:versionCli";
+$inputVersionShared = $evn:versionShared;
+$inputVersionCli = $evn:versionCli;
 
-$inputUpdateShared = "$evn:updateShared";
-$inputUpdateCli = "$evn:updateCli";
+$inputUpdateShared = $evn:updateShared;
+$inputUpdateCli = $evn:updateCli;
 
 
 Write-output " inputVersionShared: $inputVersionShared"
