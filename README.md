@@ -8,6 +8,15 @@
 
 `gah`provides tooling for working with decentralized, modular angular applications.
 
+## ToC
+- [Features](#features)
+- [Upcoming](#upcoming)
+- [Getting started](#getting-started)
+  * [From CLI](#from-cli)
+  * [From Code](#from-code)
+- [Plugins](#plugins)
+
+
 ## Features
 ✅ Intuitive CLI for configuring modules, hosts, dependencies, plugins and more  
 ✅ Works with angular-CLI but is not strictly dependent on it  
@@ -74,3 +83,15 @@ await gah.install();
 await gah.run('ng build');
 ```
 Please note that all commands are executed for the current working directory of NodeJS. So for adding dependencies you first have to navigate to that folder and execute the commands there.
+
+## Plugins
+gah is plugable. To add a plugin utilize `gah plugin add [name]`. Plugins are npm packages.
+The following Table contains some example plugins:
+
+| package name                                                                    | description                                                                    |
+|---------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
+| [gah-plugin-template](https://github.com/awdware/gah-plugin-template)           | An empty example for a new plugin to get started.                              |
+| [gah-angular-json-plugin](https://github.com/awdware/gah-angular-json-plugin)   | Adjust the generated angular.json file                                         |
+| [gah-ie11-plugin](https://github.com/awdware/gah-ie11-plugin)                   | Make the generated application compatible with IE11                            |
+| [gah-translation-merger](https://github.com/awdware/gah-translation-merger)     | Merge multiple translation files into one (per language) eg. for ngx-translate |
+| [gah-for-root-initializer](https://github.com/awdware/gah-for-root-initializer) | Call forRoot on selected NgModules instead of using their class name           |
