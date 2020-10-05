@@ -1,7 +1,7 @@
 $inputVersionShared = "$evn:versionShared";
 $inputVersionCli = "$evn:versionCli";
-$updateShared = ("$evn:updateShared" -eq 'true');
-$updateCli = ("$evn:updateCli" -eq 'true');
+$updateShared = [System.Convert]::ToBoolean("$evn:updateShared");
+$updateCli = [System.Convert]::ToBoolean("$evn:updateCli");
 
 $sharedVersion = '';
 $cliVersion = '';
