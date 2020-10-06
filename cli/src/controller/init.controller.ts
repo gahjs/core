@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { ModuleDefinition, GahHost, GahModule, PackageJson } from '@awdware/gah-shared';
+import { ModuleDefinition, GahModule, PackageJson } from '@awdware/gah-shared';
 import { Controller } from './controller';
 
 @injectable()
