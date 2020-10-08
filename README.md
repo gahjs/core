@@ -28,6 +28,7 @@
 
 ## Upcoming
 🆕 Multi-Repository Support  
+🆕 Using precompiled (npm) packages   
 
 ## Getting started
 `gah` can be used both as a CLI tool and integrated into your NodeJS scripts or JS build systems.
