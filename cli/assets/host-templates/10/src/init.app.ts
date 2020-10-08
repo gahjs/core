@@ -123,7 +123,7 @@ const fixGahOutlets = (routes: Routes) => {
         }
 
         if (a.path === 'gah-outlet') {
-          x.children = a.children;
+          x.children = [...x.children.filter(c => c.path !== 'gah-outlet'), ...a.children];
         }
       }
     }
