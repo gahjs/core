@@ -18,8 +18,8 @@ export class InitController extends Controller {
       return;
     }
 
-    if(!isHost) {
-  
+    if (!isHost) {
+
 
       const packageJson = this.getPackageJson();
 
@@ -28,18 +28,18 @@ export class InitController extends Controller {
         this._loggerService.warn('No module name provided...');
         return;
       }
-    
+
       const packageName = await this.askPackageName(packageJson, isHost);
       if (!packageName && !isHost) {
         this._loggerService.warn('No package name provided...');
         return;
       }
-    
+
       const overwrite = await this.askForModuleOverwrite(newModuleName, packageName);
       if (this.nameExists && !overwrite) {
         return;
       }
-    
+
 
       const assetsFolderPath = await this.askForAssetsFolderPath(isHost);
       const stylesFolderPath = await this.askForGlobalStylesPath(isHost);
@@ -146,7 +146,7 @@ export class InitController extends Controller {
 
   private async askForAssetsFolderPath(isHost: boolean | undefined) {
     const defaultAssetsFolder = this._fileSystemService.getFilesFromGlob('**/assets', ['.gah', 'dist'])?.[0];
-    
+
     const assetsFolderPath = await this._promptService
       .fuzzyPath({
         msg: 'Enter the path to the assets folder. Leave empty for none',

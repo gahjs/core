@@ -1,6 +1,8 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { exec, spawn } from 'child_process';
-import { IExecutionService } from '@awdware/gah-shared';
+import { IExecutionService, ILoggerService } from '@awdware/gah-shared';
+import { LoggerService } from './logger.service';
+import chalk from 'chalk';
 
 /**
  * TODO: Use loggerservice to ensure that this works with loading animations, but without any square before the msg
@@ -9,12 +11,16 @@ import { IExecutionService } from '@awdware/gah-shared';
 export class ExecutionService implements IExecutionService {
   public executionResult: string = '';
   public executionErrorResult: string = '';
+  @inject(LoggerService)
+  private readonly _loggerService: ILoggerService;
 
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string, cwd?: string): Promise<boolean> {
     return new Promise((resolve) => {
       this.executionResult = '';
       this.executionErrorResult = '';
-      const childProcess = exec(cmd, { cwd });
+      this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(cwd ?? process.cwd())}'`);
+      this._loggerService.debug(`Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}`);
+      const childProcess = exec(cmd, { cwd, env: process.env });
 
       childProcess.stdout?.on('data', buffer => {
         this.executionResult += buffer;

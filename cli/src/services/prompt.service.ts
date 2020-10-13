@@ -45,7 +45,7 @@ export class PromptService implements IPromptService {
 
     const def = cfg.optional ? 0 : cfg.default && defaultIndex || undefined;
 
-    if(filteredFiles.length === 0) {
+    if (filteredFiles.length === 0) {
       return;
     }
 
