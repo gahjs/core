@@ -43,6 +43,7 @@ export class MainController extends Controller {
     // This sets the debug context variable depending on the used options
     this._contextService.setContext({ debug: process.argv.some(x => x === '--debug') });
 
+    this._loggerService.debug(`Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}\n`);
 
     await this.checkForUpdates();
 
@@ -150,7 +151,7 @@ export class MainController extends Controller {
       checkNewVersion = true;
     }
 
-    if(checkNewVersion) {
+    if (checkNewVersion) {
       const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
       if (success) {
         const versionString = this._executionService.executionResult;

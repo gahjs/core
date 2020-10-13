@@ -19,7 +19,6 @@ export class ExecutionService implements IExecutionService {
       this.executionResult = '';
       this.executionErrorResult = '';
       this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(cwd ?? process.cwd())}'`);
-      this._loggerService.debug(`Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}`);
       const childProcess = exec(cmd, { cwd, env: process.env });
 
       childProcess.stdout?.on('data', buffer => {
@@ -47,6 +46,9 @@ export class ExecutionService implements IExecutionService {
       });
 
       childProcess.on('exit', code => {
+        this._loggerService.debug(chalk.magenta('--------------Execution Result--------------'));
+        this._loggerService.debug(chalk.cyan(this.executionResult.replace(/\s$/g, '')));
+        this._loggerService.debug(chalk.magenta('--------------################--------------\n'));
         if (code !== 0) {
           setTimeout(() => {
             resolve(false);

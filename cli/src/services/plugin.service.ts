@@ -16,6 +16,7 @@ import { ExecutionService } from './execution.service';
 import { ContextService } from './context-service';
 import DIContainer from '../di-container';
 import { createHash } from 'crypto';
+import chalk from 'chalk';
 
 @injectable()
 export class PluginService implements IPluginService {
@@ -96,10 +97,10 @@ export class PluginService implements IPluginService {
   private registerPlugin(plugin: GahPlugin, pluginDepCfg: GahPluginDependencyConfig) {
     plugin.config = pluginDepCfg.settings;
     this.initPluginServices(plugin);
-    if(plugin.config.enabled === undefined || plugin.config.enabled) {
+    if (plugin.config.enabled === undefined || plugin.config.enabled) {
       plugin.onInit();
       this._plugins.push(plugin);
-      this._loggerService.debug(`loaded plugin ${pluginDepCfg.name}`);
+      this._loggerService.debug(`loaded plugin ${chalk.magenta(pluginDepCfg.name)}`);
     } else {
       this._loggerService.debug(`plugin ${pluginDepCfg.name} is disabled`);
     }
