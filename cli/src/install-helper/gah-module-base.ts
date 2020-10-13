@@ -183,9 +183,6 @@ export abstract class GahModuleBase {
       this.loggerService.log(`Executing ${preinstall ? 'pre' : 'post'}-install script.`);
 
       const success = await this.executionService.execute(`yarn run ${scriptName}`, false, undefined, this.basePath);
-      this.loggerService.debug('--------------Execution Result--------------');
-      this.loggerService.debug(this.executionService.executionResult);
-      this.loggerService.debug('--------------################--------------');
 
       if (success) {
         this.loggerService.success(`Finnished ${preinstall ? 'pre' : 'post'}-install script.`);
