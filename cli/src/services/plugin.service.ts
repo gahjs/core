@@ -236,8 +236,10 @@ export class PluginService implements IPluginService {
   }
 
   triggerEvent<T extends GahEventType>(type: T, payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>): void {
+    this._loggerService.debug(`Event '${type}' fired`);
     this._handlers.forEach(handler => {
       if (handler.eventType === type) {
+        this._loggerService.debug(`Calling handler '${handler.pluginName}'`);
         try {
           handler.handler(payload);
         } catch (error) {

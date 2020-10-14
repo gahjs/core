@@ -21,8 +21,7 @@
     "start": "yarn run build && yarn run global",
     "global": "yarn global add file:F:/git/@awdware/gah/cli",
     "lint": "yarn eslint ./src/**",
-    "build": "yarn run prebuild && tsc -p . && yarn run postbuild",
-    "drop": "yarn run build && yarn publish --access public --no-git-tag-version "
+    "build": "yarn run prebuild && tsc -p . && yarn run postbuild"
   },
   "engines": {
     "node": ">=10.0"
