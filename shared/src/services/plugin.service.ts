@@ -10,4 +10,6 @@ export interface IPluginService {
   getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null>;
   updatePlugins(pluginUpdates: PlguinUpdate[]): Promise<void>;
   isPluginConfigured(pluginName: string): boolean;
+  registerCommandHandler(pluginName: string, commandName: string, handler: (args: string[]) => Promise<boolean> | boolean): void;
+  run(cmd: string, args: string[]): Promise<boolean>;
 }

@@ -44,7 +44,8 @@ export class PluginController extends Controller {
     const updateablePlugins = await this._pluginService.getUpdateablePlugins(pluginName);
     if (!updateablePlugins || updateablePlugins.length === 0) {
       this._loggerService.log('No plugins can be updated.');
-      return; }
+      return;
+    }
 
     let pluginsToUpdate: PlguinUpdate[];
     if (!pluginName) {
@@ -54,25 +55,31 @@ export class PluginController extends Controller {
         choices: () => updateablePlugins.map(x => `${x.name} ${x.fromVersion} > ${x.toVersion}`)
       });
       pluginsToUpdate = resp.map(x => x.split(' ')[0]).map(name => updateablePlugins.find(x => x.name === name)!);
-      if(pluginsToUpdate.length === 0) {
+      if (pluginsToUpdate.length === 0) {
         this._loggerService.log('No plugins selected.');
         return;
       }
     } else {
       const pluginInstalled = this._pluginService.isPluginConfigured(pluginName);
-      if(!pluginInstalled) {
-        this._loggerService.log(`The plugin '${  pluginName  }' is not installed`);
+      if (!pluginInstalled) {
+        this._loggerService.log(`The plugin '${pluginName}' is not installed`);
         return;
       }
 
       pluginsToUpdate = [updateablePlugins.find(x => x.name === pluginName)!];
-      if(pluginsToUpdate.length === 0) {
-        this._loggerService.log(`No updates available for the plugin '${  pluginName  }'`);
+      if (pluginsToUpdate.length === 0) {
+        this._loggerService.log(`No updates available for the plugin '${pluginName}'`);
         return;
       }
     }
 
     await this._pluginService.updatePlugins(pluginsToUpdate);
+  }
+
+  public async run(command: string[]) {
+    const cmd = command.splice(0, 1)[0];
+    const args = command;
+    this._pluginService.run(cmd, args);
   }
 
   private async askForInstalledPlugin(msg: string, pluginName?: string): Promise<string | null> {

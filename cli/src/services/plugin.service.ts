@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 
 import {
-  GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig,
+  GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig, GahCommandHandler,
   IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
   ILoggerService, IFileSystemService, IContextService, PlguinUpdate, GahEventType, ExtractEventPayload, PackageJson
 } from '@awdware/gah-shared';
@@ -22,7 +22,8 @@ import chalk from 'chalk';
 export class PluginService implements IPluginService {
 
   private readonly _plugins = new Array<GahPlugin>();
-  private readonly _handlers = new Array<GahEventHandler<any>>();
+  private readonly _eventHandlers = new Array<GahEventHandler<any>>();
+  private readonly _commandHandlers = new Array<GahCommandHandler>();
   private readonly _pluginFolder: string;
   private readonly _pluginPackageJson: string;
 
@@ -237,7 +238,7 @@ export class PluginService implements IPluginService {
 
   triggerEvent<T extends GahEventType>(type: T, payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>): void {
     this._loggerService.debug(`Event '${type}' fired`);
-    this._handlers.forEach(handler => {
+    this._eventHandlers.forEach(handler => {
       if (handler.eventType === type) {
         this._loggerService.debug(`Calling handler '${handler.pluginName}'`);
         try {
@@ -257,7 +258,7 @@ export class PluginService implements IPluginService {
     newHandler.pluginName = pluginName;
     newHandler.eventType = type;
     newHandler.handler = handler;
-    this._handlers.push(newHandler);
+    this._eventHandlers.push(newHandler);
   }
 
   public async installPlugin(pluginName: string): Promise<boolean> {
@@ -346,6 +347,24 @@ export class PluginService implements IPluginService {
       plugin!.version = pluginUpdate.toVersion;
     });
     this._configService.saveGahConfig();
+  }
+
+  registerCommandHandler(pluginName: string, commandName: string, handler: (args: string[]) => Promise<boolean>): void {
+    const newHandler = new GahCommandHandler();
+    newHandler.pluginName = pluginName;
+    newHandler.command = commandName;
+    newHandler.handler = handler;
+    this._commandHandlers.push(newHandler);
+  }
+
+  async run(cmd: string, args: string[]): Promise<boolean> {
+    const cmdHandler = this._commandHandlers.find(x => x.command === cmd);
+    if (!cmdHandler) {
+      this._loggerService.error(`The command '${chalk.yellow(cmd)}' cannot be found`);
+      return false;
+    }
+    this._loggerService.debug(`executing command '${chalk.yellow(cmd)}' from '${chalk.yellow(cmdHandler.pluginName)}'`);
+    return cmdHandler.handler(args);
   }
 
 }
