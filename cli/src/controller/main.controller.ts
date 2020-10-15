@@ -108,7 +108,7 @@ export class MainController extends Controller {
       .action(async () => this._hostModuleController.remove());
 
     const cmdPlugin = program
-      .command('plugin <add|remove|update> [options]');
+      .command('plugin <add|remove|update|run> [options]');
     cmdPlugin
       .command('add [pluginName]')
       .description('Adds and installs a new plugin.')
@@ -121,6 +121,10 @@ export class MainController extends Controller {
       .command('update [pluginName]')
       .description('Updates plugin to its newest version.')
       .action(async (pluginName) => this._pluginController.update(pluginName));
+    cmdPlugin
+      .command('run <command...>')
+      .description('Runs a custom command from a plugin.')
+      .action(async (command: string[]) => this._pluginController.run(command));
 
     program
       .command('run  <command...>')
