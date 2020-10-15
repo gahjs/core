@@ -86,7 +86,7 @@ export class GahHostDef extends GahModuleBase {
     this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
     this.generateFromTemplate();
     this.pluginService.triggerEvent('TEMPLATE_GENERATED', { module: this.data() });
-    this.copyAssets();
+    await this.linkAssets();
     this.pluginService.triggerEvent('ASSETS_COPIED', { module: this.data() });
     this.referenceGlobalStyles();
     this.pluginService.triggerEvent('STYLES_REFERENCED', { module: this.data() });
@@ -173,27 +173,35 @@ export class GahHostDef extends GahModuleBase {
     }
   }
 
-  private copyAssets() {
+  private async linkAssets() {
+    // Bug: Symlinks are not copied to dist folder https://github.com/angular/angular-cli/issues/19086
+    // workaround: include symlinked folder directly in assets config in angular json
+    const ngJsonPath = this.fileSystemService.join(this.basePath, 'angular.json');
+    const ngJson = this.fileSystemService.parseFile<any>(ngJsonPath);
+    const assetsArray = ngJson.projects['gah-host'].architect.build.options.assets as string[];
+
     for (const dep of this.allRecursiveDependencies) {
       if (!dep.assetsFolderRelativeTobasePaths || (Array.isArray(dep.assetsFolderRelativeTobasePaths) && dep.assetsFolderRelativeTobasePaths.length === 0)) {
         continue;
       }
-
       const assetsFolderRelativeTobasePaths = Array.isArray(dep.assetsFolderRelativeTobasePaths) ? dep.assetsFolderRelativeTobasePaths : [dep.assetsFolderRelativeTobasePaths];
 
-      assetsFolderRelativeTobasePaths.forEach(p => {
+      for (const p of assetsFolderRelativeTobasePaths) {
         const assetsDirectoryPath = this.fileSystemService.join(dep.basePath, p);
 
-        // Copying assets
+        // Linking assets
         if (this.fileSystemService.directoryExists(assetsDirectoryPath)) {
           const hostAssetsFolder = this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets', dep.moduleName!);
-          this.fileSystemService.copyFilesInDirectory(assetsDirectoryPath, hostAssetsFolder);
-          // Symlinks are not copied to dist folder (bug ?)
-          // this.fileSystemService.createDirLink(hostAssetsFolder, absoluteAssetsFolderOfDep);
-          // Possible fix: Include symlinked folder directly in assets config in angular json
+          await this.fileSystemService.createDirLink(hostAssetsFolder, assetsDirectoryPath);
         }
-      });
+      }
+
+      // workaround
+      assetsArray.push(`src/assets/${dep.moduleName}`);
     }
+
+    // workaround
+    this.fileSystemService.saveObjectToFile(ngJsonPath, ngJson);
   }
 
   private referenceGlobalStyles() {
