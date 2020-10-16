@@ -29,7 +29,7 @@ export abstract class GahModuleBase {
   public stylesFilePathRelativeToBasePath?: string;
   public publicApiPathRelativeToBasePath: string;
   public baseNgModuleName?: string;
-  protected isHost: boolean;
+  public isHost: boolean;
   protected installed: boolean;
   protected gahConfig: GahConfig;
   public isEntry: boolean;
