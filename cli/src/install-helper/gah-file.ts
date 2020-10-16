@@ -10,6 +10,7 @@ import { WorkspaceService } from '../services/workspace.service';
 import { CopyHost } from './copy-host';
 import { LoggerService } from '../services/logger.service';
 import { PluginService } from '../services/plugin.service';
+import chalk from 'chalk';
 
 export class GahFile {
   private readonly _fileSystemService: IFileSystemService;
@@ -86,6 +87,24 @@ export class GahFile {
     this._loggerService.stopLoadingAnimation(false, true, `All modules installed ${i}/${i}!`);
   }
 
+  public why(moduleName: string) {
+    const becauseOfThem = this._modules.filter(module => {
+      return module.dependencies.some(dep => dep.moduleName === moduleName);
+    });
+    if(becauseOfThem.length > 0) {
+      this._loggerService.log(`'${chalk.green(moduleName)}' is used by the following module(s):`);
+      becauseOfThem.forEach(x => {
+        if(x.isHost) {
+          this._loggerService.log(`gah host in '${chalk.gray(this._fileSystemService.getDirectoryPathFromFilePath(x.basePath))}'`);
+        } else {
+          this._loggerService.log(`'${chalk.green(x.moduleName)}' in '${chalk.gray(x.basePath)}'`);
+        }
+      });
+    } else {
+      this._loggerService.log(`'${chalk.green(moduleName)}' is not referenced`);
+    }
+  }
+
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
     cfg.modules.forEach(moduleRef => {
       moduleRef.names.forEach(moduleName => {
@@ -118,14 +137,14 @@ export class GahFile {
     let angularCoreVersion = entryPackageJson.dependencies?.['@angular/core']?.match(/(\d+)\.\d+\.\d+/)?.[1];
 
     switch (angularCoreVersion) {
-      case '8':
-        break;
-      case '9':
-        angularCoreVersion = '8';
-        break;
-      default:
-        angularCoreVersion = '10';
-        break;
+    case '8':
+      break;
+    case '9':
+      angularCoreVersion = '8';
+      break;
+    default:
+      angularCoreVersion = '10';
+      break;
     }
 
 
