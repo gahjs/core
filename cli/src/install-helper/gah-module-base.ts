@@ -1,6 +1,6 @@
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
-  IPluginService, GahConfig, GahModuleData, PackageJson
+  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService
 } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -14,6 +14,7 @@ import { LoggerService } from '../services/logger.service';
 import { ExecutionService } from '../services/execution.service';
 import { GahModuleDef } from './gah-module-def';
 import { PluginService } from '../services/plugin.service';
+import { ContextService } from '../services/context-service';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -22,6 +23,7 @@ export abstract class GahModuleBase {
   protected executionService: IExecutionService;
   protected loggerService: ILoggerService;
   protected pluginService: IPluginService;
+  protected contextService: IContextService;
 
   public basePath: string;
   public srcBasePath: string;
@@ -35,6 +37,7 @@ export abstract class GahModuleBase {
   public isEntry: boolean;
   public parentGahModule?: string;
   public excludedPackages: string[];
+  public aliasNames: { forModule: string, alias: string }[];
 
   public tsConfigFile: TsConfigFile;
   public gahFolder: GahFolder;
@@ -50,6 +53,7 @@ export abstract class GahModuleBase {
     this.executionService = DIContainer.get(ExecutionService);
     this.loggerService = DIContainer.get(LoggerService);
     this.pluginService = DIContainer.get(PluginService);
+    this.contextService = DIContainer.get(ContextService);
 
     this.installed = false;
     this.moduleName = moduleName;
@@ -85,6 +89,12 @@ export abstract class GahModuleBase {
     const specificData = this.specificData();
 
     return Object.assign(myData, specificData);
+  }
+
+  public addAlias(forModule: string, alias: string) {
+    if (!this.aliasNames.some(x => x.forModule === forModule && x.alias === alias)) {
+      this.aliasNames.push({ forModule, alias });
+    }
   }
 
   protected initTsConfigObject() {
@@ -139,9 +149,16 @@ export abstract class GahModuleBase {
       const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(0, publicApiPathRelativeToBaseSrcPath.length - 3);
 
       const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, publicApiRelativePathWithoutExtention);
-      const aliasName = `@${dep.packageName}/${dep.moduleName!}`;
+      const pathName = `@${dep.packageName}/${dep.moduleName!}`;
 
-      this.tsConfigFile.addPathAlias(aliasName, path);
+      this.tsConfigFile.addPathAlias(pathName, path);
+
+      if (dep.aliasNames) {
+        const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
+        if (aliasForThisModule) {
+          this.tsConfigFile.addPathAlias(aliasForThisModule.alias, path);
+        }
+      }
     }
     this.tsConfigFile.save();
   }
@@ -178,6 +195,9 @@ export abstract class GahModuleBase {
   }
 
   private async executeScripts(preinstall: boolean) {
+    if (this.contextService.getContext().skipScripts) {
+      return;
+    }
     const scriptName = preinstall ? 'gah-preinstall' : 'gah-postinstall';
     if (this.packageJson.scripts?.[scriptName]) {
 

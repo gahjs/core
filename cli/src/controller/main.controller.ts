@@ -45,6 +45,7 @@ export class MainController extends Controller {
 
     // This sets the debug context variable depending on the used options
     this._contextService.setContext({ debug: process.argv.some(x => x === '--debug') });
+    this._contextService.setContext({ skipScripts: process.argv.some(x => x === '--skipScripts') });
 
     this._loggerService.debug(`Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}\n`);
 
@@ -69,7 +70,8 @@ export class MainController extends Controller {
       .version(this._version);
 
     program
-      .option('--debug', 'Enables verbose debug logging');
+      .option('--debug', 'Enables verbose debug logging')
+      .option('--skipScripts', 'Skips pre and post install scripts');
 
     const cmdModule = program
       .command('module')

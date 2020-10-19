@@ -10,4 +10,8 @@ export class ModuleReference {
    * The names of the referenced modules within the project
    */
   public names: string[];
+  /**
+   * The module will be imported with an alias name instead of the real module name
+   */
+  public aliasName?: string;
 }
