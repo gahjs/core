@@ -12,6 +12,7 @@ import { Controller } from './controller';
 import { HostModuleController } from './hostModule.controller';
 import { GahModuleType } from '@awdware/gah-shared';
 import { RunController } from './run.controller';
+import { WhyController } from './why.controller';
 
 @injectable()
 export class MainController extends Controller {
@@ -25,6 +26,8 @@ export class MainController extends Controller {
   private readonly _installController: InstallController;
   @inject(PluginController)
   private readonly _pluginController: PluginController;
+  @inject(WhyController)
+  private readonly _whyController: WhyController;
   @inject(RunController)
   private readonly _runController: RunController;
   private readonly _version: string;
@@ -138,6 +141,11 @@ export class MainController extends Controller {
       .description('Installs all dependencies.')
       .alias('i')
       .action(async () => this._installController.install());
+
+    program
+      .command('why <module>')
+      .description('Why is this module referenced?')
+      .action(async (module) => this._whyController.why(module));
 
     await program.parseAsync(process.argv);
   }
