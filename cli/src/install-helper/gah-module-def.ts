@@ -33,15 +33,23 @@ export class GahModuleDef extends GahModuleBase {
     this.isEntry = moduleCfg.isEntry || false;
     this.parentGahModule = moduleCfg.parentGahModule;
     this.excludedPackages = moduleCfg.excludedPackages || [];
+    this.aliasNames = [];
     moduleCfg.dependencies?.forEach(moduleDependency => {
       moduleDependency.names.forEach(depModuleName => {
         const depAbsoluteBasepath = this.fileSystemService.join(this.basePath, moduleDependency.path);
         const alreadyInitialized = initializedModules.find(x => x.moduleName === depModuleName);
         if (alreadyInitialized) {
+          if (moduleDependency.aliasName) {
+            alreadyInitialized.addAlias(this.moduleName!, moduleDependency.aliasName);
+          }
           this.dependencies.push(alreadyInitialized);
         } else {
           if (this.fileSystemService.fileExists(depAbsoluteBasepath)) {
-            this.dependencies.push(new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules));
+            const newModuleDef = new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules);
+            if (moduleDependency.aliasName) {
+              newModuleDef.addAlias(this.moduleName!, moduleDependency.aliasName);
+            }
+            this.dependencies.push(newModuleDef);
           } else {
             this.loggerService.error(`Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
             process.exit(1);

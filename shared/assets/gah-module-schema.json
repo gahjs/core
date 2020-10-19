@@ -92,6 +92,10 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "aliasName": {
+                    "description": "The module will be imported with an alias name instead of the real module name",
+                    "type": "string"
                 }
             }
         }
