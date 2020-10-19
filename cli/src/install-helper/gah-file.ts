@@ -88,36 +88,47 @@ export class GahFile {
   }
 
   public why(moduleName: string) {
-    // const becauseOfThem = this._modules.filter(module => {
-    //   return module.dependencies.some(dep => dep.moduleName === moduleName);
-    // });
-    // if (becauseOfThem.length > 0) {
-    //   this._loggerService.log(`'${chalk.green(moduleName)}' is used by the following module(s):`);
-    //   becauseOfThem.forEach(x => {
-    //     if (x.isHost) {
-    //       this._loggerService.log(`gah host in '${chalk.gray(this._fileSystemService.getDirectoryPathFromFilePath(x.basePath))}'`);
-    //     } else {
-    //       this._loggerService.log(`'${chalk.green(x.moduleName)}' in '${chalk.gray(x.basePath)}'`);
-    //     }
-    //   });
-    // } else {
-    //   this._loggerService.log(`'${chalk.green(moduleName)}' is not referenced`);
-    // }
-    const res = this._modules.map(mod => this.hasRef(moduleName, mod));
+    let refs: string[][];
+    if (this.isHost) {
+      refs = this.findRecursiveDependencieChains(moduleName, this._modules.find(x => x.isHost)!, [], [], 'HOST');
+    } else {
+      const refsArray = this._modules.map(mod => this.findRecursiveDependencieChains(moduleName, mod, [], [], mod.moduleName!));
+      refs = Array.prototype.concat(...refsArray);
+    }
+
+    if (refs.length <= 1) {
+      this._loggerService.log(`'${chalk.green(moduleName)}' is not referenced`);
+    } else {
+      this._loggerService.log(`'${chalk.green(moduleName)}' is referenced by the following configurations:`);
+      refs.forEach(chain => {
+        const chainLine = chain.map(x => `'${chalk.green(x)}'`).join(' -> ');
+        this._loggerService.log(chainLine);
+      });
+    }
   }
 
-  private hasRef(searchedName: string, module: GahModuleBase): string[] | undefined {
+  private findRecursiveDependencieChains(searchedName: string, module: GahModuleBase, chains: string[][], chain: string[], pathStart: string): string[][] {
+    if (!chain || chain.length === 0) {
+      chain = [pathStart];
+    }
     for (const dep of module.dependencies) {
-      if (dep.moduleName === searchedName) {
-        return [searchedName];
+      if (chain.indexOf(dep.moduleName!) !== -1) {
+        this._loggerService.warn(`ERROR: circular dependdency detected: ${[...chain, dep.moduleName!].map(x => `'${chalk.red(x)}'`).join(' -> ')}`);
+        continue;
       }
-      const res = this.hasRef(searchedName, dep);
-      if (res) {
-        return [dep.moduleName!, ...res];
+      if (dep.moduleName === searchedName) {
+        chains.push([...chain, searchedName]);
       } else {
-        return undefined;
+        chain.push(dep.moduleName!);
+        const res = this.findRecursiveDependencieChains(searchedName, dep, chains, chain, pathStart);
+        if (res && res.length > 0) {
+          chain = [pathStart];
+        } else {
+          chain.pop();
+        }
       }
     }
+    return chains;
   }
 
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
