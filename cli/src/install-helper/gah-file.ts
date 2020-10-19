@@ -87,7 +87,7 @@ export class GahFile {
     this._loggerService.stopLoadingAnimation(false, true, `All modules installed ${i}/${i}!`);
   }
 
-  public why(moduleName: string) {
+  public whyModule(moduleName: string) {
     let refs: string[][];
     if (this.isHost) {
       const host = this._modules.find(x => x.isHost);
@@ -133,6 +133,27 @@ export class GahFile {
       }
     }
     return chains;
+  }
+
+  public whyPackage(packageName: string) {
+    const host = this._modules.find(x => x.isHost);
+    if (!host) {
+      throw new Error('Host could not be found');
+    }
+    const becauseOfus = host.allRecursiveDependencies
+      .filter(x => x.packageJson?.dependencies?.[packageName] || x.packageJson?.devDependencies?.[packageName]);
+    if (becauseOfus.length <= 1) {
+      this._loggerService.log(`'${chalk.yellow(packageName)}' is not referenced`);
+    } else {
+      this._loggerService.log(`'${chalk.yellow(packageName)}' is referenced by the following configurations: (red means it is excluded)`);
+      becauseOfus.forEach(module => {
+        if (module.excludedPackages.indexOf(packageName) !== -1) {
+          this._loggerService.log(`'${chalk.red(module.moduleName ?? '#N/A#')}'`);
+        } else {
+          this._loggerService.log(`'${chalk.green(module.moduleName ?? '#N/A#')}'`);
+        }
+      });
+    }
   }
 
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {

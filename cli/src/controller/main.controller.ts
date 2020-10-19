@@ -142,10 +142,17 @@ export class MainController extends Controller {
       .alias('i')
       .action(async () => this._installController.install());
 
-    program
-      .command('why <module>')
+    const cmdWhy = program
+      .command('why <module|package>')
+      .description('Why is something there?');
+    cmdWhy
+      .command('module <name>')
       .description('Why is this module referenced?')
-      .action(async (module) => this._whyController.why(module));
+      .action(async (name) => this._whyController.whyModule(name));
+    cmdWhy
+      .command('package <name>')
+      .description('Why is this package there?')
+      .action(async (name) => this._whyController.whyPackage(name));
 
     await program.parseAsync(process.argv);
   }
