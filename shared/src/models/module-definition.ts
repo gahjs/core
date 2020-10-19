@@ -37,4 +37,8 @@ export class ModuleDefinition {
    * Configures the parent of this module. Must be the name of a gah module which has a router outlet containing a route with the path 'gah-outlet'.
    */
   public parentGahModule?: string;
+  /**
+   * Exclude certain packages from the package.json to be added to the host's package.json. Has to be set for all modules that import which package to be effective.
+   */
+  public excludedPackages?: string[];
 }

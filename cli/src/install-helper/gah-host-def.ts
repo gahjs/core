@@ -252,8 +252,11 @@ export class GahHostDef extends GahModuleBase {
       const externalDeps = externalPackageJson.dependencies!;
       const externalDevDeps = externalPackageJson.devDependencies!;
 
-      const deps = Object.keys(externalDeps).filter(x => blocklistPackages.indexOf(x) === - 1);
-      const devDeps = Object.keys(externalDevDeps);
+      const deps = Object.keys(externalDeps)
+        .filter(x => blocklistPackages.indexOf(x) === - 1)
+        .filter(x => dep.excludedPackages.indexOf(x) === -1);
+      const devDeps = Object.keys(externalDevDeps)
+        .filter(x => dep.excludedPackages.indexOf(x) === -1);
 
       // Merging module (dev-)dependencies into host
       deps.forEach((d) => {

@@ -34,6 +34,7 @@ export abstract class GahModuleBase {
   protected gahConfig: GahConfig;
   public isEntry: boolean;
   public parentGahModule?: string;
+  public excludedPackages: string[];
 
   public tsConfigFile: TsConfigFile;
   public gahFolder: GahFolder;
