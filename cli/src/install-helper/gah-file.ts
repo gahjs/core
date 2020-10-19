@@ -90,7 +90,11 @@ export class GahFile {
   public why(moduleName: string) {
     let refs: string[][];
     if (this.isHost) {
-      refs = this.findRecursiveDependencieChains(moduleName, this._modules.find(x => x.isHost)!, [], [], 'HOST');
+      const host = this._modules.find(x => x.isHost);
+      if (!host) {
+        throw new Error('Could not find host');
+      }
+      refs = this.findRecursiveDependencieChains(moduleName, host, [], [], 'HOST');
     } else {
       const refsArray = this._modules.map(mod => this.findRecursiveDependencieChains(moduleName, mod, [], [], mod.moduleName!));
       refs = Array.prototype.concat(...refsArray);
