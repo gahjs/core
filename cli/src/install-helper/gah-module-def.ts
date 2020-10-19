@@ -40,7 +40,12 @@ export class GahModuleDef extends GahModuleBase {
         if (alreadyInitialized) {
           this.dependencies.push(alreadyInitialized);
         } else {
-          this.dependencies.push(new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules));
+          if (this.fileSystemService.fileExists(depAbsoluteBasepath)) {
+            this.dependencies.push(new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules));
+          } else {
+            this.loggerService.error(`Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
+            process.exit(1);
+          }
         }
       });
     });

@@ -29,11 +29,17 @@ export class GahHostDef extends GahModuleBase {
     }
     hostCfg.modules?.forEach(moduleDependency => {
       moduleDependency.names.forEach(depModuleName => {
+        const moduleAbsoluteBasepath = this.fileSystemService.join(this.basePath, moduleDependency.path);
         const alreadyInitialized = initializedModules.find(x => x.moduleName === depModuleName);
         if (alreadyInitialized) {
           this.dependencies.push(alreadyInitialized);
         } else {
-          this.dependencies.push(new GahModuleDef(moduleDependency.path, depModuleName, initializedModules));
+          if (this.fileSystemService.fileExists(moduleAbsoluteBasepath)) {
+            this.dependencies.push(new GahModuleDef(moduleAbsoluteBasepath, depModuleName, initializedModules));
+          } else {
+            this.loggerService.error(`Module '${depModuleName}' could not be found at '${moduleAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
+            process.exit(1);
+          }
         }
       });
     });
