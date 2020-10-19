@@ -64,6 +64,17 @@
                 "isEntry": {
                     "description": "Describes whether a module is the entry module for the host. This has to be set to true for exactly one module that is referenced by a host.",
                     "type": "boolean"
+                },
+                "parentGahModule": {
+                    "description": "Configures the parent of this module. Must be the name of a gah module which has a router outlet containing a route with the path 'gah-outlet'.",
+                    "type": "string"
+                },
+                "excludedPackages": {
+                    "description": "Exclude certain packages from the package.json to be added to the host's package.json. Has to be set for all modules that import which package to be effective.",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
                 }
             }
         },
