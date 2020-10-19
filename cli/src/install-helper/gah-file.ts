@@ -88,20 +88,35 @@ export class GahFile {
   }
 
   public why(moduleName: string) {
-    const becauseOfThem = this._modules.filter(module => {
-      return module.dependencies.some(dep => dep.moduleName === moduleName);
-    });
-    if(becauseOfThem.length > 0) {
-      this._loggerService.log(`'${chalk.green(moduleName)}' is used by the following module(s):`);
-      becauseOfThem.forEach(x => {
-        if(x.isHost) {
-          this._loggerService.log(`gah host in '${chalk.gray(this._fileSystemService.getDirectoryPathFromFilePath(x.basePath))}'`);
-        } else {
-          this._loggerService.log(`'${chalk.green(x.moduleName)}' in '${chalk.gray(x.basePath)}'`);
-        }
-      });
-    } else {
-      this._loggerService.log(`'${chalk.green(moduleName)}' is not referenced`);
+    // const becauseOfThem = this._modules.filter(module => {
+    //   return module.dependencies.some(dep => dep.moduleName === moduleName);
+    // });
+    // if (becauseOfThem.length > 0) {
+    //   this._loggerService.log(`'${chalk.green(moduleName)}' is used by the following module(s):`);
+    //   becauseOfThem.forEach(x => {
+    //     if (x.isHost) {
+    //       this._loggerService.log(`gah host in '${chalk.gray(this._fileSystemService.getDirectoryPathFromFilePath(x.basePath))}'`);
+    //     } else {
+    //       this._loggerService.log(`'${chalk.green(x.moduleName)}' in '${chalk.gray(x.basePath)}'`);
+    //     }
+    //   });
+    // } else {
+    //   this._loggerService.log(`'${chalk.green(moduleName)}' is not referenced`);
+    // }
+    const res = this._modules.map(mod => this.hasRef(moduleName, mod));
+  }
+
+  private hasRef(searchedName: string, module: GahModuleBase): string[] | undefined {
+    for (const dep of module.dependencies) {
+      if (dep.moduleName === searchedName) {
+        return [searchedName];
+      }
+      const res = this.hasRef(searchedName, dep);
+      if (res) {
+        return [dep.moduleName!, ...res];
+      } else {
+        return undefined;
+      }
     }
   }
 
@@ -137,14 +152,14 @@ export class GahFile {
     let angularCoreVersion = entryPackageJson.dependencies?.['@angular/core']?.match(/(\d+)\.\d+\.\d+/)?.[1];
 
     switch (angularCoreVersion) {
-    case '8':
-      break;
-    case '9':
-      angularCoreVersion = '8';
-      break;
-    default:
-      angularCoreVersion = '10';
-      break;
+      case '8':
+        break;
+      case '9':
+        angularCoreVersion = '8';
+        break;
+      default:
+        angularCoreVersion = '10';
+        break;
     }
 
 
