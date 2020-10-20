@@ -86,6 +86,8 @@ const buildModuleRoutes = (routeCfg: GahRouteConfig[]) => {
   return entry.routes;
 };
 
+const addedRoutes = [];
+
 const addToGahOutlet = (parentRoutes: Routes, child: GahRouteConfig) => {
   if (!parentRoutes) {
     return false;
@@ -96,7 +98,7 @@ const addToGahOutlet = (parentRoutes: Routes, child: GahRouteConfig) => {
     return true;
   } else {
     for (const parentRoute of parentRoutes) {
-      if (addToGahOutlet(parentRoute.children?.filter(x => !x.path.endsWith('~~~~~~~added')), child)) {
+      if (addToGahOutlet(parentRoute.children?.filter(x => !addedRoutes.includes(x)), child)) {
         return true;
       }
     }
@@ -104,11 +106,13 @@ const addToGahOutlet = (parentRoutes: Routes, child: GahRouteConfig) => {
   }
 };
 
+
+
 const addToChildren = (route: Route, routes: Routes) => {
   if (!route.children) {
     route.children = [];
   }
-  routes.forEach(x => x.path = x.path + '~~~~~~~added');
+  addedRoutes.push(...routes);
   route.children.push(...routes);
 };
 
@@ -118,10 +122,6 @@ const fixGahOutlets = (routes: Routes) => {
       fixGahOutlets(x.children);
 
       for (const a of x.children) {
-        if (a.path.endsWith('~~~~~~~added')) {
-          a.path = a.path.replace('~~~~~~~added', '');
-        }
-
         if (a.path === 'gah-outlet') {
           x.children = [...x.children.filter(c => c.path !== 'gah-outlet'), ...a.children];
         }
