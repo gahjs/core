@@ -6,6 +6,7 @@ import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 import readline from 'readline';
 import { GahAngularCompilerOptions } from '@awdware/gah-shared/lib/models/gah-angular-compiler-options';
+import compareVersions from 'compare-versions';
 
 export class GahHostDef extends GahModuleBase {
   private readonly _ngOptions: { aot: boolean } = {} as any;
@@ -266,7 +267,7 @@ export class GahHostDef extends GahModuleBase {
 
       // Merging module (dev-)dependencies into host
       deps.forEach((d) => {
-        if (!hostDeps[d] || dep.isEntry) {
+        if (!hostDeps[d] || dep.isEntry || compareVersions(hostDeps[d].replace('~', '').replace('^', ''), externalDeps[d].replace('~', '').replace('^', ''))) {
           hostDeps[d] = externalDeps[d];
         }
       });

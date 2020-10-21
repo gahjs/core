@@ -147,10 +147,13 @@ export class GahFile {
     } else {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is referenced by the following configurations: (red means it is excluded)`);
       becauseOfus.forEach(module => {
+
+        const packageVersion = (module.packageJson?.dependencies ?? module.packageJson?.devDependencies)?.[packageName];
+
         if (module.excludedPackages.indexOf(packageName) !== -1) {
-          this._loggerService.log(`'${chalk.red(module.moduleName ?? '#N/A#')}'`);
+          this._loggerService.log(`'${chalk.red(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);
         } else {
-          this._loggerService.log(`'${chalk.green(module.moduleName ?? '#N/A#')}'`);
+          this._loggerService.log(`'${chalk.green(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);
         }
       });
     }
