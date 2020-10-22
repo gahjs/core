@@ -45,6 +45,7 @@ export abstract class GahModuleBase {
   public dependencies: GahModuleBase[];
   public moduleName: string | null;
   public packageName: string | null;
+  private _packageJson: PackageJson;
 
   constructor(gahModulePath: string, moduleName: string | null) {
     this.fileSystemService = DIContainer.get(FileSystemService);
@@ -187,7 +188,10 @@ export abstract class GahModuleBase {
   }
 
   public get packageJson(): PackageJson {
-    return this.fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
+    if (!this._packageJson) {
+      this._packageJson = this.fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
+    }
+    return this._packageJson;
   }
 
   public get packageJsonPath(): string {

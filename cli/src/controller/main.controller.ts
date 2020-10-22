@@ -13,6 +13,7 @@ import { HostModuleController } from './hostModule.controller';
 import { GahModuleType } from '@awdware/gah-shared';
 import { RunController } from './run.controller';
 import { WhyController } from './why.controller';
+import { TidyController } from './tidy.controler';
 
 @injectable()
 export class MainController extends Controller {
@@ -26,10 +27,13 @@ export class MainController extends Controller {
   private readonly _installController: InstallController;
   @inject(PluginController)
   private readonly _pluginController: PluginController;
-  @inject(WhyController)
-  private readonly _whyController: WhyController;
   @inject(RunController)
   private readonly _runController: RunController;
+  @inject(TidyController)
+  private readonly _tidyController: TidyController;
+  @inject(WhyController)
+  private readonly _whyController: WhyController;
+
   private readonly _version: string;
 
   constructor() {
@@ -155,6 +159,14 @@ export class MainController extends Controller {
       .command('package <name>')
       .description('Why is this package there?')
       .action(async (name) => this._whyController.whyPackage(name));
+
+    const cmdTidy = program
+      .command('tidy <packages>')
+      .description('Tidy up your modules.');
+    cmdTidy
+      .command('packages')
+      .description('Tidies up the packages of your modules.')
+      .action(async () => this._tidyController.tidyPackages());
 
     await program.parseAsync(process.argv);
   }
