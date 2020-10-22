@@ -1,5 +1,5 @@
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService
+  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, PackageJson
 } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
@@ -11,6 +11,7 @@ import { CopyHost } from './copy-host';
 import { LoggerService } from '../services/logger.service';
 import { PluginService } from '../services/plugin.service';
 import chalk from 'chalk';
+import compareVersions from 'compare-versions';
 
 export class GahFile {
   private readonly _fileSystemService: IFileSystemService;
@@ -157,6 +158,45 @@ export class GahFile {
         }
       });
     }
+  }
+
+  public tidyPackages() {
+    const host = this._modules.find(x => x.isHost);
+    if (!host) {
+      this._loggerService.error('Could not find host');
+      return;
+    }
+    const modulesThatChanged: GahModuleBase[] = [];
+    const hostPackageJson = host.packageJson;
+    Object.keys(hostPackageJson.dependencies!).forEach(dep => {
+      this._modules.filter(x => !x.isHost).forEach(mod => {
+        if (mod.packageJson.dependencies?.[dep] && compareVersions(
+          mod.packageJson.dependencies[dep].replace('~', '').replace('^', ''),
+          hostPackageJson.dependencies![dep].replace('~', '').replace('^', '')
+        )) {
+          mod.packageJson.dependencies[dep] = hostPackageJson.dependencies![dep];
+          if (!modulesThatChanged.includes(mod)) {
+            modulesThatChanged.push(mod);
+          }
+        }
+      });
+    });
+    Object.keys(hostPackageJson.devDependencies!).forEach(dep => {
+      this._modules.filter(x => !x.isHost).forEach(mod => {
+        if (mod.packageJson.devDependencies?.[dep] && compareVersions(
+          mod.packageJson.devDependencies[dep].replace('~', '').replace('^', ''),
+          hostPackageJson.devDependencies![dep].replace('~', '').replace('^', '')
+        )) {
+          mod.packageJson.devDependencies[dep] = hostPackageJson.devDependencies![dep];
+          if (!modulesThatChanged.includes(mod)) {
+            modulesThatChanged.push(mod);
+          }
+        }
+      });
+    });
+    modulesThatChanged.forEach(mod => {
+      this._fileSystemService.saveObjectToFile(this._fileSystemService.join(mod.basePath, 'package.json'), mod.packageJson);
+    });
   }
 
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {

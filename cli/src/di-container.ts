@@ -18,6 +18,7 @@ import { ExecutionService } from './services/execution.service';
 import { ContextService } from './services/context-service';
 import { RunController } from './controller/run.controller';
 import { WhyController } from './controller/why.controller';
+import { TidyController } from './controller/tidy.controler';
 
 
 const DIContainer = new Container();
@@ -28,6 +29,7 @@ DIContainer.bind<HostModuleController>(HostModuleController).toSelf().inSingleto
 DIContainer.bind<InstallController>(InstallController).toSelf().inSingletonScope();
 DIContainer.bind<PluginController>(PluginController).toSelf().inSingletonScope();
 DIContainer.bind<RunController>(RunController).toSelf().inSingletonScope();
+DIContainer.bind<TidyController>(TidyController).toSelf().inSingletonScope();
 DIContainer.bind<WhyController>(WhyController).toSelf().inSingletonScope();
 
 DIContainer.bind<FileSystemService>(FileSystemService).toSelf().inSingletonScope();
