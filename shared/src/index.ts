@@ -10,7 +10,8 @@ export * from './models/gah-module-type';
 export * from './models/gah-module';
 export * from './models/gah-plugin-config';
 export * from './models/gah-plugin-dependency-config';
-export * from './models/global-gah-data'
+export * from './models/global-gah-data';
+export * from './models/gah-local-config';
 export * from './models/gah-plugin';
 export * from './models/module-definition';
 export * from './models/module-reference';

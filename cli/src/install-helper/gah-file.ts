@@ -1,16 +1,16 @@
+import chalk from 'chalk';
+import DIContainer from '../di-container';
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, PackageJson
+  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService
 } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
 import { GahHostDef } from './gah-host-def';
-import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { CopyHost } from './copy-host';
 import { LoggerService } from '../services/logger.service';
 import { PluginService } from '../services/plugin.service';
-import chalk from 'chalk';
 import compareVersions from 'compare-versions';
 
 export class GahFile {
@@ -200,6 +200,7 @@ export class GahFile {
   }
 
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
+
     cfg.modules.forEach(moduleRef => {
       moduleRef.names.forEach(moduleName => {
         this._modules.push(new GahModuleDef(moduleRef.path, moduleName, initializedModules));

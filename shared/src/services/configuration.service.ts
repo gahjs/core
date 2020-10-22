@@ -3,6 +3,7 @@ import { GahHost } from '../models/gah-host';
 import { GahModule } from '../models/gah-module';
 import { TsConfig } from '../models/ts-config';
 import { GahModuleType } from '../models/gah-module-type';
+import { GahLocalConfig } from '../models/gah-local-config';
 
 export interface IConfigurationService {
   gahConfigExists(): boolean;
@@ -19,4 +20,5 @@ export interface IConfigurationService {
   deleteGahConfig(): void;
   externalConfigPath: string;
   externalConfig: GahModule;
+  localConfig(): GahLocalConfig | undefined;
 }

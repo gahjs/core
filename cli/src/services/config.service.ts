@@ -1,8 +1,9 @@
 import { injectable, inject } from 'inversify';
 
-import { GahConfig, TsConfig, IConfigurationService, IFileSystemService, GahHost, GahModule, GahModuleType } from '@awdware/gah-shared';
+import { GahConfig, TsConfig, IConfigurationService, IFileSystemService, GahHost, GahModule, GahModuleType, GahLocalConfig } from '@awdware/gah-shared';
 
 import { FileSystemService } from './file-system.service';
+import DIContainer from '../di-container';
 
 const gahConfigFileName = 'gah-config.json';
 const gahModuleConfigFileName = 'gah-module.json';
@@ -12,16 +13,22 @@ const tsConfigPath = 'tsconfig.json';
 
 @injectable()
 export class ConfigService implements IConfigurationService {
-
-  @inject(FileSystemService)
   private readonly _fileSystemService: IFileSystemService;
   private _cfg: GahConfig;
   private _moduleCfg: GahModule | GahHost;
   private _tsCfg: TsConfig;
   private isHost: boolean;
+  private readonly _gahLocalConfig: GahLocalConfig;
 
   public externalConfigPath: string;
   public externalConfig: GahModule;
+
+  constructor() {
+    this._fileSystemService = DIContainer.get(FileSystemService);
+    if (this._fileSystemService.fileExists('gah-local.json')) {
+      this._gahLocalConfig = this._fileSystemService.parseFile<GahLocalConfig>('gah-local.json');
+    }
+  }
 
   public gahConfigExists() {
     return this._fileSystemService.fileExists(gahConfigFileName);
@@ -148,6 +155,10 @@ export class ConfigService implements IConfigurationService {
 
   public deleteGahConfig() {
     this._fileSystemService.deleteFile(gahConfigFileName);
+  }
+
+  localConfig(): GahLocalConfig | undefined {
+    return this._gahLocalConfig;
   }
 
 }

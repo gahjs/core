@@ -18,4 +18,6 @@ export class ContextService implements IContextService {
   getContext(): GahContext {
     return this._ctx;
   }
+
+
 }

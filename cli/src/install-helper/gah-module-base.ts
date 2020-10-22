@@ -15,6 +15,7 @@ import { ExecutionService } from '../services/execution.service';
 import { GahModuleDef } from './gah-module-def';
 import { PluginService } from '../services/plugin.service';
 import { ContextService } from '../services/context-service';
+import { ConfigService } from '../services/config.service';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -24,6 +25,7 @@ export abstract class GahModuleBase {
   protected loggerService: ILoggerService;
   protected pluginService: IPluginService;
   protected contextService: IContextService;
+  protected cfgService: ConfigService;
 
   public basePath: string;
   public srcBasePath: string;
@@ -38,6 +40,7 @@ export abstract class GahModuleBase {
   public parentGahModule?: string;
   public excludedPackages: string[];
   public aliasNames: { forModule: string, alias: string }[];
+  public preCompiled: boolean;
 
   public tsConfigFile: TsConfigFile;
   public gahFolder: GahFolder;
@@ -55,10 +58,13 @@ export abstract class GahModuleBase {
     this.loggerService = DIContainer.get(LoggerService);
     this.pluginService = DIContainer.get(PluginService);
     this.contextService = DIContainer.get(ContextService);
+    this.cfgService = DIContainer.get(ConfigService);
 
     this.installed = false;
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
+
+    this.preCompiled = this.cfgService.localConfig()?.precompiled?.some(x => x.name === moduleName) ?? false;
 
     const gahCfgPath = this.fileSystemService.join(this.fileSystemService.getDirectoryPathFromFilePath(gahModulePath), 'gah-config.json');
     if (this.fileSystemService.fileExists(gahCfgPath)) {
@@ -113,6 +119,10 @@ export abstract class GahModuleBase {
 
   public abstract async install(): Promise<void>;
 
+  public get fullName(): string {
+    return this.packageName ? `@${this.packageName}/${this.moduleName}` : this.moduleName!;
+  }
+
   public get allRecursiveDependencies(): GahModuleDef[] {
     const allModules = new Array<GahModuleBase>();
     this.dependencies.forEach(dep => {
@@ -145,6 +155,17 @@ export abstract class GahModuleBase {
 
     for (const dep of this.allRecursiveDependencies) {
 
+      if (dep.preCompiled) {
+        const preCompiled = this.cfgService.localConfig()?.precompiled?.find(x => x.name === dep.moduleName);
+        if (!preCompiled) {
+          throw new Error('Could not find matching precompiled module');
+        }
+        if (preCompiled.path) {
+          this.packageJson.dependencies![dep.fullName] = preCompiled.path;
+        }
+        continue;
+      }
+
       // /public-api.ts or / Index.ts or similar. Usually without sub-folders
       const publicApiPathRelativeToBaseSrcPath = this.fileSystemService.ensureRelativePath(dep.publicApiPathRelativeToBasePath, dep.srcBasePath, true);
       const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(0, publicApiPathRelativeToBaseSrcPath.length - 3);
@@ -161,11 +182,15 @@ export abstract class GahModuleBase {
         }
       }
     }
+    this.fileSystemService.saveObjectToFile(this.packageJsonPath, this.packageJson);
     this.tsConfigFile.save();
   }
 
   protected generateStyleImports() {
     for (const dep of this.allRecursiveDependencies) {
+      if (dep.preCompiled) {
+        continue;
+      }
 
       // Generate scss style files
       // Find all scss files in a folder called styles in the external module
@@ -185,6 +210,7 @@ export abstract class GahModuleBase {
 
   protected adjustGitignore() {
     this.workspaceService.ensureGitIgnoreLine('**/.gah', 'Ignoring gah generated files', this.basePath);
+    this.workspaceService.ensureGitIgnoreLine('**/gah-local.json', 'Ignoring local gah config', this.basePath);
   }
 
   public get packageJson(): PackageJson {
@@ -199,7 +225,7 @@ export abstract class GahModuleBase {
   }
 
   private async executeScripts(preinstall: boolean) {
-    if (this.contextService.getContext().skipScripts) {
+    if (this.preCompiled || this.contextService.getContext().skipScripts) {
       return;
     }
     const scriptName = preinstall ? 'gah-preinstall' : 'gah-postinstall';
