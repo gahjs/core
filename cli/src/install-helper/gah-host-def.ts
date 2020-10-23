@@ -218,22 +218,31 @@ export class GahHostDef extends GahModuleBase {
       if (!dep.stylesFilePathRelativeToBasePath) {
         continue;
       }
+      let finalStyleImportPath: string;
+      if (dep.preCompiled) {
+        const stylePathRelativeToPackageBase = this.fileSystemService.ensureRelativePath(
+          dep.stylesFilePathRelativeToBasePath, this.fileSystemService.getDirectoryPathFromFilePath(dep.srcBasePath), true
+        );
 
-      const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.stylesFilePathRelativeToBasePath);
-
-      // Copying base styles if they exist
-      if (this.fileSystemService.fileExists(absoluteStylesFilePathOfDep)) {
-
-        const depAbsoluteSrcFolder = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
-
-        const depStylesPathRelativeToSrcBase = this.fileSystemService.ensureRelativePath(absoluteStylesFilePathOfDep, depAbsoluteSrcFolder, true);
-        const dependencyPathRelativeFromSrcBase = this.fileSystemService.ensureRelativePath(this.gahFolder.dependencyPath, this.srcBasePath, true);
-
-        const moduleFacadePath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depStylesPathRelativeToSrcBase);
-        stylesScss.push(`@import "${moduleFacadePath}";`);
+        finalStyleImportPath = this.fileSystemService.join(dep.packageName ? `@${dep.packageName}` : '', dep.moduleName!, stylePathRelativeToPackageBase);
       } else {
-        this.loggerService.warn(`Could not find styles file "${dep.stylesFilePathRelativeToBasePath}" defined by module "${dep.moduleName}"`);
+        const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.stylesFilePathRelativeToBasePath);
+
+        // Copying base styles if they exist
+        if (this.fileSystemService.fileExists(absoluteStylesFilePathOfDep)) {
+
+          const depAbsoluteSrcFolder = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
+
+          const depStylesPathRelativeToSrcBase = this.fileSystemService.ensureRelativePath(absoluteStylesFilePathOfDep, depAbsoluteSrcFolder, true);
+          const dependencyPathRelativeFromSrcBase = this.fileSystemService.ensureRelativePath(this.gahFolder.dependencyPath, this.srcBasePath, true);
+
+          finalStyleImportPath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depStylesPathRelativeToSrcBase);
+        } else {
+          this.loggerService.error(`Could not find styles file "${dep.stylesFilePathRelativeToBasePath}" defined by module "${dep.moduleName}"`);
+          process.exit(1);
+        }
       }
+      stylesScss.push(`@import "${finalStyleImportPath}";`);
     }
     this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'), stylesScss.join('\n'));
   }

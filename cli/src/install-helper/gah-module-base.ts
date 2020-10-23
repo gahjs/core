@@ -141,7 +141,13 @@ export abstract class GahModuleBase {
   }
 
   protected async createSymlinksToDependencies() {
+    if (this.preCompiled) {
+      return;
+    }
     for (const dep of this.allRecursiveDependencies) {
+      if (dep.preCompiled) {
+        continue;
+      }
       const from = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath, dep.moduleName!);
       const to = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
       await this.fileSystemService.createDirLink(from, to);
@@ -149,7 +155,7 @@ export abstract class GahModuleBase {
   }
 
   protected addDependenciesToTsConfigFile() {
-    if (this.gahConfig?.skipTsConfigPathsAdjustments) {
+    if (this.gahConfig?.skipTsConfigPathsAdjustments || this.preCompiled) {
       return;
     }
 
@@ -187,19 +193,53 @@ export abstract class GahModuleBase {
   }
 
   protected generateStyleImports() {
+    if (this.preCompiled) {
+      return;
+    }
     for (const dep of this.allRecursiveDependencies) {
-      if (dep.preCompiled) {
-        continue;
+      // Reference scss style files
+
+      const node_modulesPath = this.fileSystemService.join(
+        this.contextService.getContext().currentBaseFolder!, 'node_modules'
+      );
+      const node_modulePackagePath = this.fileSystemService.join(
+        node_modulesPath, dep.packageName ? `@${dep.packageName}` : '', dep.moduleName!
+      );
+
+      // In case the module is not precompiled a fake node_module with the styles will be created
+      if (!dep.preCompiled) {
+        // Find all styles in the source folder
+        const sourceStyles = this.fileSystemService.getFilesFromGlob(`${dep.basePath}/**/styles/**/*.scss`, ['**/dist/**']);
+
+        // Getting the parent directory of the source path, because we want the name of the source path to be included later in the relative paths
+        const absoluteSrcParentPath = this.fileSystemService.getDirectoryPathFromFilePath(this.fileSystemService.join(dep.basePath, dep.srcBasePath));
+        // getting the relative paths to the style files including the source directoy itself
+        const relativeSourcePaths = sourceStyles.map(x => this.fileSystemService.ensureRelativePath(
+          x, absoluteSrcParentPath, true
+        ));
+        // Getting the path in the node_modules folder where the files are linked to later
+        const targetPaths = relativeSourcePaths.map(p => {
+          const moduleStylePath = this.fileSystemService.join(node_modulePackagePath, p);
+          this.fileSystemService.ensureDirectory(this.fileSystemService.getDirectoryPathFromFilePath(moduleStylePath));
+          return moduleStylePath;
+        });
+        for (let i = 0; i < relativeSourcePaths.length; i++) {
+          const src = relativeSourcePaths[i];
+          const target = targetPaths[i];
+          // link the file to the fake node_module
+          if (this.fileSystemService.fileExists(target)) {
+            this.fileSystemService.deleteFile(target);
+          }
+          this.fileSystemService.createFileLink(target, this.fileSystemService.join(absoluteSrcParentPath, src));
+        }
       }
 
-      // Generate scss style files
-      // Find all scss files in a folder called styles in the external module
-      const styles = this.fileSystemService.getFilesFromGlob(`${dep.basePath}/**/styles/**/*.scss`, ['**/dist/**']);
-      if (styles.length > 0) {
-        // Get the path without the path to the module itself (starting at the same point as .gap-dependencies links)
-        const shortPaths = styles.map((x) => this.fileSystemService.ensureRelativePath(x, this.fileSystemService.join(dep.basePath, dep.srcBasePath), true));
-        // Get the path from the perspective of the .gah/styles folder
-        const relativePaths = shortPaths.map((x) => this.fileSystemService.join('../dependencies', dep.moduleName!, x));
+      // Find all scss files in a folder called styles in the precompiled node_modules module folder
+      const styles = this.fileSystemService.getFilesFromGlob(`${node_modulePackagePath}/**/styles/**/*.scss`, ['**/dist/**'], true);
+      // Get the path without the path to the module itself (starting at the same point as .gah-dependencies links)
+      const relativePaths = styles.map((x) => this.fileSystemService.ensureRelativePath(x, node_modulesPath, true));
+
+      if (relativePaths.length > 0) {
 
         // Generate all the imports to the found style files (pointing to .gah/dependencies)
         const fileContent = relativePaths.map((s) => `@import "${s}";`).join('\n');

@@ -45,6 +45,9 @@ export class MainController extends Controller {
   public async main() {
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
+      this._contextService.setContext({ currentBaseFolder: this._fileSystemService.join(process.cwd(), '.gah') });
+    } else {
+      this._contextService.setContext({ currentBaseFolder: process.cwd() });
     }
 
     // This sets the debug context variable depending on the used options

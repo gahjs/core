@@ -77,7 +77,7 @@ export class GahFile {
       this._pluginService.triggerEvent('HOST_COPIED', { gahFile: this.data() });
     }
     let i = 0;
-    for (const x of this._modules) {
+    for (const x of this._modules.filter(x => !x.preCompiled)) {
       this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: x.data() });
       this._loggerService.stopLoadingAnimation(true);
       this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, i)} ${i}/${this._modules.length}`);
