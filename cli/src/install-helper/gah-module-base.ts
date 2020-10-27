@@ -90,7 +90,8 @@ export abstract class GahModuleBase {
       assetsGlobbingPath: this.assetsFolderRelativeTobasePaths,
       stylesPathRelativeToBasePath: this.stylesFilePathRelativeToBasePath,
       moduleName: this.moduleName ?? undefined,
-      packageName: this.packageName ?? undefined
+      packageName: this.packageName ?? undefined,
+      packageJson: this.packageJson
     };
 
     const specificData = this.specificData();

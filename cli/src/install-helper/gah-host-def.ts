@@ -250,9 +250,8 @@ export class GahHostDef extends GahModuleBase {
   private mergePackageDependencies() {
     const packageJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
     // Get package.json from host
-    const packageJson = this.fileSystemService.parseFile<PackageJson>(packageJsonPath);
-    const hostDeps = packageJson.dependencies!;
-    const hostDevDeps = packageJson.devDependencies!;
+    const hostDeps = this.packageJson.dependencies!;
+    const hostDevDeps = this.packageJson.devDependencies!;
 
     const blocklistPackages = new Array<string>();
 
@@ -289,7 +288,7 @@ export class GahHostDef extends GahModuleBase {
     }
 
     // Saving the file back into the host package.json
-    this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
+    this.fileSystemService.saveObjectToFile(packageJsonPath, this.packageJson);
   }
 
   private adjustAngularJsonConfig() {
