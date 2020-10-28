@@ -20,7 +20,7 @@ export class PluginController extends Controller {
     }
 
     const cfg = this._configService.getGahConfig();
-    if (!cfg.plugins) { cfg.plugins = new Array<GahPluginDependencyConfig>(); }
+    cfg.plugins ??= new Array<GahPluginDependencyConfig>();
 
     if (cfg.plugins.some(x => x.name.toLowerCase() === pluginName?.toLowerCase())) {
       this._loggerService.warn('This plugin has already been added.');
@@ -96,11 +96,7 @@ export class PluginController extends Controller {
         choices: () => cfg.plugins!.map(x => x.name)
       });
 
-    pluginName = pluginName ?? pluginName_;
-    if (!pluginName) {
-      return null;
-    }
-    return pluginName;
+    return pluginName ?? pluginName_;
   }
 
 

@@ -1,12 +1,21 @@
 import { injectable, inject } from 'inversify';
 import { FileSystemService } from './file-system.service';
-import { IWorkspaceService, IFileSystemService, GlobalGahData } from '@awdware/gah-shared';
+import { IWorkspaceService, IFileSystemService, GlobalGahData, ILoggerService } from '@awdware/gah-shared';
 import { platform, homedir } from 'os';
+import { createHash } from 'crypto';
+import { LoggerService } from './logger.service';
+import DIContainer from '../di-container';
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
-  @inject(FileSystemService)
   private readonly _fileSystemService: IFileSystemService;
+  private readonly _loggerService: ILoggerService;
+
+  constructor() {
+    this._fileSystemService = DIContainer.get(FileSystemService);
+    this._loggerService = DIContainer.get(LoggerService);
+    this._loggerService.debug(`WORKSPACE HASH: ${this.getWorkspaceHash()}`);
+  }
 
   public ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string) {
     const gitIgnorePath = baseDir ? this._fileSystemService.join(baseDir, '.gitignore') : '.gitignore';
@@ -45,7 +54,15 @@ export class WorkspaceService implements IWorkspaceService {
   }
   public saveGlobalGahData(data: GlobalGahData) {
     const globalDataPath = this._fileSystemService.join(this.getGlobalGahFolder(), 'data.json');
-	this._fileSystemService.ensureDirectory(this.getGlobalGahFolder());
+    this._fileSystemService.ensureDirectory(this.getGlobalGahFolder());
     return this._fileSystemService.saveObjectToFile(globalDataPath, data);
+  }
+
+  public getWorkspaceHash(): string {
+    return createHash('md5').update(process.cwd()).digest('hex').substr(0, 6);
+  }
+
+  public getWorkspaceFolder(): string {
+    return this._fileSystemService.join(this.getGlobalGahFolder(), this.getWorkspaceHash());
   }
 }

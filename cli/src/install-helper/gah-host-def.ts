@@ -1,7 +1,5 @@
 import { GahModuleBase } from './gah-module-base';
-import {
-  GahHost, PackageJson, GahModuleData
-} from '@awdware/gah-shared';
+import { GahHost, GahModuleData } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 import readline from 'readline';
@@ -189,10 +187,10 @@ export class GahHostDef extends GahModuleBase {
     const assetsArray = ngJson.projects['gah-host'].architect.build.options.assets as string[];
 
     for (const dep of this.allRecursiveDependencies) {
-      if (!dep.assetsFolderRelativeTobasePaths || (Array.isArray(dep.assetsFolderRelativeTobasePaths) && dep.assetsFolderRelativeTobasePaths.length === 0)) {
+      if (!dep.assetsFolderRelativeToBasePaths || (Array.isArray(dep.assetsFolderRelativeToBasePaths) && dep.assetsFolderRelativeToBasePaths.length === 0)) {
         continue;
       }
-      const assetsFolderRelativeTobasePaths = Array.isArray(dep.assetsFolderRelativeTobasePaths) ? dep.assetsFolderRelativeTobasePaths : [dep.assetsFolderRelativeTobasePaths];
+      const assetsFolderRelativeTobasePaths = Array.isArray(dep.assetsFolderRelativeToBasePaths) ? dep.assetsFolderRelativeToBasePaths : [dep.assetsFolderRelativeToBasePaths];
 
       for (const p of assetsFolderRelativeTobasePaths) {
         const assetsDirectoryPath = this.fileSystemService.join(dep.basePath, p);
@@ -369,9 +367,7 @@ export class GahHostDef extends GahModuleBase {
     const pkgJson = this.packageJson;
 
     if (allGahScripts.length > 0) {
-      if (!pkgJson.scripts) {
-        pkgJson.scripts = {};
-      }
+      pkgJson.scripts ??= {};
 
       allGahScripts.forEach(script => {
         pkgJson.scripts![script.name] = script.script;

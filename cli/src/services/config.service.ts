@@ -1,4 +1,4 @@
-import { injectable, inject } from 'inversify';
+import { injectable } from 'inversify';
 
 import { GahConfig, TsConfig, IConfigurationService, IFileSystemService, GahHost, GahModule, GahModuleType, GahLocalConfig } from '@awdware/gah-shared';
 
@@ -157,7 +157,7 @@ export class ConfigService implements IConfigurationService {
     this._fileSystemService.deleteFile(gahConfigFileName);
   }
 
-  localConfig(): GahLocalConfig | undefined {
+  public localConfig(): GahLocalConfig | undefined {
     return this._gahLocalConfig;
   }
 

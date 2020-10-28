@@ -1,6 +1,7 @@
+import DIContainer from '../di-container';
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
-  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService, IPackageService
+  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService
 } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -9,7 +10,6 @@ import { TemplateService } from '../services/template.service';
 
 import { TsConfigFile } from './ts-config-file';
 import { GahFolder } from './gah-folder';
-import DIContainer from '../di-container';
 import { LoggerService } from '../services/logger.service';
 import { ExecutionService } from '../services/execution.service';
 import { GahModuleDef } from './gah-module-def';
@@ -17,8 +17,10 @@ import { PluginService } from '../services/plugin.service';
 import { ContextService } from '../services/context-service';
 import { ConfigService } from '../services/config.service';
 import { PackageService } from '../services/package.service';
+import { CleanupSevice } from '../services/cleanup.service';
 
 export abstract class GahModuleBase {
+  protected cleanupService: ICleanupService;
   protected fileSystemService: IFileSystemService;
   protected templateService: ITemplateService;
   protected workspaceService: IWorkspaceService;
@@ -31,7 +33,7 @@ export abstract class GahModuleBase {
 
   public basePath: string;
   public srcBasePath: string;
-  public assetsFolderRelativeTobasePaths?: string | string[];
+  public assetsFolderRelativeToBasePaths?: string | string[];
   public stylesFilePathRelativeToBasePath?: string;
   public publicApiPathRelativeToBasePath: string;
   public baseNgModuleName?: string;
@@ -53,6 +55,7 @@ export abstract class GahModuleBase {
   private _packageJson: PackageJson;
 
   constructor(gahModulePath: string, moduleName: string | null) {
+    this.cleanupService = DIContainer.get(CleanupSevice);
     this.fileSystemService = DIContainer.get(FileSystemService);
     this.workspaceService = DIContainer.get(WorkspaceService);
     this.templateService = DIContainer.get(TemplateService);
@@ -90,7 +93,7 @@ export abstract class GahModuleBase {
       srcBasePath: this.srcBasePath,
       tsConfigFile: this.tsConfigFile?.data(),
       baseNgModuleName: this.baseNgModuleName,
-      assetsGlobbingPath: this.assetsFolderRelativeTobasePaths,
+      assetsGlobbingPath: this.assetsFolderRelativeToBasePaths,
       stylesPathRelativeToBasePath: this.stylesFilePathRelativeToBasePath,
       moduleName: this.moduleName ?? undefined,
       packageName: this.packageName ?? undefined,
@@ -113,9 +116,9 @@ export abstract class GahModuleBase {
     const op2 = this.fileSystemService.join(this.basePath, 'tsconfig.json');
 
     if (this.fileSystemService.fileExists(op1)) {
-      this.tsConfigFile = new TsConfigFile(op1, this.fileSystemService);
+      this.tsConfigFile = new TsConfigFile(op1, this.fileSystemService, this.cleanupService);
     } else if (this.fileSystemService.fileExists(op2)) {
-      this.tsConfigFile = new TsConfigFile(op2, this.fileSystemService);
+      this.tsConfigFile = new TsConfigFile(op2, this.fileSystemService, this.cleanupService);
     } else {
       throw new Error('Cannot find a tsconfig.base.json or tsconfig.json');
     }
@@ -172,19 +175,24 @@ export abstract class GahModuleBase {
         }
         if (preCompiled.path) {
           this.packageJson.dependencies![dep.fullName] = preCompiled.path;
+          this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![dep.fullName], preCompiled.path);
           if (dep.aliasNames) {
             const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
             if (aliasForThisModule) {
               this.packageJson.dependencies![aliasForThisModule.alias] = preCompiled.path;
+              this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![aliasForThisModule.alias], preCompiled.path);
             }
           }
         } else {
           const latest = await this.packageService.findLatestPackageVersion(dep.fullName);
           this.packageJson.dependencies![dep.fullName] = latest;
+          this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![dep.fullName], latest);
           if (dep.aliasNames) {
             const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
             if (aliasForThisModule) {
-              this.packageJson.dependencies![aliasForThisModule.alias] = `npm:${dep.fullName}@${latest}`;
+              const newPackageValue = `npm:${dep.fullName}@${latest}`;
+              this.packageJson.dependencies![aliasForThisModule.alias] = newPackageValue;
+              this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![aliasForThisModule.alias], newPackageValue);
             }
           }
         }
@@ -198,12 +206,12 @@ export abstract class GahModuleBase {
       const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, publicApiRelativePathWithoutExtention);
       const pathName = `@${dep.packageName}/${dep.moduleName!}`;
 
-      this.tsConfigFile.addPathAlias(pathName, path);
+      this.tsConfigFile.addPathAlias(pathName, path, this.isHost);
 
       if (dep.aliasNames) {
         const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
         if (aliasForThisModule) {
-          this.tsConfigFile.addPathAlias(aliasForThisModule.alias, path);
+          this.tsConfigFile.addPathAlias(aliasForThisModule.alias, path, this.isHost);
         }
       }
     }
@@ -273,9 +281,7 @@ export abstract class GahModuleBase {
   }
 
   public get packageJson(): PackageJson {
-    if (!this._packageJson) {
-      this._packageJson = this.fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
-    }
+    this._packageJson ??= this.fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
     return this._packageJson;
   }
 

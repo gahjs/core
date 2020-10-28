@@ -87,10 +87,7 @@ export class DependencyController extends Controller {
 
     newDep.names = selectedModules.map(x => x.name);
 
-    if (!module.dependencies) {
-      module.dependencies = new Array<ModuleReference>();
-    }
-
+    module.dependencies ??= new Array<ModuleReference>();
     module.dependencies.push(newDep);
 
     this._configService.saveGahModuleConfig();

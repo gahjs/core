@@ -26,7 +26,7 @@ export class GahModuleDef extends GahModuleBase {
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
     this.packageName = moduleCfg.packageName;
-    this.assetsFolderRelativeTobasePaths = moduleCfg.assetsPath;
+    this.assetsFolderRelativeToBasePaths = moduleCfg.assetsPath;
     this.stylesFilePathRelativeToBasePath = moduleCfg.stylesPath;
     this.publicApiPathRelativeToBasePath = moduleCfg.publicApiPath;
     this.baseNgModuleName = moduleCfg.baseNgModuleName;

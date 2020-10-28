@@ -1,3 +1,4 @@
+export * from './models/cleanup-data';
 export * from './models/gah-angular-compiler-options';
 export * from './models/gah-command-handler';
 export * from './models/gah-config';
@@ -26,6 +27,7 @@ export * from './models/install-helper/gah-folder-data';
 export * from './models/install-helper/gah-module-data';
 export * from './models/install-helper/ts-config-file-data';
 
+export * from './services/cleanup.service';
 export * from './services/configuration.service';
 export * from './services/context.service';
 export * from './services/file-system.service';

@@ -14,6 +14,7 @@ import { GahModuleType } from '@awdware/gah-shared';
 import { RunController } from './run.controller';
 import { WhyController } from './why.controller';
 import { TidyController } from './tidy.controler';
+import { CleanController } from './clean.controller';
 
 @injectable()
 export class MainController extends Controller {
@@ -33,6 +34,8 @@ export class MainController extends Controller {
   private readonly _tidyController: TidyController;
   @inject(WhyController)
   private readonly _whyController: WhyController;
+  @inject(CleanController)
+  private readonly _cleanController: CleanController;
 
   private readonly _version: string;
 
@@ -170,6 +173,11 @@ export class MainController extends Controller {
       .command('packages')
       .description('Tidies up the packages of your modules.')
       .action(async () => this._tidyController.tidyPackages());
+
+    const cmdClean = program
+      .command('clean')
+      .description('Cleans your workspace before commit')
+      .action(async () => this._cleanController.clean());
 
     await program.parseAsync(process.argv);
   }

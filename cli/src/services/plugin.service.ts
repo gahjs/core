@@ -15,7 +15,6 @@ import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
 import { ContextService } from './context-service';
 import DIContainer from '../di-container';
-import { createHash } from 'crypto';
 import chalk from 'chalk';
 
 @injectable()
@@ -48,8 +47,7 @@ export class PluginService implements IPluginService {
     this._executionService = DIContainer.get(ExecutionService);
     this._contextService = DIContainer.get(ContextService);
 
-    const workspaceHash = createHash('md5').update(process.cwd()).digest('hex').substr(0, 6);
-    this._pluginFolder = this._fileSystemService.join(this._workspaceService.getGlobalGahFolder(), 'plugins', workspaceHash);
+    this._pluginFolder = this._fileSystemService.join(this._workspaceService.getWorkspaceFolder(), 'plugins');
     this._fileSystemService.ensureDirectory(this._pluginFolder);
     this._pluginPackageJson = this._fileSystemService.join(this._pluginFolder, 'package.json');
     if (!this._fileSystemService.fileExists(this._pluginPackageJson)) {
@@ -210,9 +208,9 @@ export class PluginService implements IPluginService {
   private async saveChangesToGahConfig(pluginName: string) {
     const cfg = this._configService.getGahConfig();
     let pluginCfg: GahPluginDependencyConfig;
-    if (!cfg.plugins) {
-      cfg.plugins = new Array<GahPluginDependencyConfig>();
-    }
+
+    cfg.plugins ??= new Array<GahPluginDependencyConfig>();
+
     if (cfg.plugins.some(x => x.name === pluginName)) {
       pluginCfg = cfg.plugins.find(x => x.name === pluginName)!;
     } else {
