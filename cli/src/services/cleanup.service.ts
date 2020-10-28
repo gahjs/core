@@ -81,7 +81,6 @@ export class CleanupSevice implements ICleanupService {
 
     const existing = cleanupFile.packageJson.find(x => x.filePath === filePath && x.dependencyKey === dependencyKey);
     if (existing) {
-      existing.prevValue = prevValue;
       existing.newValue = newValue;
     } else {
       if (newValue === prevValue) {

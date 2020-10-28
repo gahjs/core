@@ -61,6 +61,7 @@ export class MainController extends Controller {
 
     await this.checkForUpdates();
 
+    this._loggerService.debug(`WORKSPACE HASH: ${this._workspaceService.getWorkspaceHash()}`);
 
     await this._pluginService.loadInstalledPlugins();
 

@@ -1,4 +1,4 @@
-import { injectable, inject } from 'inversify';
+import { injectable } from 'inversify';
 import { FileSystemService } from './file-system.service';
 import { IWorkspaceService, IFileSystemService, GlobalGahData, ILoggerService } from '@awdware/gah-shared';
 import { platform, homedir } from 'os';
@@ -14,7 +14,6 @@ export class WorkspaceService implements IWorkspaceService {
   constructor() {
     this._fileSystemService = DIContainer.get(FileSystemService);
     this._loggerService = DIContainer.get(LoggerService);
-    this._loggerService.debug(`WORKSPACE HASH: ${this.getWorkspaceHash()}`);
   }
 
   public ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string) {
