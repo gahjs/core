@@ -30,6 +30,7 @@ export * from './services/configuration.service';
 export * from './services/context.service';
 export * from './services/file-system.service';
 export * from './services/logger.service';
+export * from './services/package.service';
 export * from './services/plugin.service';
 export * from './services/prompt.service';
 export * from './services/template.service';

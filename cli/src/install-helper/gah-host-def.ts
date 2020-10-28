@@ -49,7 +49,7 @@ export class GahHostDef extends GahModuleBase {
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
     this._baseHref = hostCfg.baseHref ? hostCfg.baseHref : '/';
     this._title = hostCfg.title ?? '';
-    this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`);
+    this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`, this._gahCfgFolder);
   }
 
   public specificData(): Partial<GahModuleData> {
@@ -88,7 +88,7 @@ export class GahHostDef extends GahModuleBase {
     await this.createSymlinksToDependencies();
     this.pluginService.triggerEvent('SYMLINKS_CREATED', { module: this.data() });
 
-    this.addDependenciesToTsConfigFile();
+    await this.addDependenciesToTsConfigFile();
     this.setAngularCompilerOptionsInTsConfig();
     this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
     this.generateFromTemplate();
@@ -136,6 +136,7 @@ export class GahHostDef extends GahModuleBase {
     this.loggerService.log('Installing yarn packages');
     let state = 0;
     let stateString = 'Installing yarn packages';
+
     const success = await this.executionService.execute('yarn', true, (test) => {
 
       // This is just for super fancy logging:

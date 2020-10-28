@@ -76,7 +76,7 @@ export class GahModuleDef extends GahModuleBase {
     this.gahFolder.cleanStylesDirectory();
     this.gahFolder.tryHideGahFolder();
     await this.createSymlinksToDependencies();
-    this.addDependenciesToTsConfigFile();
+    await this.addDependenciesToTsConfigFile();
     this.generateStyleImports();
     this.adjustGitignore();
     await this.executePostinstallScripts();

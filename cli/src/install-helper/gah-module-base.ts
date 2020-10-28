@@ -1,6 +1,6 @@
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
-  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService
+  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService, IPackageService
 } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -16,6 +16,7 @@ import { GahModuleDef } from './gah-module-def';
 import { PluginService } from '../services/plugin.service';
 import { ContextService } from '../services/context-service';
 import { ConfigService } from '../services/config.service';
+import { PackageService } from '../services/package.service';
 
 export abstract class GahModuleBase {
   protected fileSystemService: IFileSystemService;
@@ -23,6 +24,7 @@ export abstract class GahModuleBase {
   protected workspaceService: IWorkspaceService;
   protected executionService: IExecutionService;
   protected loggerService: ILoggerService;
+  protected packageService: IPackageService;
   protected pluginService: IPluginService;
   protected contextService: IContextService;
   protected cfgService: ConfigService;
@@ -56,6 +58,7 @@ export abstract class GahModuleBase {
     this.templateService = DIContainer.get(TemplateService);
     this.executionService = DIContainer.get(ExecutionService);
     this.loggerService = DIContainer.get(LoggerService);
+    this.packageService = DIContainer.get(PackageService);
     this.pluginService = DIContainer.get(PluginService);
     this.contextService = DIContainer.get(ContextService);
     this.cfgService = DIContainer.get(ConfigService);
@@ -155,7 +158,7 @@ export abstract class GahModuleBase {
     }
   }
 
-  protected addDependenciesToTsConfigFile() {
+  protected async addDependenciesToTsConfigFile() {
     if (this.gahConfig?.skipTsConfigPathsAdjustments || this.preCompiled) {
       return;
     }
@@ -169,6 +172,21 @@ export abstract class GahModuleBase {
         }
         if (preCompiled.path) {
           this.packageJson.dependencies![dep.fullName] = preCompiled.path;
+          if (dep.aliasNames) {
+            const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
+            if (aliasForThisModule) {
+              this.packageJson.dependencies![aliasForThisModule.alias] = preCompiled.path;
+            }
+          }
+        } else {
+          const latest = await this.packageService.findLatestPackageVersion(dep.fullName);
+          this.packageJson.dependencies![dep.fullName] = latest;
+          if (dep.aliasNames) {
+            const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
+            if (aliasForThisModule) {
+              this.packageJson.dependencies![aliasForThisModule.alias] = `npm:${dep.fullName}@${latest}`;
+            }
+          }
         }
         continue;
       }
@@ -250,8 +268,8 @@ export abstract class GahModuleBase {
   }
 
   protected adjustGitignore() {
-    this.workspaceService.ensureGitIgnoreLine('**/.gah', 'Ignoring gah generated files', this.basePath);
-    this.workspaceService.ensureGitIgnoreLine('**/gah-local.json', 'Ignoring local gah config', this.basePath);
+    this.workspaceService.ensureGitIgnoreLine('**/.gah', 'Ignoring gah generated files', this.gahFolder.path);
+    this.workspaceService.ensureGitIgnoreLine('**/gah-local.json', 'Ignoring local gah config', this.gahFolder.path);
   }
 
   public get packageJson(): PackageJson {

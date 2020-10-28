@@ -188,13 +188,12 @@ export class MainController extends Controller {
     }
 
     if (checkNewVersion) {
-      const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
-      if (success) {
-        const versionString = this._executionService.executionResult;
-        const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
-        const newestVersion = versionString.match(versionMatcher);
-        gahData.latestGahVersion = newestVersion?.[1];
+      try {
+        const latestVersion = await this._packageService.findLatestPackageVersion('@awdware/gah');
+        gahData.latestGahVersion = latestVersion;
         gahData.lastUpdateCheck = new Date();
+      } catch (error) {
+        // Ignore error
       }
     }
 

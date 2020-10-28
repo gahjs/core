@@ -8,15 +8,17 @@ export class GahFolder {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _templateService: ITemplateService;
 
+  private readonly _gahCfgFolder: string;
   private readonly _moduleBaseFolder: string;
   private readonly _pathRelativeToModuleBaseFolder: string;
   private readonly _modulesTemplateData: ModulesTemplateData;
 
-  constructor(moduleBaseFolder: string, srcBasePath: string) {
+  constructor(moduleBaseFolder: string, srcBasePath: string, gahCfgFolder?: string) {
     this._fileSystemService = DIContainer.get(FileSystemService);
     this._templateService = DIContainer.get(TemplateService);
     this._modulesTemplateData = new ModulesTemplateData();
 
+    this._gahCfgFolder = gahCfgFolder ?? moduleBaseFolder;
     this._moduleBaseFolder = moduleBaseFolder;
     this._pathRelativeToModuleBaseFolder = this._fileSystemService.join(srcBasePath, '.gah');
   }
@@ -30,6 +32,10 @@ export class GahFolder {
       pathRelativeToModuleBaseFolder: this._pathRelativeToModuleBaseFolder,
       stylesPath: this.stylesPath
     };
+  }
+
+  public get path(): string {
+    return this._gahCfgFolder;
   }
 
   public get dependencyPath(): string {
