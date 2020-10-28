@@ -31,6 +31,7 @@ export * from './services/cleanup.service';
 export * from './services/configuration.service';
 export * from './services/context.service';
 export * from './services/file-system.service';
+export * from './services/git.service';
 export * from './services/logger.service';
 export * from './services/package.service';
 export * from './services/plugin.service';

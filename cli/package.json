@@ -36,6 +36,7 @@
     "commander": "^6.0.0",
     "comment-json": "^3.0.3",
     "compare-versions": "^3.6.0",
+    "deep-equal": "^2.0.4",
     "ejs": "^3.1.5",
     "enquirer": "^2.3.6",
     "figlet": "^1.5.0",
@@ -44,11 +45,13 @@
     "globby": "^11.0.1",
     "inversify": "^5.0.1",
     "ora": "^5.0.0",
-    "reflect-metadata": "~0.1.13"
+    "reflect-metadata": "~0.1.13",
+    "simple-git": "^2.21.0"
   },
   "devDependencies": {
     "@awdware/eslint-config-nodejs": "^0.0.6",
     "@types/clear": "^0.1.0",
+    "@types/deep-equal": "^1.0.1",
     "@types/ejs": "^3.0.4",
     "@types/figlet": "^1.2.0",
     "@types/fs-extra": "^9.0.1",

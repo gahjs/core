@@ -15,6 +15,7 @@ import { RunController } from './run.controller';
 import { WhyController } from './why.controller';
 import { TidyController } from './tidy.controler';
 import { CleanController } from './clean.controller';
+import { GitService } from '../services/git.service';
 
 @injectable()
 export class MainController extends Controller {
@@ -36,6 +37,8 @@ export class MainController extends Controller {
   private readonly _whyController: WhyController;
   @inject(CleanController)
   private readonly _cleanController: CleanController;
+  @inject(GitService)
+  private readonly _gitService: GitService;
 
   private readonly _version: string;
 
@@ -61,7 +64,9 @@ export class MainController extends Controller {
 
     await this.checkForUpdates();
 
-    this._loggerService.debug(`WORKSPACE HASH: ${this._workspaceService.getWorkspaceHash()}`);
+    this._loggerService.debug(`WORKSPACE HASH: ${chalk.red(this._workspaceService.getWorkspaceHash())}`);
+
+    await this._gitService.init();
 
     await this._pluginService.loadInstalledPlugins();
 
@@ -176,9 +181,19 @@ export class MainController extends Controller {
       .action(async () => this._tidyController.tidyPackages());
 
     const cmdClean = program
-      .command('clean')
+      .command('clean <targets...>')
+      .helpOption('targets', 'One or multiple of: \'packages\', \'tsconfig\'')
       .description('Cleans your workspace before commit')
-      .action(async () => this._cleanController.clean());
+      .action(async (targets: string[]) => {
+        const invalid = targets.some(x => x.toLowerCase() !== 'tsconfig' && x.toLowerCase() !== 'packages');
+        if (invalid) {
+          this._loggerService.error('Invalid parameter');
+          return;
+        }
+        const cleanPackages = targets.some(x => x.toLowerCase() === 'packages');
+        const cleanTsConfig = targets.some(x => x.toLowerCase() === 'tsconfig');
+        return this._cleanController.clean(cleanPackages, cleanTsConfig);
+      });
 
     await program.parseAsync(process.argv);
   }
