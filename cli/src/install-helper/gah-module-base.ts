@@ -174,25 +174,25 @@ export abstract class GahModuleBase {
           throw new Error('Could not find matching precompiled module');
         }
         if (preCompiled.path) {
-          this.packageJson.dependencies![dep.fullName] = preCompiled.path;
           this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![dep.fullName], preCompiled.path);
+          this.packageJson.dependencies![dep.fullName] = preCompiled.path;
           if (dep.aliasNames) {
             const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
             if (aliasForThisModule) {
-              this.packageJson.dependencies![aliasForThisModule.alias] = preCompiled.path;
               this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![aliasForThisModule.alias], preCompiled.path);
+              this.packageJson.dependencies![aliasForThisModule.alias] = preCompiled.path;
             }
           }
         } else {
           const latest = await this.packageService.findLatestPackageVersion(dep.fullName);
-          this.packageJson.dependencies![dep.fullName] = latest;
           this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![dep.fullName], latest);
+          this.packageJson.dependencies![dep.fullName] = latest;
           if (dep.aliasNames) {
             const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
             if (aliasForThisModule) {
               const newPackageValue = `npm:${dep.fullName}@${latest}`;
-              this.packageJson.dependencies![aliasForThisModule.alias] = newPackageValue;
               this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![aliasForThisModule.alias], newPackageValue);
+              this.packageJson.dependencies![aliasForThisModule.alias] = newPackageValue;
             }
           }
         }
