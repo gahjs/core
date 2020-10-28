@@ -179,7 +179,9 @@ export abstract class GahModuleBase {
           if (dep.aliasNames) {
             const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
             if (aliasForThisModule) {
-              this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![aliasForThisModule.alias], preCompiled.path);
+              this.cleanupService.logPackageJsonDependencyChange(
+                this.packageJsonPath, aliasForThisModule.alias, this.packageJson.dependencies![aliasForThisModule.alias], preCompiled.path
+              );
               this.packageJson.dependencies![aliasForThisModule.alias] = preCompiled.path;
             }
           }
@@ -191,7 +193,9 @@ export abstract class GahModuleBase {
             const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
             if (aliasForThisModule) {
               const newPackageValue = `npm:${dep.fullName}@${latest}`;
-              this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![aliasForThisModule.alias], newPackageValue);
+              this.cleanupService.logPackageJsonDependencyChange(
+                this.packageJsonPath, aliasForThisModule.alias, this.packageJson.dependencies![aliasForThisModule.alias], newPackageValue
+              );
               this.packageJson.dependencies![aliasForThisModule.alias] = newPackageValue;
             }
           }
