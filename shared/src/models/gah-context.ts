@@ -4,4 +4,5 @@ export interface GahContext {
   debug?: boolean;
   skipScripts?: boolean;
   currentBaseFolder?: string;
+  oneTimeClearDone?: boolean;
 }

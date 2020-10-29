@@ -1,4 +1,3 @@
-export * from './models/cleanup-data';
 export * from './models/gah-angular-compiler-options';
 export * from './models/gah-command-handler';
 export * from './models/gah-config';

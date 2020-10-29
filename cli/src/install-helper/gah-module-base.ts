@@ -18,6 +18,7 @@ import { ContextService } from '../services/context-service';
 import { ConfigService } from '../services/config.service';
 import { PackageService } from '../services/package.service';
 import { CleanupSevice } from '../services/cleanup.service';
+import chalk from 'chalk';
 
 export abstract class GahModuleBase {
   protected cleanupService: ICleanupService;
@@ -52,7 +53,10 @@ export abstract class GahModuleBase {
   public dependencies: GahModuleBase[];
   public moduleName: string | null;
   public packageName: string | null;
-  private _packageJson: PackageJson;
+  private _packageJson?: PackageJson;
+  private readonly _globalPackageStorePath: string;
+  private readonly _globalPackageStoreJsonPath: string;
+  private readonly _globalPackageStoreArchivePath: string;
 
   constructor(gahModulePath: string, moduleName: string | null) {
     this.cleanupService = DIContainer.get(CleanupSevice);
@@ -71,6 +75,25 @@ export abstract class GahModuleBase {
     this.dependencies = new Array<GahModuleBase>();
 
     this.preCompiled = this.cfgService.localConfig()?.precompiled?.some(x => x.name === moduleName) ?? false;
+
+    this._globalPackageStorePath = this.fileSystemService.join(this.workspaceService.getWorkspaceFolder(), 'precompiled');
+    this._globalPackageStoreArchivePath = this.fileSystemService.join(this._globalPackageStorePath, 'targz');
+    this._globalPackageStoreJsonPath = this.fileSystemService.join(this._globalPackageStorePath, 'package.json');
+
+    if (!this.contextService.getContext().oneTimeClearDone) {
+      this.contextService.setContext({ oneTimeClearDone: true });
+      if (this.fileSystemService.directoryExists(this._globalPackageStorePath)) {
+        this.fileSystemService.deleteFilesInDirectory(this._globalPackageStorePath);
+      }
+
+      this.fileSystemService.ensureDirectory(this._globalPackageStorePath);
+      this.fileSystemService.ensureDirectory(this._globalPackageStoreArchivePath);
+
+      if (!this.fileSystemService.fileExists(this._globalPackageStoreJsonPath)) {
+        const packageJsonTemplatePath = this.fileSystemService.join(__dirname, '..', '..', 'assets', 'package-store', 'package.json');
+        this.fileSystemService.copyFile(packageJsonTemplatePath, this._globalPackageStorePath);
+      }
+    }
 
     const gahCfgPath = this.fileSystemService.join(this.fileSystemService.getDirectoryPathFromFilePath(gahModulePath), 'gah-config.json');
     if (this.fileSystemService.fileExists(gahCfgPath)) {
@@ -153,11 +176,36 @@ export abstract class GahModuleBase {
     }
     for (const dep of this.allRecursiveDependencies) {
       if (dep.preCompiled) {
-        continue;
+        if (dep.installed) {
+          return;
+        }
+        const preCompiled = this.cfgService.localConfig()?.precompiled?.find(x => x.name === dep.moduleName);
+        if (!preCompiled) {
+          throw new Error('Could not find matching precompiled module');
+        }
+        if (preCompiled.path) {
+          const destPath = this.fileSystemService.join(this._globalPackageStoreArchivePath, dep.fullName);
+          if (!this.fileSystemService.directoryExists(destPath)) {
+            const success = await this.fileSystemService.decompressTargz(preCompiled.path, destPath);
+            if (!success) {
+              throw new Error(`Could not unpack package '${chalk.green(preCompiled.name)}'`);
+            }
+          }
+          const from = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
+          this.fileSystemService.ensureDirectory(this.fileSystemService.getDirectoryPathFromFilePath(from));
+          const to = this.fileSystemService.join(destPath, 'package');
+          await this.fileSystemService.createDirLink(from, to);
+        } else {
+          //
+        }
+      } else {
+        const mockPath = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
+        this.fileSystemService.ensureDirectory(mockPath);
+
+        const from = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath, dep.moduleName!);
+        const to = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
+        await this.fileSystemService.createDirLink(from, to);
       }
-      const from = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath, dep.moduleName!);
-      const to = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
-      await this.fileSystemService.createDirLink(from, to);
     }
   }
 
@@ -169,53 +217,31 @@ export abstract class GahModuleBase {
     for (const dep of this.allRecursiveDependencies) {
 
       if (dep.preCompiled) {
-        const preCompiled = this.cfgService.localConfig()?.precompiled?.find(x => x.name === dep.moduleName);
-        if (!preCompiled) {
-          throw new Error('Could not find matching precompiled module');
-        }
-        if (preCompiled.path) {
-          this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![dep.fullName], preCompiled.path);
-          this.packageJson.dependencies![dep.fullName] = preCompiled.path;
-          if (dep.aliasNames) {
-            const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
-            if (aliasForThisModule) {
-              this.cleanupService.logPackageJsonDependencyChange(
-                this.packageJsonPath, aliasForThisModule.alias, this.packageJson.dependencies![aliasForThisModule.alias], preCompiled.path
-              );
-              this.packageJson.dependencies![aliasForThisModule.alias] = preCompiled.path;
-            }
-          }
-        } else {
-          const latest = await this.packageService.findLatestPackageVersion(dep.fullName);
-          this.cleanupService.logPackageJsonDependencyChange(this.packageJsonPath, dep.fullName, this.packageJson.dependencies![dep.fullName], latest);
-          this.packageJson.dependencies![dep.fullName] = latest;
-          if (dep.aliasNames) {
-            const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
-            if (aliasForThisModule) {
-              const newPackageValue = `npm:${dep.fullName}@${latest}`;
-              this.cleanupService.logPackageJsonDependencyChange(
-                this.packageJsonPath, aliasForThisModule.alias, this.packageJson.dependencies![aliasForThisModule.alias], newPackageValue
-              );
-              this.packageJson.dependencies![aliasForThisModule.alias] = newPackageValue;
-            }
+        this.packageJson.dependencies![dep.fullName] = `file:.gah/${dep.fullName}`;
+
+        if (dep.aliasNames) {
+          const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
+          if (aliasForThisModule) {
+            this.packageJson.dependencies![aliasForThisModule.alias] = `file:.gah/${dep.fullName}`;
           }
         }
-        continue;
-      }
 
-      // /public-api.ts or / Index.ts or similar. Usually without sub-folders
-      const publicApiPathRelativeToBaseSrcPath = this.fileSystemService.ensureRelativePath(dep.publicApiPathRelativeToBasePath, dep.srcBasePath, true);
-      const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(0, publicApiPathRelativeToBaseSrcPath.length - 3);
+        this.fileSystemService.saveObjectToFile(this.packageJsonPath, this.packageJson);
+      } else {
+        // /public-api.ts or / Index.ts or similar. Usually without sub-folders
+        const publicApiPathRelativeToBaseSrcPath = this.fileSystemService.ensureRelativePath(dep.publicApiPathRelativeToBasePath, dep.srcBasePath, true);
+        const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(0, publicApiPathRelativeToBaseSrcPath.length - 3);
 
-      const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, publicApiRelativePathWithoutExtention);
-      const pathName = `@${dep.packageName}/${dep.moduleName!}`;
+        const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, publicApiRelativePathWithoutExtention);
+        const pathName = `@${dep.packageName}/${dep.moduleName!}`;
 
-      this.tsConfigFile.addPathAlias(pathName, path, this.isHost);
+        this.tsConfigFile.addPathAlias(pathName, path);
 
-      if (dep.aliasNames) {
-        const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
-        if (aliasForThisModule) {
-          this.tsConfigFile.addPathAlias(aliasForThisModule.alias, path, this.isHost);
+        if (dep.aliasNames) {
+          const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
+          if (aliasForThisModule) {
+            this.tsConfigFile.addPathAlias(aliasForThisModule.alias, path);
+          }
         }
       }
     }
@@ -285,8 +311,8 @@ export abstract class GahModuleBase {
   }
 
   public get packageJson(): PackageJson {
-    this._packageJson ??= this.fileSystemService.parseFile<PackageJson>(this.packageJsonPath);
-    return this._packageJson;
+    this._packageJson ??= this.fileSystemService.tryParseFile<PackageJson>(this.packageJsonPath) ?? undefined;
+    return this._packageJson ?? {};
   }
 
   public get packageJsonPath(): string {

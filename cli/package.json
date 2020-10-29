@@ -36,6 +36,8 @@
     "commander": "^6.0.0",
     "comment-json": "^3.0.3",
     "compare-versions": "^3.6.0",
+    "decompress": "^4.2.1",
+    "decompress-targz": "^4.1.1",
     "deep-equal": "^2.0.4",
     "ejs": "^3.1.5",
     "enquirer": "^2.3.6",
@@ -51,6 +53,7 @@
   "devDependencies": {
     "@awdware/eslint-config-nodejs": "^0.0.6",
     "@types/clear": "^0.1.0",
+    "@types/decompress": "^4.2.3",
     "@types/deep-equal": "^1.0.1",
     "@types/ejs": "^3.0.4",
     "@types/figlet": "^1.2.0",

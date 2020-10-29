@@ -69,6 +69,7 @@ export class GahHostDef extends GahModuleBase {
     this.gahFolder.cleanGeneratedDirectory();
     this.gahFolder.cleanDependencyDirectory();
     this.gahFolder.cleanStylesDirectory();
+    this.gahFolder.cleanPrecompiledFolder();
     this.pluginService.triggerEvent('GAH_FOLDER_CLEANED', { module: this.data() });
 
     this.fileSystemService.deleteFilesInDirectory(this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets'));
@@ -263,8 +264,8 @@ export class GahHostDef extends GahModuleBase {
       const externalPackageJson = dep.packageJson;
 
       // Getting (dev-)dependency objects from host and module
-      const externalDeps = externalPackageJson.dependencies!;
-      const externalDevDeps = externalPackageJson.devDependencies!;
+      const externalDeps = externalPackageJson!.dependencies!;
+      const externalDevDeps = externalPackageJson!.devDependencies!;
 
       const deps = Object.keys(externalDeps)
         .filter(x => blocklistPackages.indexOf(x) === - 1)
@@ -367,10 +368,10 @@ export class GahHostDef extends GahModuleBase {
     const pkgJson = this.packageJson;
 
     if (allGahScripts.length > 0) {
-      pkgJson.scripts ??= {};
+      pkgJson!.scripts ??= {};
 
       allGahScripts.forEach(script => {
-        pkgJson.scripts![script.name] = script.script;
+        pkgJson!.scripts![script.name] = script.script;
       });
 
       this.fileSystemService.saveObjectToFile(this.packageJsonPath, pkgJson);

@@ -14,7 +14,6 @@ import { GahModuleType } from '@awdware/gah-shared';
 import { RunController } from './run.controller';
 import { WhyController } from './why.controller';
 import { TidyController } from './tidy.controler';
-import { CleanController } from './clean.controller';
 import { GitService } from '../services/git.service';
 
 @injectable()
@@ -35,8 +34,6 @@ export class MainController extends Controller {
   private readonly _tidyController: TidyController;
   @inject(WhyController)
   private readonly _whyController: WhyController;
-  @inject(CleanController)
-  private readonly _cleanController: CleanController;
   @inject(GitService)
   private readonly _gitService: GitService;
 
@@ -179,21 +176,6 @@ export class MainController extends Controller {
       .command('packages')
       .description('Tidies up the packages of your modules.')
       .action(async () => this._tidyController.tidyPackages());
-
-    const cmdClean = program
-      .command('clean <targets...>')
-      .helpOption('targets', 'One or multiple of: \'packages\', \'tsconfig\'')
-      .description('Cleans your workspace before commit')
-      .action(async (targets: string[]) => {
-        const invalid = targets.some(x => x.toLowerCase() !== 'tsconfig' && x.toLowerCase() !== 'packages');
-        if (invalid) {
-          this._loggerService.error('Invalid parameter');
-          return;
-        }
-        const cleanPackages = targets.some(x => x.toLowerCase() === 'packages');
-        const cleanTsConfig = targets.some(x => x.toLowerCase() === 'tsconfig');
-        return this._cleanController.clean(cleanPackages, cleanTsConfig);
-      });
 
     await program.parseAsync(process.argv);
   }

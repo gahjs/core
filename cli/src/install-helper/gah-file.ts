@@ -77,7 +77,7 @@ export class GahFile {
       this._pluginService.triggerEvent('HOST_COPIED', { gahFile: this.data() });
     }
     let i = 0;
-    for (const x of this._modules.filter(x => !x.preCompiled)) {
+    for (const x of this._modules.filter(x => !x.preCompiled && x.isHost)) {
       this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: x.data() });
       this._loggerService.stopLoadingAnimation(true);
       this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, i)} ${i}/${this._modules.length}`);
@@ -142,14 +142,14 @@ export class GahFile {
       throw new Error('Host could not be found');
     }
     const becauseOfus = host.allRecursiveDependencies
-      .filter(x => x.packageJson?.dependencies?.[packageName] || x.packageJson?.devDependencies?.[packageName]);
+      .filter(x => x.packageJson.dependencies?.[packageName] || x.packageJson.devDependencies?.[packageName]);
     if (becauseOfus.length <= 1) {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is not referenced`);
     } else {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is referenced by the following configurations: (red means it is excluded)`);
       becauseOfus.forEach(module => {
 
-        const packageVersion = (module.packageJson?.dependencies ?? module.packageJson?.devDependencies)?.[packageName];
+        const packageVersion = (module.packageJson.dependencies ?? module.packageJson.devDependencies)?.[packageName];
 
         if (module.excludedPackages.indexOf(packageName) !== -1) {
           this._loggerService.log(`'${chalk.red(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);

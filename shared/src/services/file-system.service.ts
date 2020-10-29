@@ -34,6 +34,12 @@ export interface IFileSystemService {
    */
   parseFile<T>(path: string): T;
   /**
+   * Tries to synchronously read and parse the file to `T`.
+   * @param path  A path to a file.
+   * @returns The parsed object of type `T` or null if the file does not exist
+   */
+  tryParseFile<T>(path: string): T | null;
+  /**
    * Synchronously saves a string to a file.
    * @param path  A path to a file.
    * @param content  The content of the file.
@@ -141,4 +147,11 @@ export interface IFileSystemService {
    * @param path The path that should be ensured to be absolute
    */
   ensureAbsolutePath(path: string): string;
+  /**
+   * Decompresses a targz archive
+   * @param filePath The path to the archive
+   * @param destinationPath The destination path for the decompressed files
+   * @returns whether the decompression was successful
+   */
+  decompressTargz(filePath: string, destinationPath: string): Promise<boolean>;
 }

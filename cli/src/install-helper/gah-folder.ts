@@ -46,6 +46,10 @@ export class GahFolder {
     return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'styles');
   }
 
+  public get precompiledPath(): string {
+    return this._fileSystemService.join(this._moduleBaseFolder, '.gah');
+  }
+
   public get generatedPath(): string {
     return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'generated');
   }
@@ -56,8 +60,17 @@ export class GahFolder {
   }
 
   public cleanStylesDirectory() {
-    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
     this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
+  }
+
+  public cleanPrecompiledFolder() {
+    this._fileSystemService.deleteFilesInDirectory(this.precompiledPath);
+    this._fileSystemService.ensureDirectory(this.precompiledPath);
+    if (platform() === 'win32') {
+      const fswin = require('fswin');
+      fswin.setAttributesSync(this.precompiledPath, { IS_HIDDEN: true });
+    }
   }
 
   public cleanGeneratedDirectory() {

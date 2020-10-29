@@ -14,7 +14,7 @@ export interface GahModuleData {
   readonly installed: boolean;
   readonly gahConfig: GahConfig;
   readonly isEntry: boolean;
-  readonly packageJson: PackageJson;
+  readonly packageJson?: PackageJson;
 
   readonly tsConfigFile: TsConfigFileData;
   readonly gahFolder: GahFolderData;

@@ -1,5 +1,4 @@
 import { Container } from 'inversify';
-import { CleanController } from './controller/clean.controller';
 
 import { DependencyController } from './controller/dependency.controller';
 import { HostModuleController } from './controller/hostModule.controller';
@@ -26,7 +25,6 @@ import { WorkspaceService } from './services/workspace.service';
 
 
 const DIContainer = new Container();
-DIContainer.bind<CleanController>(CleanController).toSelf().inSingletonScope();
 DIContainer.bind<DependencyController>(DependencyController).toSelf().inSingletonScope();
 DIContainer.bind<HostModuleController>(HostModuleController).toSelf().inSingletonScope();
 DIContainer.bind<InitController>(InitController).toSelf().inSingletonScope();
