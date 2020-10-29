@@ -196,7 +196,7 @@ export abstract class GahModuleBase {
           const to = this.fileSystemService.join(destPath, 'package');
           await this.fileSystemService.createDirLink(from, to);
         } else {
-          //
+          // todo: allow real npm packages from a registry
         }
       } else {
         const mockPath = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
