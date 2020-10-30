@@ -3,4 +3,6 @@ export interface GahContext {
   calledFromHostFolder?: boolean;
   debug?: boolean;
   skipScripts?: boolean;
+  currentBaseFolder?: string;
+  oneTimeClearDone?: boolean;
 }

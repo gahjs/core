@@ -14,6 +14,7 @@ import { GahModuleType } from '@awdware/gah-shared';
 import { RunController } from './run.controller';
 import { WhyController } from './why.controller';
 import { TidyController } from './tidy.controler';
+import { GitService } from '../services/git.service';
 
 @injectable()
 export class MainController extends Controller {
@@ -33,6 +34,8 @@ export class MainController extends Controller {
   private readonly _tidyController: TidyController;
   @inject(WhyController)
   private readonly _whyController: WhyController;
+  @inject(GitService)
+  private readonly _gitService: GitService;
 
   private readonly _version: string;
 
@@ -45,6 +48,9 @@ export class MainController extends Controller {
   public async main() {
     if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
+      this._contextService.setContext({ currentBaseFolder: this._fileSystemService.join(process.cwd(), '.gah') });
+    } else {
+      this._contextService.setContext({ currentBaseFolder: process.cwd() });
     }
 
     // This sets the debug context variable depending on the used options
@@ -55,6 +61,9 @@ export class MainController extends Controller {
 
     await this.checkForUpdates();
 
+    this._loggerService.debug(`WORKSPACE HASH: ${chalk.red(this._workspaceService.getWorkspaceHash())}`);
+
+    await this._gitService.init();
 
     await this._pluginService.loadInstalledPlugins();
 
@@ -185,13 +194,12 @@ export class MainController extends Controller {
     }
 
     if (checkNewVersion) {
-      const success = await this._executionService.execute('yarn info --json @awdware/gah version', false);
-      if (success) {
-        const versionString = this._executionService.executionResult;
-        const versionMatcher = /{"type":"inspect","data":"(.*?)"}/;
-        const newestVersion = versionString.match(versionMatcher);
-        gahData.latestGahVersion = newestVersion?.[1];
+      try {
+        const latestVersion = await this._packageService.findLatestPackageVersion('@awdware/gah');
+        gahData.latestGahVersion = latestVersion;
         gahData.lastUpdateCheck = new Date();
+      } catch (error) {
+        // Ignore error
       }
     }
 

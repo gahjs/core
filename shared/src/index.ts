@@ -10,7 +10,8 @@ export * from './models/gah-module-type';
 export * from './models/gah-module';
 export * from './models/gah-plugin-config';
 export * from './models/gah-plugin-dependency-config';
-export * from './models/global-gah-data'
+export * from './models/global-gah-data';
+export * from './models/gah-local-config';
 export * from './models/gah-plugin';
 export * from './models/module-definition';
 export * from './models/module-reference';
@@ -25,10 +26,13 @@ export * from './models/install-helper/gah-folder-data';
 export * from './models/install-helper/gah-module-data';
 export * from './models/install-helper/ts-config-file-data';
 
+export * from './services/cleanup.service';
 export * from './services/configuration.service';
 export * from './services/context.service';
 export * from './services/file-system.service';
+export * from './services/git.service';
 export * from './services/logger.service';
+export * from './services/package.service';
 export * from './services/plugin.service';
 export * from './services/prompt.service';
 export * from './services/template.service';

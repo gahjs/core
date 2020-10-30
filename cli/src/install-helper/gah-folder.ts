@@ -8,15 +8,17 @@ export class GahFolder {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _templateService: ITemplateService;
 
+  private readonly _gahCfgFolder: string;
   private readonly _moduleBaseFolder: string;
   private readonly _pathRelativeToModuleBaseFolder: string;
   private readonly _modulesTemplateData: ModulesTemplateData;
 
-  constructor(moduleBaseFolder: string, srcBasePath: string) {
+  constructor(moduleBaseFolder: string, srcBasePath: string, gahCfgFolder?: string) {
     this._fileSystemService = DIContainer.get(FileSystemService);
     this._templateService = DIContainer.get(TemplateService);
     this._modulesTemplateData = new ModulesTemplateData();
 
+    this._gahCfgFolder = gahCfgFolder ?? moduleBaseFolder;
     this._moduleBaseFolder = moduleBaseFolder;
     this._pathRelativeToModuleBaseFolder = this._fileSystemService.join(srcBasePath, '.gah');
   }
@@ -32,12 +34,20 @@ export class GahFolder {
     };
   }
 
+  public get path(): string {
+    return this._gahCfgFolder;
+  }
+
   public get dependencyPath(): string {
     return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'dependencies');
   }
 
   public get stylesPath(): string {
     return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'styles');
+  }
+
+  public get precompiledPath(): string {
+    return this._fileSystemService.join(this._moduleBaseFolder, '.gah');
   }
 
   public get generatedPath(): string {
@@ -50,8 +60,17 @@ export class GahFolder {
   }
 
   public cleanStylesDirectory() {
-    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
     this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
+  }
+
+  public cleanPrecompiledFolder() {
+    this._fileSystemService.deleteFilesInDirectory(this.precompiledPath);
+    this._fileSystemService.ensureDirectory(this.precompiledPath);
+    if (platform() === 'win32') {
+      const fswin = require('fswin');
+      fswin.setAttributesSync(this.precompiledPath, { IS_HIDDEN: true });
+    }
   }
 
   public cleanGeneratedDirectory() {

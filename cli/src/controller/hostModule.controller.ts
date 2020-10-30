@@ -72,9 +72,8 @@ export class HostModuleController extends Controller {
       throw new Error('Some dependencies could not be found');
     }
     newDep.names = selectedModules.map(x => x.name);
-    if (!cfg.modules) {
-      cfg.modules = new Array<ModuleReference>();
-    }
+
+    cfg.modules ??= new Array<ModuleReference>();
     cfg.modules.push(newDep);
     this._configService.saveGahModuleConfig();
     this._loggerService.success('Dependency added successfully.');

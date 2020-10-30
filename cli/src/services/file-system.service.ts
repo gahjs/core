@@ -6,7 +6,9 @@ import globby from 'globby';
 import { platform } from 'os';
 import { ExecutionService } from './execution.service';
 import { LoggerService } from './logger.service';
-import {parse, stringify} from 'comment-json';
+import { parse, stringify } from 'comment-json';
+import decompress from 'decompress';
+const decompressTargz = require('decompress-targz');
 
 @injectable()
 export class FileSystemService implements IFileSystemService {
@@ -38,6 +40,13 @@ export class FileSystemService implements IFileSystemService {
       return null;
     }
     return fs.readFileSync(path).toString();
+  }
+
+  tryParseFile<T>(path: string): T | null {
+    if (!this.fileExists(path)) {
+      return null;
+    }
+    return this.parseFile<T>(path);
   }
 
   parseFile<T>(path: string): T {
@@ -82,6 +91,10 @@ export class FileSystemService implements IFileSystemService {
 
   deleteFilesInDirectory(path: string): void {
     fs.emptyDirSync(path);
+  }
+
+  deleteDirectory(path: string): void {
+    fs.rmdirSync(path, { recursive: true });
   }
 
   copyFilesInDirectory(fromDirectory: string, toDirectory: string) {
@@ -156,5 +169,18 @@ export class FileSystemService implements IFileSystemService {
   ensureAbsolutePath(path: string) {
     if (path_.isAbsolute(path)) { return path.replace(/\\/g, '/'); }
     return path_.resolve(path).replace(/\\/g, '/');
+  }
+
+  async decompressTargz(filePath: string, destinationPath: string) {
+    return decompress(filePath, destinationPath, {
+      plugins: [
+        decompressTargz()
+      ]
+    })
+      .then(() => true)
+      .catch((reason) => {
+        this._loggerService.error(reason);
+        return false;
+      });
   }
 }

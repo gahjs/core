@@ -1,10 +1,7 @@
 import { GahModuleBase } from './gah-module-base';
-import {
-  GahHost, PackageJson, GahModuleData
-} from '@awdware/gah-shared';
+import { GahHost, GahModuleData } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
-import readline from 'readline';
 import { GahAngularCompilerOptions } from '@awdware/gah-shared/lib/models/gah-angular-compiler-options';
 import compareVersions from 'compare-versions';
 
@@ -19,10 +16,12 @@ export class GahHostDef extends GahModuleBase {
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
     this.isHost = true;
-
     this._gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.basePath = this.fileSystemService.join(this._gahCfgFolder, '.gah');
     this.srcBasePath = './src';
+
+    this.installStepCount = 13;
+    this._installDescriptionText = 'Installing host';
 
     const hostCfg = this.fileSystemService.parseFile<GahHost>(gahCfgPath);
     if (!hostCfg) {
@@ -49,7 +48,7 @@ export class GahHostDef extends GahModuleBase {
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
     this._baseHref = hostCfg.baseHref ? hostCfg.baseHref : '/';
     this._title = hostCfg.title ?? '';
-    this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`);
+    this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`, this._gahCfgFolder);
   }
 
   public specificData(): Partial<GahModuleData> {
@@ -65,12 +64,15 @@ export class GahHostDef extends GahModuleBase {
     this.initTsConfigObject();
     this.installed = true;
 
+    this.prog('preinstall scripts');
     await this.executePreinstallScripts();
+    this.prog('cleanup');
     this.tsConfigFile.clean();
     this.pluginService.triggerEvent('TS_CONFIG_CLEANED', { module: this.data() });
     this.gahFolder.cleanGeneratedDirectory();
     this.gahFolder.cleanDependencyDirectory();
     this.gahFolder.cleanStylesDirectory();
+    this.gahFolder.cleanPrecompiledFolder();
     this.pluginService.triggerEvent('GAH_FOLDER_CLEANED', { module: this.data() });
 
     this.fileSystemService.deleteFilesInDirectory(this.fileSystemService.join(this.basePath, this.srcBasePath, 'assets'));
@@ -85,22 +87,31 @@ export class GahHostDef extends GahModuleBase {
       + ' * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n');
     this.pluginService.triggerEvent('STYLES_FILE_GENERATED', { module: this.data() });
 
+    this.prog('linking dependencies');
     await this.createSymlinksToDependencies();
     this.pluginService.triggerEvent('SYMLINKS_CREATED', { module: this.data() });
 
-    this.addDependenciesToTsConfigFile();
+    this.prog('referencing dependencies');
+    await this.addDependenciesToTsConfigFile();
+    this.prog('adjusting configuration');
     this.setAngularCompilerOptionsInTsConfig();
     this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
+    this.prog('generating template');
     this.generateFromTemplate();
     this.pluginService.triggerEvent('TEMPLATE_GENERATED', { module: this.data() });
+    this.prog('linking assets');
     await this.linkAssets();
+    this.prog('referencing styles');
     this.pluginService.triggerEvent('ASSETS_COPIED', { module: this.data() });
     this.referenceGlobalStyles();
     this.pluginService.triggerEvent('STYLES_REFERENCED', { module: this.data() });
+    this.prog('merging packages');
     this.mergePackageDependencies();
     this.pluginService.triggerEvent('DEPENDENCIES_MERGED', { module: this.data() });
+    this.prog('importing styles');
     this.generateStyleImports();
     this.pluginService.triggerEvent('STYLE_IMPORTS_GENERATED', { module: this.data() });
+    this.prog('adjusting configurations');
     this.adjustGitignore();
     this.adjustGitignoreForHost();
     this.pluginService.triggerEvent('GITIGNORE_ADJUSTED', { module: this.data() });
@@ -111,11 +122,13 @@ export class GahHostDef extends GahModuleBase {
 
     this.collectModuleScripts();
 
+    this.prog('installing packages');
     await this.installPackages();
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
 
     this.generateEnvFolderIfNeeded();
 
+    this.prog('postinstall scripts');
     await this.executePostinstallScripts();
   }
 
@@ -132,53 +145,6 @@ export class GahHostDef extends GahModuleBase {
     this.gahFolder.generateFileFromTemplate();
   }
 
-  private async installPackages() {
-    this.loggerService.log('Installing yarn packages');
-    let state = 0;
-    let stateString = 'Installing yarn packages';
-    const success = await this.executionService.execute('yarn', true, (test) => {
-
-      // This is just for super fancy logging:
-
-      if (test.indexOf('Done in') !== -1) {
-        state = 4;
-        stateString = 'Done.';
-      } else if (test.indexOf('[4/4]') !== -1) {
-        state = 4;
-        stateString = 'Building fresh packages';
-      } else if (test.indexOf('[3/4]') !== -1) {
-        state = 3;
-        stateString = 'Linking dependencies';
-      } else if (test.indexOf('[2/4]') !== -1) {
-        state = 2;
-        stateString = 'Fetching packages';
-      } else if (test.indexOf('[1/4]') !== -1) {
-        state = 1;
-        stateString = 'Resolving packages';
-      }
-
-      this.loggerService.interruptLoading(() => {
-        readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
-        readline.clearLine(process.stdout, 0);
-      });
-      this.loggerService.log(`${this.loggerService.getProgressBarString(4, state)} [${state}/4] ${stateString}`);
-      return '';
-
-      // Super fancy logging end.
-    }, '.gah');
-
-    this.loggerService.interruptLoading(() => {
-      readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
-      readline.clearLine(process.stdout, 0);
-    });
-
-    if (success) {
-      this.loggerService.success('Packages installed successfully');
-    } else {
-      this.loggerService.error('Installing packages failed');
-      this.loggerService.error(this.executionService.executionErrorResult);
-    }
-  }
 
   private async linkAssets() {
     // Bug: Symlinks are not copied to dist folder https://github.com/angular/angular-cli/issues/19086
@@ -188,10 +154,10 @@ export class GahHostDef extends GahModuleBase {
     const assetsArray = ngJson.projects['gah-host'].architect.build.options.assets as string[];
 
     for (const dep of this.allRecursiveDependencies) {
-      if (!dep.assetsFolderRelativeTobasePaths || (Array.isArray(dep.assetsFolderRelativeTobasePaths) && dep.assetsFolderRelativeTobasePaths.length === 0)) {
+      if (!dep.assetsFolderRelativeToBasePaths || (Array.isArray(dep.assetsFolderRelativeToBasePaths) && dep.assetsFolderRelativeToBasePaths.length === 0)) {
         continue;
       }
-      const assetsFolderRelativeTobasePaths = Array.isArray(dep.assetsFolderRelativeTobasePaths) ? dep.assetsFolderRelativeTobasePaths : [dep.assetsFolderRelativeTobasePaths];
+      const assetsFolderRelativeTobasePaths = Array.isArray(dep.assetsFolderRelativeToBasePaths) ? dep.assetsFolderRelativeToBasePaths : [dep.assetsFolderRelativeToBasePaths];
 
       for (const p of assetsFolderRelativeTobasePaths) {
         const assetsDirectoryPath = this.fileSystemService.join(dep.basePath, p);
@@ -218,22 +184,31 @@ export class GahHostDef extends GahModuleBase {
       if (!dep.stylesFilePathRelativeToBasePath) {
         continue;
       }
+      let finalStyleImportPath: string;
+      if (dep.preCompiled) {
+        const stylePathRelativeToPackageBase = this.fileSystemService.ensureRelativePath(
+          dep.stylesFilePathRelativeToBasePath, this.fileSystemService.getDirectoryPathFromFilePath(dep.srcBasePath), true
+        );
 
-      const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.stylesFilePathRelativeToBasePath);
-
-      // Copying base styles if they exist
-      if (this.fileSystemService.fileExists(absoluteStylesFilePathOfDep)) {
-
-        const depAbsoluteSrcFolder = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
-
-        const depStylesPathRelativeToSrcBase = this.fileSystemService.ensureRelativePath(absoluteStylesFilePathOfDep, depAbsoluteSrcFolder, true);
-        const dependencyPathRelativeFromSrcBase = this.fileSystemService.ensureRelativePath(this.gahFolder.dependencyPath, this.srcBasePath, true);
-
-        const moduleFacadePath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depStylesPathRelativeToSrcBase);
-        stylesScss.push(`@import "${moduleFacadePath}";`);
+        finalStyleImportPath = this.fileSystemService.join(dep.packageName ? `@${dep.packageName}` : '', dep.moduleName!, stylePathRelativeToPackageBase);
       } else {
-        this.loggerService.warn(`Could not find styles file "${dep.stylesFilePathRelativeToBasePath}" defined by module "${dep.moduleName}"`);
+        const absoluteStylesFilePathOfDep = this.fileSystemService.join(dep.basePath, dep.stylesFilePathRelativeToBasePath);
+
+        // Copying base styles if they exist
+        if (this.fileSystemService.fileExists(absoluteStylesFilePathOfDep)) {
+
+          const depAbsoluteSrcFolder = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
+
+          const depStylesPathRelativeToSrcBase = this.fileSystemService.ensureRelativePath(absoluteStylesFilePathOfDep, depAbsoluteSrcFolder, true);
+          const dependencyPathRelativeFromSrcBase = this.fileSystemService.ensureRelativePath(this.gahFolder.dependencyPath, this.srcBasePath, true);
+
+          finalStyleImportPath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depStylesPathRelativeToSrcBase);
+        } else {
+          this.loggerService.error(`Could not find styles file "${dep.stylesFilePathRelativeToBasePath}" defined by module "${dep.moduleName}"`);
+          process.exit(1);
+        }
       }
+      stylesScss.push(`@import "${finalStyleImportPath}";`);
     }
     this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.srcBasePath, 'styles.scss'), stylesScss.join('\n'));
   }
@@ -241,9 +216,8 @@ export class GahHostDef extends GahModuleBase {
   private mergePackageDependencies() {
     const packageJsonPath = this.fileSystemService.join(this.basePath, 'package.json');
     // Get package.json from host
-    const packageJson = this.fileSystemService.parseFile<PackageJson>(packageJsonPath);
-    const hostDeps = packageJson.dependencies!;
-    const hostDevDeps = packageJson.devDependencies!;
+    const hostDeps = this.packageJson.dependencies!;
+    const hostDevDeps = this.packageJson.devDependencies!;
 
     const blocklistPackages = new Array<string>();
 
@@ -256,8 +230,8 @@ export class GahHostDef extends GahModuleBase {
       const externalPackageJson = dep.packageJson;
 
       // Getting (dev-)dependency objects from host and module
-      const externalDeps = externalPackageJson.dependencies!;
-      const externalDevDeps = externalPackageJson.devDependencies!;
+      const externalDeps = externalPackageJson!.dependencies!;
+      const externalDevDeps = externalPackageJson!.devDependencies!;
 
       const deps = Object.keys(externalDeps)
         .filter(x => blocklistPackages.indexOf(x) === - 1)
@@ -280,7 +254,7 @@ export class GahHostDef extends GahModuleBase {
     }
 
     // Saving the file back into the host package.json
-    this.fileSystemService.saveObjectToFile(packageJsonPath, packageJson);
+    this.fileSystemService.saveObjectToFile(packageJsonPath, this.packageJson);
   }
 
   private adjustAngularJsonConfig() {
@@ -360,12 +334,10 @@ export class GahHostDef extends GahModuleBase {
     const pkgJson = this.packageJson;
 
     if (allGahScripts.length > 0) {
-      if (!pkgJson.scripts) {
-        pkgJson.scripts = {};
-      }
+      pkgJson!.scripts ??= {};
 
       allGahScripts.forEach(script => {
-        pkgJson.scripts![script.name] = script.script;
+        pkgJson!.scripts![script.name] = script.script;
       });
 
       this.fileSystemService.saveObjectToFile(this.packageJsonPath, pkgJson);

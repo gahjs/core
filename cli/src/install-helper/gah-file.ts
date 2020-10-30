@@ -1,16 +1,16 @@
+import chalk from 'chalk';
+import DIContainer from '../di-container';
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, PackageJson
+  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService
 } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
 import { GahHostDef } from './gah-host-def';
-import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { CopyHost } from './copy-host';
 import { LoggerService } from '../services/logger.service';
 import { PluginService } from '../services/plugin.service';
-import chalk from 'chalk';
 import compareVersions from 'compare-versions';
 
 export class GahFile {
@@ -25,6 +25,8 @@ export class GahFile {
   public isInstalled: boolean;
 
   private readonly _modules: GahModuleBase[];
+  private _rootModule: GahModuleBase;
+
   constructor(filePath: string) {
     const initializedModules = new Array<GahModuleBase>();
 
@@ -68,24 +70,23 @@ export class GahFile {
     };
   }
 
+
+
   public async install() {
-    this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, 0)} 1/${this._modules.length}`);
+
+    this._rootModule.prog('Copying host');
 
     if (this.isHost) {
       this.checkValidConfiguration();
       this.copyHostFiles();
       this._pluginService.triggerEvent('HOST_COPIED', { gahFile: this.data() });
     }
-    let i = 0;
-    for (const x of this._modules) {
-      this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: x.data() });
-      this._loggerService.stopLoadingAnimation(true);
-      this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, i)} ${i}/${this._modules.length}`);
-      await x.install();
-      i++;
-      this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: x.data() });
-    }
-    this._loggerService.stopLoadingAnimation(false, true, `All modules installed ${i}/${i}!`);
+
+    this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: this._rootModule.data() });
+    await this._rootModule.install();
+    this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: this._rootModule.data() });
+
+    this._loggerService.stopLoadingAnimation(false, true, `gah install done ${this._rootModule.installStepCount}/${this._rootModule.installStepCount}!`);
   }
 
   public whyModule(moduleName: string) {
@@ -142,14 +143,14 @@ export class GahFile {
       throw new Error('Host could not be found');
     }
     const becauseOfus = host.allRecursiveDependencies
-      .filter(x => x.packageJson?.dependencies?.[packageName] || x.packageJson?.devDependencies?.[packageName]);
+      .filter(x => x.packageJson.dependencies?.[packageName] || x.packageJson.devDependencies?.[packageName]);
     if (becauseOfus.length <= 1) {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is not referenced`);
     } else {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is referenced by the following configurations: (red means it is excluded)`);
       becauseOfus.forEach(module => {
 
-        const packageVersion = (module.packageJson?.dependencies ?? module.packageJson?.devDependencies)?.[packageName];
+        const packageVersion = (module.packageJson.dependencies ?? module.packageJson.devDependencies)?.[packageName];
 
         if (module.excludedPackages.indexOf(packageName) !== -1) {
           this._loggerService.log(`'${chalk.red(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);
@@ -200,17 +201,23 @@ export class GahFile {
   }
 
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
+
     cfg.modules.forEach(moduleRef => {
       moduleRef.names.forEach(moduleName => {
         this._modules.push(new GahModuleDef(moduleRef.path, moduleName, initializedModules));
       });
     });
-    this._modules.push(new GahHostDef(cfgPath, initializedModules));
+
+    const newHost = new GahHostDef(cfgPath, initializedModules);
+    this._rootModule = newHost;
+    this._modules.push(newHost);
   }
 
   private loadModule(cfg: GahModule, cfgPath: string, initializedModules: GahModuleBase[]) {
     cfg.modules.forEach(moduleDef => {
-      this._modules.push(new GahModuleDef(cfgPath, moduleDef.name, initializedModules));
+      const newModule = new GahModuleDef(cfgPath, moduleDef.name, initializedModules);
+      this._rootModule = newModule;
+      this._modules.push(newModule);
     });
   }
 
@@ -253,10 +260,12 @@ export class GahFile {
       }
     });
     if (entryModuleNames.length === 0) {
-      throw new Error('You do not have any entry modules defined! You need exactly one entry module for the system to work!');
+      this._loggerService.error('You do not have any entry modules defined! You need exactly one entry module for the system to work!');
+      process.exit(1);
     } else if (entryModuleNames.length > 1) {
-      throw new Error(`${'You have too many entry modules defined! You need exactly one entry module for the system to work!'
+      this._loggerService.error(`${'You have too many entry modules defined! You need exactly one entry module for the system to work!'
         + ' The following modules are configured as entry modules: '}${entryModuleNames.join(', ')}`);
+      process.exit(1);
     }
   }
 }

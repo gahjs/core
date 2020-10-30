@@ -1,6 +1,7 @@
 import { GahConfig } from '../gah-config';
 import { TsConfigFileData } from './ts-config-file-data';
 import { GahFolderData } from './gah-folder-data';
+import { PackageJson } from '../package-json';
 
 export interface GahModuleData {
   readonly basePath: string;
@@ -13,6 +14,7 @@ export interface GahModuleData {
   readonly installed: boolean;
   readonly gahConfig: GahConfig;
   readonly isEntry: boolean;
+  readonly packageJson?: PackageJson;
 
   readonly tsConfigFile: TsConfigFileData;
   readonly gahFolder: GahFolderData;

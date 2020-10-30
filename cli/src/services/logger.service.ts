@@ -62,6 +62,9 @@ export class LoggerService implements ILoggerService {
   }
 
   public stopLoadingAnimation(removeLine: boolean = false, succeeded: boolean = true, text?: string): void {
+    if (!this._ora?.isSpinning) {
+      return;
+    }
     if (removeLine) {
       this._ora.stop();
       return;

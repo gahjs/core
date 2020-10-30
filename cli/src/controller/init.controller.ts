@@ -162,9 +162,7 @@ export class InitController extends Controller {
   private async askForGlobalStylesPath(isHost: boolean | undefined) {
     let defaultStylesPath: string | null = null;
     defaultStylesPath = this._fileSystemService.getFilesFromGlob('**/styles.scss', ['.gah', 'dist'])?.[0];
-    if (!defaultStylesPath) {
-      defaultStylesPath = this._fileSystemService.getFilesFromGlob('**/index.scss', ['.gah', 'dist'])?.[0];
-    }
+    defaultStylesPath ??= this._fileSystemService.getFilesFromGlob('**/index.scss', ['.gah', 'dist'])?.[0];
 
     if (process.platform === 'win32') {
       defaultStylesPath = defaultStylesPath?.replace(/\//g, '\\');
@@ -256,7 +254,6 @@ export class InitController extends Controller {
 
     const firtsPossibleModuleContent = this._fileSystemService.readFile(possibleModuleFiles[0]);
     const match = firtsPossibleModuleContent.match(/export class (\S+) {/);
-    if (!match) { return undefined; }
-    return match[1];
+    return match?.[1];
   }
 }

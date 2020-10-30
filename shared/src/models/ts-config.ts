@@ -12,5 +12,5 @@ export class TsConfigCompilerOptions {
 }
 
 export class TsConfigCompilerOptionsPaths {
-  [name: string]: string[];
+  [name: string]: string[] | undefined;
 }

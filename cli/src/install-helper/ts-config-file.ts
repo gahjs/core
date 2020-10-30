@@ -1,7 +1,8 @@
-import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData, GahAngularCompilerOptions } from '@awdware/gah-shared';
+import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData, GahAngularCompilerOptions, ICleanupService } from '@awdware/gah-shared';
 
 export class TsConfigFile {
   private readonly _fileSystemService: IFileSystemService;
+  private readonly _cleanupService: ICleanupService;
 
   private readonly _path: string;
   private readonly _tsConfig: TsConfig;
@@ -22,7 +23,7 @@ export class TsConfigFile {
     const allPaths = Object.keys(this._tsConfig.compilerOptions.paths);
     allPaths.forEach((x) => {
       const pathCfg = this._tsConfig.compilerOptions.paths[x];
-      if (pathCfg.some(pathCfgEntry => pathCfgEntry.startsWith('[gah]'))) {
+      if (pathCfg?.some(pathCfgEntry => pathCfgEntry.startsWith('[gah]'))) {
         delete this._tsConfig.compilerOptions.paths[x];
       }
     });
@@ -34,8 +35,9 @@ export class TsConfigFile {
     this.save();
   }
 
-  constructor(path: string, fileSystemService: IFileSystemService) {
+  constructor(path: string, fileSystemService: IFileSystemService, cleanupService: ICleanupService) {
     this._fileSystemService = fileSystemService;
+    this._cleanupService = cleanupService;
     this._path = path;
 
     this._tsConfig = this._fileSystemService.parseFile<TsConfig>(this._path);
@@ -46,7 +48,7 @@ export class TsConfigFile {
     const oldData = this._fileSystemService.parseFile<TsConfig>(this._path);
 
     const equals = JSON.stringify(oldData) === JSON.stringify(this._tsConfig);
-    if(!equals) { 
+    if (!equals) {
       this._fileSystemService.saveObjectToFile(this._path, this._tsConfig);
     }
   }
