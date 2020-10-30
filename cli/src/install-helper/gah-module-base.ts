@@ -141,7 +141,7 @@ export abstract class GahModuleBase {
     this.loggerService.stopLoadingAnimation(true);
     const progStr = this.loggerService.getProgressBarString(this.installStepCount, this._installProgress);
     this.loggerService.startLoadingAnimation(
-      `${this._installDescriptionText} ${progStr} ${this._installProgress}/${this.installStepCount} ${step}`
+      `${this._installDescriptionText} ${progStr} [${this._installProgress}/${this.installStepCount}] ${chalk.gray(step)}`
     );
   }
 
