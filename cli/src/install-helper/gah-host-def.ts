@@ -2,7 +2,6 @@ import { GahModuleBase } from './gah-module-base';
 import { GahHost, GahModuleData } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
-import readline from 'readline';
 import { GahAngularCompilerOptions } from '@awdware/gah-shared/lib/models/gah-angular-compiler-options';
 import compareVersions from 'compare-versions';
 
@@ -17,10 +16,12 @@ export class GahHostDef extends GahModuleBase {
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, null);
     this.isHost = true;
-
     this._gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.basePath = this.fileSystemService.join(this._gahCfgFolder, '.gah');
     this.srcBasePath = './src';
+
+    this.installStepCount = 13;
+    this._installDescriptionText = 'Installing host';
 
     const hostCfg = this.fileSystemService.parseFile<GahHost>(gahCfgPath);
     if (!hostCfg) {
@@ -63,7 +64,9 @@ export class GahHostDef extends GahModuleBase {
     this.initTsConfigObject();
     this.installed = true;
 
+    this.prog('preinstall scripts');
     await this.executePreinstallScripts();
+    this.prog('cleanup');
     this.tsConfigFile.clean();
     this.pluginService.triggerEvent('TS_CONFIG_CLEANED', { module: this.data() });
     this.gahFolder.cleanGeneratedDirectory();
@@ -84,22 +87,31 @@ export class GahHostDef extends GahModuleBase {
       + ' * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */\n');
     this.pluginService.triggerEvent('STYLES_FILE_GENERATED', { module: this.data() });
 
+    this.prog('linking dependencies');
     await this.createSymlinksToDependencies();
     this.pluginService.triggerEvent('SYMLINKS_CREATED', { module: this.data() });
 
+    this.prog('referencing dependencies');
     await this.addDependenciesToTsConfigFile();
+    this.prog('adjusting configuration');
     this.setAngularCompilerOptionsInTsConfig();
     this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
+    this.prog('generating template');
     this.generateFromTemplate();
     this.pluginService.triggerEvent('TEMPLATE_GENERATED', { module: this.data() });
+    this.prog('linking assets');
     await this.linkAssets();
+    this.prog('referencing styles');
     this.pluginService.triggerEvent('ASSETS_COPIED', { module: this.data() });
     this.referenceGlobalStyles();
     this.pluginService.triggerEvent('STYLES_REFERENCED', { module: this.data() });
+    this.prog('merging packages');
     this.mergePackageDependencies();
     this.pluginService.triggerEvent('DEPENDENCIES_MERGED', { module: this.data() });
+    this.prog('importing styles');
     this.generateStyleImports();
     this.pluginService.triggerEvent('STYLE_IMPORTS_GENERATED', { module: this.data() });
+    this.prog('adjusting configurations');
     this.adjustGitignore();
     this.adjustGitignoreForHost();
     this.pluginService.triggerEvent('GITIGNORE_ADJUSTED', { module: this.data() });
@@ -110,11 +122,13 @@ export class GahHostDef extends GahModuleBase {
 
     this.collectModuleScripts();
 
+    this.prog('installing packages');
     await this.installPackages();
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
 
     this.generateEnvFolderIfNeeded();
 
+    this.prog('postinstall scripts');
     await this.executePostinstallScripts();
   }
 
@@ -131,54 +145,6 @@ export class GahHostDef extends GahModuleBase {
     this.gahFolder.generateFileFromTemplate();
   }
 
-  private async installPackages() {
-    this.loggerService.log('Installing yarn packages');
-    let state = 0;
-    let stateString = 'Installing yarn packages';
-
-    const success = await this.executionService.execute('yarn', true, (test) => {
-
-      // This is just for super fancy logging:
-
-      if (test.indexOf('Done in') !== -1) {
-        state = 4;
-        stateString = 'Done.';
-      } else if (test.indexOf('[4/4]') !== -1) {
-        state = 4;
-        stateString = 'Building fresh packages';
-      } else if (test.indexOf('[3/4]') !== -1) {
-        state = 3;
-        stateString = 'Linking dependencies';
-      } else if (test.indexOf('[2/4]') !== -1) {
-        state = 2;
-        stateString = 'Fetching packages';
-      } else if (test.indexOf('[1/4]') !== -1) {
-        state = 1;
-        stateString = 'Resolving packages';
-      }
-
-      this.loggerService.interruptLoading(() => {
-        readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
-        readline.clearLine(process.stdout, 0);
-      });
-      this.loggerService.log(`${this.loggerService.getProgressBarString(4, state)} [${state}/4] ${stateString}`);
-      return '';
-
-      // Super fancy logging end.
-    }, '.gah');
-
-    this.loggerService.interruptLoading(() => {
-      readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
-      readline.clearLine(process.stdout, 0);
-    });
-
-    if (success) {
-      this.loggerService.success('Packages installed successfully');
-    } else {
-      this.loggerService.error('Installing packages failed');
-      this.loggerService.error(this.executionService.executionErrorResult);
-    }
-  }
 
   private async linkAssets() {
     // Bug: Symlinks are not copied to dist folder https://github.com/angular/angular-cli/issues/19086

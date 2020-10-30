@@ -1,12 +1,16 @@
 import { GahModuleBase } from './gah-module-base';
 import { GahModule, GahModuleData } from '@awdware/gah-shared';
 import { GahFolder } from './gah-folder';
+import chalk from 'chalk';
 
 export class GahModuleDef extends GahModuleBase {
   constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[]) {
     super(gahCfgPath, moduleName);
     this.isHost = false;
     initializedModules.push(this);
+
+    this.installStepCount = 8;
+    this._installDescriptionText = `Installing ${chalk.green(this.moduleName)}`;
 
     let moduleCfgData: GahModule;
     try {
@@ -70,16 +74,25 @@ export class GahModuleDef extends GahModuleBase {
       return;
     }
     this.installed = true;
+    this.prog('preinstall scripts');
     await this.executePreinstallScripts();
+    this.prog('cleanup');
     this.tsConfigFile.clean();
     this.gahFolder.cleanDependencyDirectory();
     this.gahFolder.cleanStylesDirectory();
     this.gahFolder.cleanPrecompiledFolder();
     this.gahFolder.tryHideGahFolder();
+    this.prog('linking dependencies');
     await this.createSymlinksToDependencies();
+    this.prog('referencing dependencies');
     await this.addDependenciesToTsConfigFile();
+    this.prog('importing styles');
     this.generateStyleImports();
+    this.prog('adjusting configurations');
     this.adjustGitignore();
+    this.prog('installing packages');
+    await this.installPackages();
+    this.prog('postinstall scripts');
     await this.executePostinstallScripts();
   }
 

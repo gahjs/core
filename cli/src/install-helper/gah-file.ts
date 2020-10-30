@@ -25,6 +25,8 @@ export class GahFile {
   public isInstalled: boolean;
 
   private readonly _modules: GahModuleBase[];
+  private _rootModule: GahModuleBase;
+
   constructor(filePath: string) {
     const initializedModules = new Array<GahModuleBase>();
 
@@ -68,24 +70,23 @@ export class GahFile {
     };
   }
 
+
+
   public async install() {
-    this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, 0)} 1/${this._modules.length}`);
+
+    this._rootModule.prog('Copying host');
 
     if (this.isHost) {
       this.checkValidConfiguration();
       this.copyHostFiles();
       this._pluginService.triggerEvent('HOST_COPIED', { gahFile: this.data() });
     }
-    let i = 0;
-    for (const x of this._modules.filter(x => !x.preCompiled && x.isHost)) {
-      this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: x.data() });
-      this._loggerService.stopLoadingAnimation(true);
-      this._loggerService.startLoadingAnimation(`Installing modules ${this._loggerService.getProgressBarString(this._modules.length, i)} ${i}/${this._modules.length}`);
-      await x.install();
-      i++;
-      this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: x.data() });
-    }
-    this._loggerService.stopLoadingAnimation(false, true, `All modules installed ${i}/${i}!`);
+
+    this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: this._rootModule.data() });
+    await this._rootModule.install();
+    this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: this._rootModule.data() });
+
+    this._loggerService.stopLoadingAnimation(false, true, `gah install done ${this._rootModule.installStepCount}/${this._rootModule.installStepCount}!`);
   }
 
   public whyModule(moduleName: string) {
@@ -206,12 +207,17 @@ export class GahFile {
         this._modules.push(new GahModuleDef(moduleRef.path, moduleName, initializedModules));
       });
     });
-    this._modules.push(new GahHostDef(cfgPath, initializedModules));
+
+    const newHost = new GahHostDef(cfgPath, initializedModules);
+    this._rootModule = newHost;
+    this._modules.push(newHost);
   }
 
   private loadModule(cfg: GahModule, cfgPath: string, initializedModules: GahModuleBase[]) {
     cfg.modules.forEach(moduleDef => {
-      this._modules.push(new GahModuleDef(cfgPath, moduleDef.name, initializedModules));
+      const newModule = new GahModuleDef(cfgPath, moduleDef.name, initializedModules);
+      this._rootModule = newModule;
+      this._modules.push(newModule);
     });
   }
 

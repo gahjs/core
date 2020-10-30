@@ -1,3 +1,5 @@
+import chalk from 'chalk';
+import readline from 'readline';
 import DIContainer from '../di-container';
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
@@ -18,7 +20,6 @@ import { ContextService } from '../services/context-service';
 import { ConfigService } from '../services/config.service';
 import { PackageService } from '../services/package.service';
 import { CleanupSevice } from '../services/cleanup.service';
-import chalk from 'chalk';
 
 export abstract class GahModuleBase {
   protected cleanupService: ICleanupService;
@@ -58,6 +59,11 @@ export abstract class GahModuleBase {
   private readonly _globalPackageStoreJsonPath: string;
   private readonly _globalPackageStoreArchivePath: string;
 
+  public installStepCount: number;
+  protected _installDescriptionText: string;
+  private _installProgress: number;
+
+
   constructor(gahModulePath: string, moduleName: string | null) {
     this.cleanupService = DIContainer.get(CleanupSevice);
     this.fileSystemService = DIContainer.get(FileSystemService);
@@ -75,6 +81,8 @@ export abstract class GahModuleBase {
     this.dependencies = new Array<GahModuleBase>();
 
     this.preCompiled = this.cfgService.localConfig()?.precompiled?.some(x => x.name === moduleName) ?? false;
+
+    this._installProgress = -1;
 
     this._globalPackageStorePath = this.fileSystemService.join(this.workspaceService.getWorkspaceFolder(), 'precompiled');
     this._globalPackageStoreArchivePath = this.fileSystemService.join(this._globalPackageStorePath, 'targz');
@@ -126,6 +134,15 @@ export abstract class GahModuleBase {
     const specificData = this.specificData();
 
     return Object.assign(myData, specificData);
+  }
+
+  public prog(step: string) {
+    this._installProgress++;
+    this.loggerService.stopLoadingAnimation(true);
+    const progStr = this.loggerService.getProgressBarString(this.installStepCount, this._installProgress);
+    this.loggerService.startLoadingAnimation(
+      `${this._installDescriptionText} ${progStr} ${this._installProgress}/${this.installStepCount} ${step}`
+    );
   }
 
   public addAlias(forModule: string, alias: string) {
@@ -337,6 +354,55 @@ export abstract class GahModuleBase {
 
         throw new Error(`Error during ${preinstall ? 'pre' : 'post'}-install script.`);
       }
+    }
+  }
+
+  protected async installPackages() {
+    this.loggerService.log('Installing yarn packages');
+    let state = 0;
+    let stateString = 'Installing yarn packages';
+
+    const success = await this.executionService.execute('yarn', true, (test) => {
+
+      // This is just for super fancy logging:
+
+      if (test.indexOf('Done in') !== -1) {
+        state = 4;
+        stateString = 'Done.';
+      } else if (test.indexOf('[4/4]') !== -1) {
+        state = 4;
+        stateString = 'Building fresh packages';
+      } else if (test.indexOf('[3/4]') !== -1) {
+        state = 3;
+        stateString = 'Linking dependencies';
+      } else if (test.indexOf('[2/4]') !== -1) {
+        state = 2;
+        stateString = 'Fetching packages';
+      } else if (test.indexOf('[1/4]') !== -1) {
+        state = 1;
+        stateString = 'Resolving packages';
+      }
+
+      this.loggerService.interruptLoading(() => {
+        readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
+        readline.clearLine(process.stdout, 0);
+      });
+      this.loggerService.log(`${this.loggerService.getProgressBarString(4, state)} [${state}/4] ${stateString}`);
+      return '';
+
+      // Super fancy logging end.
+    }, '.gah');
+
+    this.loggerService.interruptLoading(() => {
+      readline.cursorTo(process.stdout, 0, process.stdout.rows - 2);
+      readline.clearLine(process.stdout, 0);
+    });
+
+    if (success) {
+      this.loggerService.success('Packages installed successfully');
+    } else {
+      this.loggerService.error('Installing packages failed');
+      this.loggerService.error(this.executionService.executionErrorResult);
     }
   }
 
