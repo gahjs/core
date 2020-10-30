@@ -86,6 +86,10 @@ export class GahFile {
     await this._rootModule.install();
     this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: this._rootModule.data() });
 
+    // workaround
+    this._modules.forEach(x => x.executePreinstallScripts());
+    this._modules.forEach(x => x.executePostinstallScripts());
+
     this._loggerService.stopLoadingAnimation(false, true, `gah install done ${this._rootModule.installStepCount}/${this._rootModule.installStepCount}!`);
   }
 
