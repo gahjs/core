@@ -242,7 +242,7 @@ export class GahHostDef extends GahModuleBase {
       // Merging module (dev-)dependencies into host
       deps.forEach((d) => {
         const isEntry = dep.isEntry;
-        const isNewer = compareVersions(hostDeps[d].replace('~', '').replace('^', ''), externalDeps[d].replace('~', '').replace('^', ''));
+        const isNewer = hostDeps[d] && compareVersions(hostDeps[d].replace('~', '').replace('^', ''), externalDeps[d].replace('~', '').replace('^', ''));
 
         if (!hostDeps[d] || isEntry || (!isEntry && isNewer)) {
           hostDeps[d] = externalDeps[d];
@@ -250,7 +250,7 @@ export class GahHostDef extends GahModuleBase {
       });
       devDeps.forEach((d) => {
         const isEntry = dep.isEntry;
-        const isNewer = !dep.isEntry && compareVersions(hostDevDeps[d].replace('~', '').replace('^', ''), externalDevDeps[d].replace('~', '').replace('^', ''));
+        const isNewer = hostDevDeps[d] && compareVersions(hostDevDeps[d].replace('~', '').replace('^', ''), externalDevDeps[d].replace('~', '').replace('^', ''));
 
         if (!hostDevDeps[d] || isEntry || (!isEntry && isNewer)) {
           hostDevDeps[d] = externalDevDeps[d];
