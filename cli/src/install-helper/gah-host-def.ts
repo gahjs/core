@@ -241,10 +241,9 @@ export class GahHostDef extends GahModuleBase {
 
       // Merging module (dev-)dependencies into host
       deps.forEach((d) => {
-        const isEntry = dep.isEntry;
-        const isNewer = hostDeps[d] && compareVersions(hostDeps[d].replace('~', '').replace('^', ''), externalDeps[d].replace('~', '').replace('^', ''));
+        const isNewer = !hostDeps[d] || compareVersions(hostDeps[d].replace('~', '').replace('^', ''), externalDeps[d].replace('~', '').replace('^', '')) === -1;
 
-        if (!hostDeps[d] || isEntry || (!isEntry && isNewer)) {
+        if (isNewer) {
           hostDeps[d] = externalDeps[d];
         }
       });
