@@ -237,6 +237,7 @@ export class GahHostDef extends GahModuleBase {
         .filter(x => blocklistPackages.indexOf(x) === - 1)
         .filter(x => dep.excludedPackages.indexOf(x) === -1);
       const devDeps = Object.keys(externalDevDeps)
+        .filter(x => blocklistPackages.indexOf(x) === - 1)
         .filter(x => dep.excludedPackages.indexOf(x) === -1);
 
       // Merging module (dev-)dependencies into host
@@ -255,8 +256,18 @@ export class GahHostDef extends GahModuleBase {
           hostDevDeps[d] = externalDevDeps[d];
         }
       });
-
     }
+
+    // Override everything with dependencies from entry module
+    const entryDependenciess = this.allRecursiveDependencies.find(x => x.isEntry)?.packageJson.dependencies!;
+    const entryDevDependenciess = this.allRecursiveDependencies.find(x => x.isEntry)?.packageJson.devDependencies!;
+
+    Object.keys(entryDependenciess).forEach(entryDependency => {
+      hostDeps[entryDependency] = entryDependenciess[entryDependency];
+    });
+    Object.keys(entryDevDependenciess).forEach(entryDevDependency => {
+      hostDevDeps[entryDevDependency] = entryDevDependenciess[entryDevDependency];
+    });
 
     // Saving the file back into the host package.json
     this.fileSystemService.saveObjectToFile(packageJsonPath, this.packageJson);
