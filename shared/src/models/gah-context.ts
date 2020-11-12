@@ -5,4 +5,5 @@ export interface GahContext {
   skipScripts?: boolean;
   currentBaseFolder?: string;
   oneTimeClearDone?: boolean;
+  yarnTimeout?: number;
 }

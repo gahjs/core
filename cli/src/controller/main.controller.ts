@@ -54,8 +54,17 @@ export class MainController extends Controller {
     }
 
     // This sets the debug context variable depending on the used options
-    this._contextService.setContext({ debug: process.argv.some(x => x === '--debug') });
-    this._contextService.setContext({ skipScripts: process.argv.some(x => x === '--skipScripts') });
+    this._contextService.setContext({ debug: process.argv.some(x => x.toLowerCase() === '--debug') });
+    this._contextService.setContext({ skipScripts: process.argv.some(x => x.toLowerCase() === '--skipscripts') });
+    const yarnTimeoutIndex = process.argv.findIndex(x => x.toLowerCase() === '--yarntimeout');
+    if (yarnTimeoutIndex !== -1) {
+      const paramValue = process.argv[yarnTimeoutIndex + 1];
+      if (!/^\d+$/.test(paramValue)) {
+        this._loggerService.error('Invalid value for parameter yarnTimeout');
+        process.exit(1);
+      }
+      this._contextService.setContext({ yarnTimeout: Number.parseInt(paramValue) });
+    }
 
     this._loggerService.debug(`Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}\n`);
 
@@ -83,6 +92,7 @@ export class MainController extends Controller {
       .version(this._version);
 
     program
+      .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
       .option('--debug', 'Enables verbose debug logging')
       .option('--skipScripts', 'Skips pre and post install scripts');
 

@@ -362,7 +362,9 @@ export abstract class GahModuleBase {
     let state = 0;
     let stateString = 'Installing yarn packages';
 
-    const success = await this.executionService.execute('yarn', true, (test) => {
+    const yarnTimeout = this.contextService.getContext().yarnTimeout;
+    const networkTimeout = yarnTimeout ? ` --network-timeout ${yarnTimeout}` : '';
+    const success = await this.executionService.execute(`yarn${networkTimeout}`, true, (test) => {
 
       // This is just for super fancy logging:
 
