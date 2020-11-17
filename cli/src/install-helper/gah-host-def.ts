@@ -1,5 +1,5 @@
 import { GahModuleBase } from './gah-module-base';
-import { GahHost, GahModuleData } from '@awdware/gah-shared';
+import { GahConfig, GahHost, GahModuleData } from '@awdware/gah-shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
 import { GahAngularCompilerOptions } from '@awdware/gah-shared/lib/models/gah-angular-compiler-options';
@@ -13,8 +13,8 @@ export class GahHostDef extends GahModuleBase {
   private readonly _gahCfgFolder: string;
   private readonly _ngCompilerOptions: GahAngularCompilerOptions;
 
-  constructor(gahCfgPath: string, initializedModules: GahModuleBase[]) {
-    super(gahCfgPath, null);
+  constructor(gahCfgPath: string, initializedModules: GahModuleBase[], gahConfigs: GahConfig[]) {
+    super(gahCfgPath);
     this.isHost = true;
     this._gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
     this.basePath = this.fileSystemService.join(this._gahCfgFolder, '.gah');
@@ -35,7 +35,7 @@ export class GahHostDef extends GahModuleBase {
           this.dependencies.push(alreadyInitialized);
         } else {
           if (this.fileSystemService.fileExists(moduleAbsoluteBasepath)) {
-            this.dependencies.push(new GahModuleDef(moduleAbsoluteBasepath, depModuleName, initializedModules));
+            this.dependencies.push(new GahModuleDef(moduleAbsoluteBasepath, depModuleName, initializedModules, gahConfigs));
           } else {
             this.loggerService.error(`Module '${depModuleName}' could not be found at '${moduleAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
             process.exit(1);
@@ -57,7 +57,7 @@ export class GahHostDef extends GahModuleBase {
     };
   }
 
-  public async install() {
+  public async install(skipPackageInstall: boolean) {
     if (this.installed) {
       return;
     }
@@ -123,7 +123,9 @@ export class GahHostDef extends GahModuleBase {
     this.collectModuleScripts();
 
     this.prog('installing packages');
-    await this.installPackages();
+    if (!skipPackageInstall) {
+      await this.installPackages();
+    }
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
 
     this.generateEnvFolderIfNeeded();

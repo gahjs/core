@@ -6,4 +6,5 @@ export interface GahContext {
   currentBaseFolder?: string;
   oneTimeClearDone?: boolean;
   yarnTimeout?: number;
+  configName?: string;
 }

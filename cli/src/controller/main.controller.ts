@@ -164,8 +164,10 @@ export class MainController extends Controller {
     program
       .command('install')
       .description('Installs all dependencies.')
+      .option('--skipPackageInstall', 'Skips the yarn install step')
+      .option('-c --config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)')
       .alias('i')
-      .action(async () => this._installController.install());
+      .action(async (cmdObj) => this._installController.install(cmdObj.skipPackageInstall, cmdObj.config));
 
     const cmdWhy = program
       .command('why <module|package>')

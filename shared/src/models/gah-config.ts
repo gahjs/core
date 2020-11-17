@@ -9,10 +9,14 @@ export class GahConfig {
   public plugins?: GahPluginDependencyConfig[];
 
   /**
-   * If this property is set to true, gah will not adjust the paths object in the tsconfig json of the module(s) in this folder.
+   * List of precompiled modules with a path to the tgz file (output from yarn pack command)
    */
-  public skipTsConfigPathsAdjustments: boolean;
-
+  public precompiled?: [
+    {
+      name: string,
+      path?: string
+    }
+  ];
   constructor() {
   }
 }

@@ -1,3 +1,4 @@
+import { GahConfig } from './gah-config';
 import { ModuleReference } from './module-reference';
 
 export class ModuleDefinition {
@@ -41,4 +42,8 @@ export class ModuleDefinition {
    * Exclude certain packages from the package.json to be added to the host's package.json. Has to be set for all modules that import which package to be effective.
    */
   public excludedPackages?: string[];
+  /**
+   * Configure plugins and other settings for this module.
+   */
+  public config?: GahConfig;
 }
