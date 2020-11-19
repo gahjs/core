@@ -10,7 +10,9 @@ import { GahFile } from '../install-helper/gah-file';
 export class InstallController extends Controller {
 
   public async install(skipPackageInstall: boolean, configName?: string) {
-    this._contextService.setContext({ configName });
+    if (configName) {
+      this._contextService.setContext({ configName });
+    }
 
     const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
     const fileName = isHost ? 'gah-host.json' : 'gah-module.json';

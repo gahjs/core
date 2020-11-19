@@ -1,11 +1,16 @@
 import { injectable } from 'inversify';
 
-import { GahConfig, TsConfig, IConfigurationService, IFileSystemService, GahHost, GahModule, GahModuleType, IContextService, ModuleDefinition } from '@awdware/gah-shared';
+import {
+  GahConfig, TsConfig, IConfigurationService, IFileSystemService, GahHost,
+  GahModule, GahModuleType, IContextService, ModuleDefinition, ILoggerService
+} from '@awdware/gah-shared';
 
-import { FileSystemService } from './file-system.service';
 import DIContainer from '../di-container';
-import { ContextService } from './context-service';
+
 import { GahFile } from '../install-helper/gah-file';
+import { FileSystemService } from './file-system.service';
+import { ContextService } from './context-service';
+import { LoggerService } from './logger.service';
 
 const gahModuleConfigFileName = 'gah-module.json';
 const gahHostConfigFileName = 'gah-host.json';
@@ -16,8 +21,9 @@ const tsConfigPath = 'tsconfig.json';
 export class ConfigService implements IConfigurationService {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _contextService: IContextService;
-  private readonly _gahConfigFileName: string;
+  private readonly _loggerService: ILoggerService;
   private _cfg: GahConfig;
+  private _partialCfg: GahConfig;
   private _moduleCfg: GahModule | GahHost;
   private _tsCfg: TsConfig;
   private _isHost: boolean;
@@ -27,13 +33,17 @@ export class ConfigService implements IConfigurationService {
 
   constructor() {
     this._fileSystemService = DIContainer.get(FileSystemService);
+    this._loggerService = DIContainer.get(LoggerService);
     this._contextService = DIContainer.get(ContextService);
+  }
+
+  private get gahConfigFileName() {
     const cfgName = this._contextService.getContext().configName;
-    this._gahConfigFileName = cfgName ? `gah-config.${cfgName}.json` : 'gah-config.json';
+    return cfgName ? `gah-config.${cfgName}.json` : 'gah-config.json';
   }
 
   public gahConfigExists() {
-    return this._fileSystemService.fileExists(this._gahConfigFileName);
+    return this._fileSystemService.fileExists(this.gahConfigFileName);
   }
 
   private collectConfigs(cfgs: GahConfig[], module: ModuleDefinition) {
@@ -60,6 +70,13 @@ export class ConfigService implements IConfigurationService {
       this.loadGahConfig();
     }
     return this._cfg;
+  }
+
+  public getPartialGahConfig() {
+    if (!this._cfg) {
+      this.loadGahConfig();
+    }
+    return this._partialCfg;
   }
 
   public getGahModule(forceLoad?: boolean): GahModule {
@@ -108,15 +125,34 @@ export class ConfigService implements IConfigurationService {
     return this.loadAndParseGahAnyType(mType === GahModuleType.HOST, inFolder);
   }
 
-  private loadGahConfig(): void {
-    const cfgStr = this._fileSystemService.tryReadFile(this._gahConfigFileName);
-    let cfg: GahConfig;
-    if (!cfgStr) {
-      cfg = new GahConfig();
-    } else {
-      cfg = JSON.parse(cfgStr);
-    }
 
+  private loadConfigs(path: string, cfgs: GahConfig[], first = false) {
+    const cfg = this._fileSystemService.tryParseFile<GahConfig>(path);
+    if (!cfg) {
+      return false;
+    }
+    if (first) {
+      this._partialCfg = cfg;
+    }
+    if (cfg.extends) {
+      const parentPath = this._fileSystemService.getDirectoryPathFromFilePath(path);
+      const extendsPath = this._fileSystemService.join(parentPath, cfg.extends);
+      const extendCfg = this.loadConfigs(extendsPath, cfgs);
+      if (!extendCfg) {
+        this._loggerService.error(`Cannot find config file '${cfg.extends}' referenced from '${path}'`);
+        process.exit(1);
+      }
+    }
+    cfgs.push(cfg);
+    return true;
+  }
+
+  private loadGahConfig(): void {
+    const cfgPath = this._fileSystemService.ensureAbsolutePath(this.gahConfigFileName);
+
+    const cfgs = new Array<GahConfig>();
+    this.loadConfigs(cfgPath, cfgs, true);
+    let cfg = GahFile.mergeConfigs(cfgs);
     const modType = this.getGahModuleType(undefined, true);
     if (modType !== GahModuleType.UNKNOWN) {
       const isHost = this.getGahModuleType() === GahModuleType.HOST;
@@ -153,7 +189,7 @@ export class ConfigService implements IConfigurationService {
   }
 
   public saveGahConfig(): void {
-    this._fileSystemService.saveObjectToFile(this._gahConfigFileName, this._cfg);
+    this._fileSystemService.saveObjectToFile(this.gahConfigFileName, this._partialCfg);
   }
 
   public saveGahModuleConfig(): void {
@@ -182,6 +218,6 @@ export class ConfigService implements IConfigurationService {
   }
 
   public deleteGahConfig() {
-    this._fileSystemService.deleteFile(this._gahConfigFileName);
+    this._fileSystemService.deleteFile(this.gahConfigFileName);
   }
 }

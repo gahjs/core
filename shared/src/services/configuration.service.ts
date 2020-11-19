@@ -7,6 +7,7 @@ import { GahModuleType } from '../models/gah-module-type';
 export interface IConfigurationService {
   gahConfigExists(): boolean;
   getGahConfig(): GahConfig;
+  getPartialGahConfig(): GahConfig;
   getGahModule(forceLoad?: boolean): GahModule;
   getGahHost(forceLoad?: boolean): GahHost;
   getGahModuleType(inFolder?: string): GahModuleType;

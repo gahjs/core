@@ -60,7 +60,7 @@ export class PluginService implements IPluginService {
     if (!this._configService.gahConfigExists()) {
       return false;
     }
-    const cfg = this._configService.getGahConfig();
+    const cfg = this._configService.getPartialGahConfig();
     if (!cfg.plugins || cfg.plugins.length === 0) {
       return false;
     }
@@ -180,7 +180,7 @@ export class PluginService implements IPluginService {
     }
     this.initPluginServices(plugin);
 
-    const cfg = this._configService.getGahConfig();
+    const cfg = this._configService.getPartialGahConfig();
     const pluginCfg = cfg.plugins!.find(x => x.name === pluginName)!;
 
     this._loggerService.log(`Starting settings configuration for '${pluginName}'`);
@@ -206,7 +206,7 @@ export class PluginService implements IPluginService {
   }
 
   private async saveChangesToGahConfig(pluginName: string) {
-    const cfg = this._configService.getGahConfig();
+    const cfg = this._configService.getPartialGahConfig();
     let pluginCfg: GahPluginDependencyConfig;
 
     cfg.plugins ??= new Array<GahPluginDependencyConfig>();
@@ -277,7 +277,7 @@ export class PluginService implements IPluginService {
   public async removePlugin(pluginName: string): Promise<boolean> {
     this._loggerService.startLoadingAnimation(`Uninstalling plugin: ${pluginName}`);
 
-    const cfg = this._configService.getGahConfig();
+    const cfg = this._configService.getPartialGahConfig();
     const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
     if (idx === -1) { throw new Error(`Error uninstalling plugin ${pluginName}`); }
 
@@ -302,7 +302,7 @@ export class PluginService implements IPluginService {
 
 
   public async getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null> {
-    const cfg = this._configService.getGahConfig();
+    const cfg = this._configService.getPartialGahConfig();
     if (!cfg.plugins) {
       this._loggerService.log('No plugins installed!');
       return null;
@@ -339,7 +339,7 @@ export class PluginService implements IPluginService {
       this._loggerService.stopLoadingAnimation(false, false, 'Updating plugin(s) failed');
       throw new Error(`Updating plugin(s) failed\n${this._executionService.executionErrorResult}`);
     }
-    const gahCfg = this._configService.getGahConfig();
+    const gahCfg = this._configService.getPartialGahConfig();
     pluginUpdates.forEach(pluginUpdate => {
       const plugin = gahCfg.plugins?.find(x => x.name === pluginUpdate.name);
       plugin!.version = pluginUpdate.toVersion;
@@ -364,5 +364,4 @@ export class PluginService implements IPluginService {
     this._loggerService.debug(`executing command '${chalk.yellow(cmd)}' from '${chalk.yellow(cmdHandler.pluginName)}'`);
     return cmdHandler.handler(args);
   }
-
 }

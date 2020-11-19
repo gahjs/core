@@ -73,10 +73,10 @@ export class GahFile {
   }
 
   public getConfig(globalCfg: GahConfig): GahConfig {
-    return this.mergeConfigs([globalCfg, ...this._configs]);
+    return GahFile.mergeConfigs([globalCfg, ...this._configs]);
   }
 
-  private mergeConfigs(cfgs: GahConfig[]): GahConfig {
+  public static mergeConfigs(cfgs: GahConfig[]): GahConfig {
     const cfgRes = new GahConfig();
 
     cfgs.forEach(cfg => this.mergeGahConfig(cfg, cfgRes));
@@ -84,10 +84,14 @@ export class GahFile {
     return cfgRes;
   }
 
-  private mergeGahConfig(source: GahConfig, target: GahConfig) {
+  private static mergeGahConfig(source: GahConfig, target: GahConfig) {
     if (source.plugins) {
       target.plugins ??= [];
       target.plugins.push(...source.plugins);
+    }
+    if (source.precompiled) {
+      target.precompiled ??= [];
+      target.precompiled.push(...source.precompiled);
     }
   }
 
