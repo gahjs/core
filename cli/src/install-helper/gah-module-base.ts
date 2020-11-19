@@ -3,7 +3,7 @@ import readline from 'readline';
 import DIContainer from '../di-container';
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
-  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService
+  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService
 } from '@awdware/gah-shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -31,7 +31,7 @@ export abstract class GahModuleBase {
   protected packageService: IPackageService;
   protected pluginService: IPluginService;
   protected contextService: IContextService;
-  protected cfgService: ConfigService;
+  protected cfgService: IConfigurationService;
 
   public basePath: string;
   public srcBasePath: string;
@@ -46,13 +46,12 @@ export abstract class GahModuleBase {
   public parentGahModule?: string;
   public excludedPackages: string[];
   public aliasNames: { forModule: string, alias: string }[];
-  public preCompiled: boolean;
 
   public tsConfigFile: TsConfigFile;
   public gahFolder: GahFolder;
 
   public dependencies: GahModuleBase[];
-  public moduleName: string | null;
+  public moduleName?: string;
   public packageName: string | null;
   private _packageJson?: PackageJson;
   private readonly _globalPackageStorePath: string;
@@ -64,7 +63,7 @@ export abstract class GahModuleBase {
   private _installProgress: number;
 
 
-  constructor(gahModulePath: string, moduleName: string | null) {
+  constructor(gahModulePath: string, moduleName?: string) {
     this.cleanupService = DIContainer.get(CleanupSevice);
     this.fileSystemService = DIContainer.get(FileSystemService);
     this.workspaceService = DIContainer.get(WorkspaceService);
@@ -79,8 +78,6 @@ export abstract class GahModuleBase {
     this.installed = false;
     this.moduleName = moduleName;
     this.dependencies = new Array<GahModuleBase>();
-
-    this.preCompiled = this.cfgService.localConfig()?.precompiled?.some(x => x.name === moduleName) ?? false;
 
     this._installProgress = -1;
 
@@ -107,6 +104,10 @@ export abstract class GahModuleBase {
     if (this.fileSystemService.fileExists(gahCfgPath)) {
       this.gahConfig = this.fileSystemService.parseFile<GahConfig>(gahCfgPath);
     }
+  }
+
+  public get preCompiled() {
+    return this.cfgService.getGahConfig().precompiled?.some(x => x.name === this.moduleName) ?? false;
   }
 
   public abstract specificData(): Partial<GahModuleData>;
@@ -164,7 +165,7 @@ export abstract class GahModuleBase {
     }
   }
 
-  public abstract async install(): Promise<void>;
+  public abstract async install(skipPackageInstall: boolean): Promise<void>;
 
   public get fullName(): string {
     return this.packageName ? `@${this.packageName}/${this.moduleName}` : this.moduleName!;
@@ -196,7 +197,7 @@ export abstract class GahModuleBase {
         if (dep.installed) {
           return;
         }
-        const preCompiled = this.cfgService.localConfig()?.precompiled?.find(x => x.name === dep.moduleName);
+        const preCompiled = this.cfgService.getGahConfig().precompiled?.find(x => x.name === dep.moduleName);
         if (!preCompiled) {
           throw new Error('Could not find matching precompiled module');
         }
@@ -227,7 +228,7 @@ export abstract class GahModuleBase {
   }
 
   protected async addDependenciesToTsConfigFile() {
-    if (this.gahConfig?.skipTsConfigPathsAdjustments || this.preCompiled) {
+    if (this.preCompiled) {
       return;
     }
 

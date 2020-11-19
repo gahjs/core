@@ -9,7 +9,11 @@ import { GahFile } from '../install-helper/gah-file';
 @injectable()
 export class InstallController extends Controller {
 
-  public async install() {
+  public async install(skipPackageInstall: boolean, configName?: string) {
+    if (configName) {
+      this._contextService.setContext({ configName });
+    }
+
     const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
     const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
 
@@ -17,7 +21,7 @@ export class InstallController extends Controller {
 
     this._pluginService.triggerEvent('INSTALL_STARTED', { gahFile: gahFile.data() });
 
-    await gahFile.install();
+    await gahFile.install(skipPackageInstall);
 
     this._pluginService.triggerEvent('INSTALL_FINISHED', {});
   }

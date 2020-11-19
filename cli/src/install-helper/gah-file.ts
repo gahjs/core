@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import DIContainer from '../di-container';
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService
+  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig
 } from '@awdware/gah-shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
@@ -18,6 +18,7 @@ export class GahFile {
   private readonly _workspaceService: IWorkspaceService;
   private readonly _loggerService: ILoggerService;
   private readonly _pluginService: IPluginService;
+  private readonly _configs: GahConfig[];
 
   private readonly _gahFileName: string;
 
@@ -36,6 +37,7 @@ export class GahFile {
     this._pluginService = DIContainer.get(PluginService);
     this.isInstalled = false;
     this._modules = new Array<GahModuleBase>();
+    this._configs = new Array<GahConfig>();
 
     this._gahFileName = this._fileSystemService.getFilenameFromFilePath(filePath);
 
@@ -70,9 +72,30 @@ export class GahFile {
     };
   }
 
+  public getConfig(globalCfg: GahConfig): GahConfig {
+    return GahFile.mergeConfigs([globalCfg, ...this._configs]);
+  }
 
+  public static mergeConfigs(cfgs: GahConfig[]): GahConfig {
+    const cfgRes = new GahConfig();
 
-  public async install() {
+    cfgs.forEach(cfg => this.mergeGahConfig(cfg, cfgRes));
+
+    return cfgRes;
+  }
+
+  private static mergeGahConfig(source: GahConfig, target: GahConfig) {
+    if (source.plugins) {
+      target.plugins ??= [];
+      target.plugins.push(...source.plugins);
+    }
+    if (source.precompiled) {
+      target.precompiled ??= [];
+      target.precompiled.push(...source.precompiled);
+    }
+  }
+
+  public async install(skipPackageInstall: boolean) {
 
     this._rootModule.prog('Copying host');
 
@@ -83,7 +106,7 @@ export class GahFile {
     }
 
     this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: this._rootModule.data() });
-    await this._rootModule.install();
+    await this._rootModule.install(skipPackageInstall);
     this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: this._rootModule.data() });
 
     // workaround
@@ -210,18 +233,18 @@ export class GahFile {
 
     cfg.modules.forEach(moduleRef => {
       moduleRef.names.forEach(moduleName => {
-        this._modules.push(new GahModuleDef(moduleRef.path, moduleName, initializedModules));
+        this._modules.push(new GahModuleDef(moduleRef.path, moduleName, initializedModules, this._configs));
       });
     });
 
-    const newHost = new GahHostDef(cfgPath, initializedModules);
+    const newHost = new GahHostDef(cfgPath, initializedModules, this._configs);
     this._rootModule = newHost;
     this._modules.push(newHost);
   }
 
   private loadModule(cfg: GahModule, cfgPath: string, initializedModules: GahModuleBase[]) {
     cfg.modules.forEach(moduleDef => {
-      const newModule = new GahModuleDef(cfgPath, moduleDef.name, initializedModules);
+      const newModule = new GahModuleDef(cfgPath, moduleDef.name, initializedModules, this._configs);
       this._rootModule = newModule;
       this._modules.push(newModule);
     });

@@ -1,10 +1,10 @@
 import { GahModuleBase } from './gah-module-base';
-import { GahModule, GahModuleData } from '@awdware/gah-shared';
+import { GahConfig, GahModule, GahModuleData } from '@awdware/gah-shared';
 import { GahFolder } from './gah-folder';
 import chalk from 'chalk';
 
 export class GahModuleDef extends GahModuleBase {
-  constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[]) {
+  constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[], gahConfigs: GahConfig[]) {
     super(gahCfgPath, moduleName);
     this.isHost = false;
     initializedModules.push(this);
@@ -38,6 +38,11 @@ export class GahModuleDef extends GahModuleBase {
     this.parentGahModule = moduleCfg.parentGahModule;
     this.excludedPackages = moduleCfg.excludedPackages || [];
     this.aliasNames = [];
+
+    if (moduleCfg.config) {
+      gahConfigs.push(moduleCfg.config);
+    }
+
     moduleCfg.dependencies?.forEach(moduleDependency => {
       moduleDependency.names.forEach(depModuleName => {
         const depAbsoluteBasepath = this.fileSystemService.join(this.basePath, moduleDependency.path);
@@ -49,7 +54,7 @@ export class GahModuleDef extends GahModuleBase {
           this.dependencies.push(alreadyInitialized);
         } else {
           if (this.fileSystemService.fileExists(depAbsoluteBasepath)) {
-            const newModuleDef = new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules);
+            const newModuleDef = new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules, gahConfigs);
             if (moduleDependency.aliasName) {
               newModuleDef.addAlias(this.moduleName!, moduleDependency.aliasName);
             }
@@ -69,7 +74,7 @@ export class GahModuleDef extends GahModuleBase {
     return {};
   }
 
-  public async install() {
+  public async install(skipPackageInstall: boolean) {
     if (this.installed) {
       return;
     }
@@ -91,7 +96,9 @@ export class GahModuleDef extends GahModuleBase {
     this.prog('adjusting configurations');
     this.adjustGitignore();
     this.prog('installing packages');
-    await this.installPackages();
+    if (!skipPackageInstall) {
+      await this.installPackages();
+    }
     this.prog('postinstall scripts');
     await this.executePostinstallScripts();
   }

@@ -53,9 +53,14 @@ export class MainController extends Controller {
       this._contextService.setContext({ currentBaseFolder: process.cwd() });
     }
 
+
+
+
+
     // This sets the debug context variable depending on the used options
     this._contextService.setContext({ debug: process.argv.some(x => x.toLowerCase() === '--debug') });
     this._contextService.setContext({ skipScripts: process.argv.some(x => x.toLowerCase() === '--skipscripts') });
+    // Yarn timeout
     const yarnTimeoutIndex = process.argv.findIndex(x => x.toLowerCase() === '--yarntimeout');
     if (yarnTimeoutIndex !== -1) {
       const paramValue = process.argv[yarnTimeoutIndex + 1];
@@ -64,6 +69,12 @@ export class MainController extends Controller {
         process.exit(1);
       }
       this._contextService.setContext({ yarnTimeout: Number.parseInt(paramValue) });
+    }
+    // Configuration name
+    const configIndex = process.argv.findIndex(x => x.toLowerCase() === '--config');
+    if (configIndex !== -1) {
+      const paramValue = process.argv[configIndex + 1];
+      this._contextService.setContext({ configName: paramValue });
     }
 
     this._loggerService.debug(`Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}\n`);
@@ -94,6 +105,7 @@ export class MainController extends Controller {
     program
       .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
       .option('--debug', 'Enables verbose debug logging')
+      .option('--config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)')
       .option('--skipScripts', 'Skips pre and post install scripts');
 
     const cmdModule = program
@@ -164,8 +176,9 @@ export class MainController extends Controller {
     program
       .command('install')
       .description('Installs all dependencies.')
+      .option('--skipPackageInstall', 'Skips the yarn install step')
       .alias('i')
-      .action(async () => this._installController.install());
+      .action(async (cmdObj) => this._installController.install(cmdObj.skipPackageInstall));
 
     const cmdWhy = program
       .command('why <module|package>')

@@ -12,7 +12,7 @@ export const gah = {
   /**
    * Installs the module(s) or host in the current directory. Use this in your build pipeline before building for example with the angular cli.
    */
-  install: () => DIContainer.get(InstallController).install(),
+  install: (skipPackageInstall: boolean = false, configName?: string) => DIContainer.get(InstallController).install(skipPackageInstall, configName),
   /**
    * Runs a command through gah (works with everything that can be executed by 'yarn run').
    */

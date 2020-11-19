@@ -5,6 +5,10 @@
             "type": "string",
             "default": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-config-schema.json"
         },
+        "extends": {
+            "description": "The path to the config file which this config file extends",
+            "type": "string"
+        },
         "plugins": {
             "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
             "type": "array",
@@ -12,9 +16,20 @@
                 "$ref": "#/definitions/GahPluginDependencyConfig"
             }
         },
-        "skipTsConfigPathsAdjustments": {
-            "description": "If this property is set to true, gah will not adjust the paths object in the tsconfig json of the module(s) in this folder.",
-            "type": "boolean"
+        "precompiled": {
+            "description": "List of precompiled modules with a path to the tgz file (output from yarn pack command)",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                }
+            }
         }
     },
     "definitions": {

@@ -19,7 +19,7 @@ export class PluginController extends Controller {
       return;
     }
 
-    const cfg = this._configService.getGahConfig();
+    const cfg = this._configService.getPartialGahConfig();
     cfg.plugins ??= new Array<GahPluginDependencyConfig>();
 
     if (cfg.plugins.some(x => x.name.toLowerCase() === pluginName?.toLowerCase())) {
@@ -83,7 +83,7 @@ export class PluginController extends Controller {
   }
 
   private async askForInstalledPlugin(msg: string, pluginName?: string): Promise<string | null> {
-    const cfg = this._configService.getGahConfig();
+    const cfg = this._configService.getPartialGahConfig();
     if (!cfg.plugins) {
       this._loggerService.log('No plugins installed!');
       return null;
