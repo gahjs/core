@@ -191,7 +191,7 @@ export class PluginService implements IPluginService {
     return true;
   }
 
-  public async doInstallPlugin(pluginName: string, pluginVersion?: string): Promise<boolean> {
+  public async doInstallPlugin(pluginName: string, pluginVersion?: string, saveChangesToConfig: boolean = false): Promise<boolean> {
     this._loggerService.startLoadingAnimation('Downloading Plugin');
     const pluginVersionOrEmpty = pluginVersion ? `@${pluginVersion}` : '';
     const success = await this._executionService.execute(`yarn add ${pluginName}${pluginVersionOrEmpty} -D -E`, false, undefined, this._pluginFolder);
@@ -200,8 +200,9 @@ export class PluginService implements IPluginService {
       return false;
     }
     this._loggerService.stopLoadingAnimation(false, true, 'Downloading Plugin succeeded');
-
-    await this.saveChangesToGahConfig(pluginName);
+    if (saveChangesToConfig) {
+      await this.saveChangesToGahConfig(pluginName);
+    }
     return true;
   }
 
@@ -262,7 +263,7 @@ export class PluginService implements IPluginService {
   public async installPlugin(pluginName: string): Promise<boolean> {
     let plugin = await this.tryLoadInstalledPlugin(pluginName);
     if (!plugin) {
-      const success = await this.doInstallPlugin(pluginName);
+      const success = await this.doInstallPlugin(pluginName, undefined, true);
       if (!success) {
         throw new Error('Failed to install the plugin');
       }
