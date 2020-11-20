@@ -202,17 +202,20 @@ export abstract class GahModuleBase {
           throw new Error('Could not find matching precompiled module');
         }
         if (preCompiled.path) {
-          const destPath = this.fileSystemService.join(this._globalPackageStoreArchivePath, dep.fullName);
-          if (!this.fileSystemService.directoryExists(destPath)) {
-            const success = await this.fileSystemService.decompressTargz(preCompiled.path, destPath);
-            if (!success) {
-              throw new Error(`Could not unpack package '${chalk.green(preCompiled.name)}'`);
-            }
+          const destPathTmp = this.fileSystemService.join(this.gahFolder.precompiledPath, 'tmp', dep.fullName);
+          const destPath = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
+          if (this.fileSystemService.directoryExists(destPathTmp)) {
+            this.fileSystemService.deleteFilesInDirectory(destPathTmp);
           }
-          const from = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
-          this.fileSystemService.ensureDirectory(this.fileSystemService.getDirectoryPathFromFilePath(from));
-          const to = this.fileSystemService.join(destPath, 'package');
-          await this.fileSystemService.createDirLink(from, to);
+          if (this.fileSystemService.directoryExists(destPath)) {
+            this.fileSystemService.deleteFilesInDirectory(destPath);
+          }
+          const success = await this.fileSystemService.decompressTargz(preCompiled.path, destPathTmp);
+          if (!success) {
+            throw new Error(`Could not unpack package '${chalk.green(preCompiled.name)}'`);
+          }
+
+          this.fileSystemService.rename(this.fileSystemService.join(destPathTmp, 'package'), destPath);
         } else {
           // todo: allow real npm packages from a registry
         }
@@ -235,12 +238,14 @@ export abstract class GahModuleBase {
     for (const dep of this.allRecursiveDependencies) {
 
       if (dep.preCompiled) {
-        this.packageJson.dependencies![dep.fullName] = `file:.gah/${dep.fullName}`;
+        const precompiledPath = this.fileSystemService.ensureRelativePath(this.gahFolder.precompiledPath, this.basePath, true);
+        const precompiledModulePath = this.fileSystemService.join(precompiledPath, dep.fullName);
+        this.packageJson.dependencies![dep.fullName] = `file:${precompiledModulePath}`;
 
         if (dep.aliasNames) {
           const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
           if (aliasForThisModule) {
-            this.packageJson.dependencies![aliasForThisModule.alias] = `file:.gah/${dep.fullName}`;
+            this.packageJson.dependencies![aliasForThisModule.alias] = `file:${precompiledModulePath}`;
           }
         }
 

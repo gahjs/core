@@ -154,4 +154,10 @@ export interface IFileSystemService {
    * @returns whether the decompression was successful
    */
   decompressTargz(filePath: string, destinationPath: string): Promise<boolean>;
+  /**
+   * Renames a file or directory
+   * @param oldPath The old path of the file or directory
+   * @param newPath The new path of the file or directory
+   */
+  rename(oldPath: string, newPath: string): void;
 }
