@@ -215,6 +215,8 @@ export abstract class GahModuleBase {
             throw new Error(`Could not unpack package '${chalk.green(preCompiled.name)}'`);
           }
 
+          const parentDestPath = this.fileSystemService.getDirectoryPathFromFilePath(destPath);
+          this.fileSystemService.ensureDirectory(parentDestPath);
           this.fileSystemService.rename(this.fileSystemService.join(destPathTmp, 'package'), destPath);
         } else {
           // todo: allow real npm packages from a registry

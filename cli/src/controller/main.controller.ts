@@ -105,8 +105,7 @@ export class MainController extends Controller {
     program
       .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
       .option('--debug', 'Enables verbose debug logging')
-      .option('--config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)')
-      .option('--skipScripts', 'Skips pre and post install scripts');
+      .option('--config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)');
 
     const cmdModule = program
       .command('module')
@@ -177,6 +176,7 @@ export class MainController extends Controller {
       .command('install')
       .description('Installs all dependencies.')
       .option('--skipPackageInstall', 'Skips the yarn install step')
+      .option('--skipScripts', 'Skips pre and post install scripts')
       .alias('i')
       .action(async (cmdObj) => this._installController.install(cmdObj.skipPackageInstall));
 
