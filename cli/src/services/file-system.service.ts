@@ -183,4 +183,8 @@ export class FileSystemService implements IFileSystemService {
         return false;
       });
   }
+
+  rename(oldPath: string, newPath: string) {
+    fs.renameSync(oldPath, newPath);
+  }
 }

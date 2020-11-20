@@ -47,7 +47,7 @@ export class GahFolder {
   }
 
   public get precompiledPath(): string {
-    return this._fileSystemService.join(this._moduleBaseFolder, '.gah');
+    return this._fileSystemService.join(this._moduleBaseFolder, '.gah', 'precompiled');
   }
 
   public get generatedPath(): string {
