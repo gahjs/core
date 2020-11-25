@@ -202,8 +202,8 @@ export abstract class GahModuleBase {
           throw new Error('Could not find matching precompiled module');
         }
         if (preCompiled.path) {
-          const destPathTmp = this.fileSystemService.join(this.gahFolder.precompiledPath, 'tmp', dep.fullName);
-          const destPath = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
+          const destPathTmp = this.fileSystemService.join(this._globalPackageStoreArchivePath, 'tmp', dep.fullName);
+          const destPath = this.fileSystemService.join(this._globalPackageStoreArchivePath, dep.fullName);
           if (this.fileSystemService.directoryExists(destPathTmp)) {
             this.fileSystemService.deleteFilesInDirectory(destPathTmp);
           }
@@ -240,8 +240,7 @@ export abstract class GahModuleBase {
     for (const dep of this.allRecursiveDependencies) {
 
       if (dep.preCompiled) {
-        const precompiledPath = this.fileSystemService.ensureRelativePath(this.gahFolder.precompiledPath, this.basePath, true);
-        const precompiledModulePath = this.fileSystemService.join(precompiledPath, dep.fullName);
+        const precompiledModulePath = this.fileSystemService.join(this._globalPackageStoreArchivePath, dep.fullName);
         this.packageJson.dependencies![dep.fullName] = `file:${precompiledModulePath}`;
 
         if (dep.aliasNames) {
