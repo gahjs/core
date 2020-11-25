@@ -218,6 +218,28 @@ export abstract class GahModuleBase {
           const parentDestPath = this.fileSystemService.getDirectoryPathFromFilePath(destPath);
           this.fileSystemService.ensureDirectory(parentDestPath);
           this.fileSystemService.rename(this.fileSystemService.join(destPathTmp, 'package'), destPath);
+
+          // Fixing path in precompiled packages to new workspace:
+          const destPathPackageJson = this.fileSystemService.join(destPath, 'package.json');
+          const destPkgJson = this.fileSystemService.parseFile<PackageJson>(destPathPackageJson);
+          const destDepKeys = Object.keys(destPkgJson.dependencies!);
+          const isGahSourceRegex = /awdware\/gah\/([a-zA-Z0-9]+)\/precompiled/;
+          const getNameRegex = /.*awdware\/gah\/[a-zA-Z0-9]+\/precompiled\/targz\/(.+)/;
+          let didAdjustPath: boolean = false;
+          destDepKeys.forEach(destDepKey => {
+            const destDep = destPkgJson.dependencies![destDepKey];
+            const prevPath = destDep;
+            if (isGahSourceRegex.test(destDep)) {
+              const packageName = destDep.match(getNameRegex)![1];
+              const adjustedPath = `file:${this.fileSystemService.join(this._globalPackageStoreArchivePath, packageName)}`;
+              destPkgJson.dependencies![destDepKey] = adjustedPath;
+              this.loggerService.debug(`Adjusted precompiled dependency path: '${chalk.red(prevPath)}' --> '${chalk.green(adjustedPath)}' in '${chalk.gray(destPathPackageJson)}'`);
+              didAdjustPath = true;
+            }
+          });
+          if (didAdjustPath) {
+            this.fileSystemService.saveObjectToFile(destPathPackageJson, destPkgJson);
+          }
         } else {
           // todo: allow real npm packages from a registry
         }
