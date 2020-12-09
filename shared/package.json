@@ -1,5 +1,5 @@
 {
-  "name": "@awdware/gah-shared",
+  "name": "@gah/shared",
   "version": "0.4.0",
   "description": "Provides types and interfaces for gah",
   "main": "./lib/index.js",
