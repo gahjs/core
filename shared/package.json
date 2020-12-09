@@ -1,6 +1,6 @@
 {
   "name": "@gah/shared",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "description": "Provides types and interfaces for gah",
   "main": "./lib/index.js",
   "scripts": {

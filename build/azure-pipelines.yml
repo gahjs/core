@@ -47,7 +47,7 @@ steps:
 
 - task: Yarn@3
   inputs:
-    arguments: 'link @awdware/gah-shared'
+    arguments: 'link @gah/shared'
     projectDirectory: 'cli'
   displayName: "\U0001F503 use linked shared"
 
