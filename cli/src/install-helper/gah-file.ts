@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import DIContainer from '../di-container';
 import {
   IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig
-} from '@awdware/gah-shared';
+} from '@gah/shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
 import { GahHostDef } from './gah-host-def';

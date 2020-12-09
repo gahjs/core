@@ -12,7 +12,7 @@ import { injectable } from 'inversify';
 import {
   IWorkspaceService, ITemplateService, IPromptService, IPluginService, ILoggerService,
   IFileSystemService, IExecutionService, IConfigurationService, IContextService, IPackageService, ICleanupService
-} from '@awdware/gah-shared';
+} from '@gah/shared';
 import { PackageService } from '../services/package.service';
 import { CleanupSevice } from '../services/cleanup.service';
 

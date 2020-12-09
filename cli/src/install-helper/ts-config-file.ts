@@ -1,4 +1,4 @@
-import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData, GahAngularCompilerOptions, ICleanupService } from '@awdware/gah-shared';
+import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData, GahAngularCompilerOptions, ICleanupService } from '@gah/shared';
 
 export class TsConfigFile {
   private readonly _fileSystemService: IFileSystemService;

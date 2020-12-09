@@ -1,4 +1,4 @@
-import { IFileSystemService, ModuleTemplateData, ModulesTemplateData, ITemplateService, GahFolderData } from '@awdware/gah-shared';
+import { IFileSystemService, ModuleTemplateData, ModulesTemplateData, ITemplateService, GahFolderData } from '@gah/shared';
 import DIContainer from '../di-container';
 import { FileSystemService } from '../services/file-system.service';
 import { TemplateService } from '../services/template.service';

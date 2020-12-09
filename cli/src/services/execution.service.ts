@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { exec, spawn } from 'child_process';
-import { IExecutionService, ILoggerService } from '@awdware/gah-shared';
+import { IExecutionService, ILoggerService } from '@gah/shared';
 import { LoggerService } from './logger.service';
 import chalk from 'chalk';
 

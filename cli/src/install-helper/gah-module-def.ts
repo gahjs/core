@@ -1,5 +1,5 @@
 import { GahModuleBase } from './gah-module-base';
-import { GahConfig, GahModule, GahModuleData } from '@awdware/gah-shared';
+import { GahConfig, GahModule, GahModuleData } from '@gah/shared';
 import { GahFolder } from './gah-folder';
 import chalk from 'chalk';
 

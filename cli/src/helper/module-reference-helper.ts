@@ -1,4 +1,4 @@
-import { IPromptService, IFileSystemService, IConfigurationService, ILoggerService } from '@awdware/gah-shared';
+import { IPromptService, IFileSystemService, IConfigurationService, ILoggerService } from '@gah/shared';
 
 export class ModuleReferenceHelper {
 

@@ -2,7 +2,7 @@ import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { environment } from './environments/environment';
-import { GahEnvironment } from '@awdware/gah-shared';
+import { GahEnvironment } from '@gah/shared';
 import { init } from './init.app';
 
 if (environment.production) {
@@ -11,7 +11,7 @@ if (environment.production) {
 
 fetch('environment.json')
   .then(res => res.json())
-  .then(async(env: GahEnvironment) => {
+  .then(async (env: GahEnvironment) => {
 
     if (!environment.production) {
       console.log(env);

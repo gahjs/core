@@ -10,7 +10,7 @@ import { InstallController } from './install.controller';
 import { PluginController } from './plugin.controller';
 import { Controller } from './controller';
 import { HostModuleController } from './hostModule.controller';
-import { GahModuleType } from '@awdware/gah-shared';
+import { GahModuleType } from '@gah/shared';
 import { RunController } from './run.controller';
 import { WhyController } from './why.controller';
 import { TidyController } from './tidy.controler';

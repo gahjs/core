@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { ModuleReference, GahModuleType } from '@awdware/gah-shared';
+import { ModuleReference, GahModuleType } from '@gah/shared';
 
 import { Controller } from './controller';
 import { ModuleReferenceHelper } from '../helper/module-reference-helper';

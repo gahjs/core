@@ -1,8 +1,8 @@
 import { GahModuleBase } from './gah-module-base';
-import { GahConfig, GahHost, GahModuleData } from '@awdware/gah-shared';
+import { GahConfig, GahHost, GahModuleData } from '@gah/shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
-import { GahAngularCompilerOptions } from '@awdware/gah-shared/lib/models/gah-angular-compiler-options';
+import { GahAngularCompilerOptions } from '@gah/shared/lib/models/gah-angular-compiler-options';
 import compareVersions from 'compare-versions';
 
 export class GahHostDef extends GahModuleBase {

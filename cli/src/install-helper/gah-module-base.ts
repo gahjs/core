@@ -4,7 +4,7 @@ import DIContainer from '../di-container';
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
   IPluginService, GahConfig, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService
-} from '@awdware/gah-shared';
+} from '@gah/shared';
 
 import { FileSystemService } from '../services/file-system.service';
 import { WorkspaceService } from '../services/workspace.service';
