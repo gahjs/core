@@ -187,4 +187,8 @@ export class FileSystemService implements IFileSystemService {
   rename(oldPath: string, newPath: string) {
     fs.renameSync(oldPath, newPath);
   }
+
+  deleteDirectoryRecursively(path: string) {
+    fs.rmdirSync(path, { recursive: true });
+  }
 }

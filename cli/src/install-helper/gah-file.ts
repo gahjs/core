@@ -281,7 +281,7 @@ export class GahFile {
     }
 
 
-    CopyHost.copy(this._fileSystemService, this._workspaceService, angularCoreVersion, true);
+    CopyHost.copy(this._fileSystemService, this._workspaceService, this._loggerService, angularCoreVersion, true);
   }
 
   private checkValidConfiguration() {
