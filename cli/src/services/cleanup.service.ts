@@ -3,7 +3,7 @@ import deepEqual from 'deep-equal';
 import chalk from 'chalk';
 import DIContainer from '../di-container';
 
-import { IFileSystemService, ICleanupService, ILoggerService, IGitService } from '@awdware/gah-shared';
+import { IFileSystemService, ICleanupService, ILoggerService, IGitService } from '@gah/shared';
 
 import { FileSystemService } from './file-system.service';
 import { LoggerService } from './logger.service';

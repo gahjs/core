@@ -4,7 +4,7 @@ import {
   GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig, GahCommandHandler,
   IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
   ILoggerService, IFileSystemService, IContextService, PlguinUpdate, GahEventType, ExtractEventPayload, PackageJson
-} from '@awdware/gah-shared';
+} from '@gah/shared';
 
 import { FileSystemService } from './file-system.service';
 import { LoggerService } from './logger.service';

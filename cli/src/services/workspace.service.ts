@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 import { FileSystemService } from './file-system.service';
-import { IWorkspaceService, IFileSystemService, GlobalGahData, ILoggerService } from '@awdware/gah-shared';
+import { IWorkspaceService, IFileSystemService, GlobalGahData, ILoggerService } from '@gah/shared';
 import { platform, homedir } from 'os';
 import { createHash } from 'crypto';
 import { LoggerService } from './logger.service';

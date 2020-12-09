@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { LoggerService } from './logger.service';
-import { IExecutionService, ILoggerService, IPackageService } from '@awdware/gah-shared';
+import { IExecutionService, ILoggerService, IPackageService } from '@gah/shared';
 import { ExecutionService } from './execution.service';
 
 

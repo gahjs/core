@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig, IFileSystemService } from '@awdware/gah-shared';
+import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig, IFileSystemService } from '@gah/shared';
 
 
 import { prompt } from 'enquirer';

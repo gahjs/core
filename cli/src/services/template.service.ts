@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import ejs from 'ejs';
 
-import { ITemplateService, IFileSystemService } from '@awdware/gah-shared';
+import { ITemplateService, IFileSystemService } from '@gah/shared';
 
 import { FileSystemService } from './file-system.service';
 

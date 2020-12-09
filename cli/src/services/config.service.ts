@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import {
   GahConfig, TsConfig, IConfigurationService, IFileSystemService, GahHost,
   GahModule, GahModuleType, IContextService, ModuleDefinition, ILoggerService
-} from '@awdware/gah-shared';
+} from '@gah/shared';
 
 import DIContainer from '../di-container';
 

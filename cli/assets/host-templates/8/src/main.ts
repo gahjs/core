@@ -11,7 +11,7 @@ if (environment.production) {
 
 fetch('environment.json')
   .then(res => res.json())
-  .then(async(env: GahEnvironment) => {
+  .then(async (env: GahEnvironment) => {
 
     if (!environment.production) {
       console.log(env);

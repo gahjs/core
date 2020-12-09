@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import { ILoggerService, IContextService } from '@awdware/gah-shared';
+import { ILoggerService, IContextService } from '@gah/shared';
 import ora, { Ora } from 'ora';
 import chalk from 'chalk';
 import { ContextService } from './context-service';

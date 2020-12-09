@@ -1,4 +1,4 @@
-import { GahInfo, IFileSystemService, ILoggerService, IWorkspaceService } from '@awdware/gah-shared';
+import { GahInfo, IFileSystemService, ILoggerService, IWorkspaceService } from '@gah/shared';
 import { platform } from 'os';
 
 export class CopyHost {

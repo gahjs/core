@@ -1,6 +1,6 @@
 import { injectable } from 'inversify';
 
-import { GahPluginDependencyConfig, PlguinUpdate } from '@awdware/gah-shared';
+import { GahPluginDependencyConfig, PlguinUpdate } from '@gah/shared';
 import { Controller } from './controller';
 
 @injectable()

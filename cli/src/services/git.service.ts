@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { LoggerService } from './logger.service';
-import { IExecutionService, ILoggerService, IGitService } from '@awdware/gah-shared';
+import { IExecutionService, ILoggerService, IGitService } from '@gah/shared';
 import { ExecutionService } from './execution.service';
 import simpleGit, { SimpleGit } from 'simple-git';
 import chalk from 'chalk';
