@@ -231,10 +231,25 @@ export class MainController extends Controller {
     }
 
     if (compareVersions(gahData.latestGahVersion, this._version) === 1) {
+      this._loggerService.warn(`GAH HAS MOVED TO ${chalk.green('@gah/cli!')}`);
+      this._loggerService.warn('Please install the new version from there and delete the old one!');
+      this._loggerService.warn(`GAH HAS MOVED TO ${chalk.green('@gah/cli!')}`);
+      this._loggerService.warn('Please install the new version from there and delete the old one!');
+      this._loggerService.warn(`GAH HAS MOVED TO ${chalk.green('@gah/cli!')}`);
+      this._loggerService.warn('Please install the new version from there and delete the old one!');
+
       this._loggerService.warn('  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *');
       this._loggerService.warn(`  *               ${chalk.green('A new version of gah is available.')}                  *`);
-      this._loggerService.warn(`  *        Please install it via ${chalk.gray('yarn global add @awdware/gah')}         *`);
+      this._loggerService.warn(`  *          Please install it via ${chalk.gray('yarn global add @gah/cli')}           *`);
       this._loggerService.warn('  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *');
+
+      this._loggerService.warn(`GAH HAS MOVED TO ${chalk.green('@gah/cli!')}`);
+      this._loggerService.warn('Please install the new version from there and delete the old one!');
+      this._loggerService.warn(`GAH HAS MOVED TO ${chalk.green('@gah/cli!')}`);
+      this._loggerService.warn('Please install the new version from there and delete the old one!');
+      this._loggerService.warn(`GAH HAS MOVED TO ${chalk.green('@gah/cli!')}`);
+      this._loggerService.warn('Please install the new version from there and delete the old one!');
+
     }
 
     this._workspaceService.saveGlobalGahData(gahData);
