@@ -272,8 +272,11 @@ export class GahFile {
       case '9':
         angularCoreVersion = '8';
         break;
-      default:
+      case '10':
         angularCoreVersion = '10';
+        break;
+      default:
+        angularCoreVersion = '11';
         break;
     }
 
