@@ -160,4 +160,9 @@ export interface IFileSystemService {
    * @param newPath The new path of the file or directory
    */
   rename(oldPath: string, newPath: string): void;
+  /**
+   * Synchronously deletes a directory with its contents.
+   * @param path  A path to the directory that should be deleted.
+   */
+  deleteDirectoryRecursively(path: string): void;
 }

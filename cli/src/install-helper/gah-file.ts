@@ -272,13 +272,16 @@ export class GahFile {
       case '9':
         angularCoreVersion = '8';
         break;
-      default:
+      case '10':
         angularCoreVersion = '10';
+        break;
+      default:
+        angularCoreVersion = '11';
         break;
     }
 
 
-    CopyHost.copy(this._fileSystemService, this._workspaceService, angularCoreVersion, true);
+    CopyHost.copy(this._fileSystemService, this._workspaceService, this._loggerService, angularCoreVersion, true);
   }
 
   private checkValidConfiguration() {

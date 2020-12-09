@@ -91,14 +91,14 @@ export class GahModuleDef extends GahModuleBase {
     await this.createSymlinksToDependencies();
     this.prog('referencing dependencies');
     await this.addDependenciesToTsConfigFile();
-    this.prog('importing styles');
-    this.generateStyleImports();
     this.prog('adjusting configurations');
     this.adjustGitignore();
     this.prog('installing packages');
     if (!skipPackageInstall) {
       await this.installPackages();
     }
+    this.prog('importing styles');
+    this.generateStyleImports();
     this.prog('postinstall scripts');
     await this.executePostinstallScripts();
   }
