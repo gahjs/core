@@ -14,11 +14,6 @@
   dependencies:
     "@awdware/eslint-config-base" "^0.0.4"
 
-"@awdware/gah-shared@^0.4.1":
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/@awdware/gah-shared/-/gah-shared-0.4.1.tgz#47260902629efe81e8b288e7f6ddd4916ed4a191"
-  integrity sha512-Ln08ssXXfKQo9sSeVWa1OzmT+JCNt9x+SDmBrjNgUmsbGtUq2oDOjL4+QeS6TzmMqSZWEpZflObN16M8PM4csQ==
-
 "@babel/code-frame@^7.0.0":
   version "7.10.4"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.10.4.tgz#168da1a36e90da68ae8d49c0f1b48c7c6249213a"
@@ -39,6 +34,11 @@
     "@babel/helper-validator-identifier" "^7.10.4"
     chalk "^2.0.0"
     js-tokens "^4.0.0"
+
+"@gah/shared@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@gah/shared/-/shared-0.4.2.tgz#44b6d33aa28b02924fc59396f25661deec69fb5a"
+  integrity sha512-y6cK1Jl9ixmEuOVQ5KGdwgqWXBkbwQWgT1zRtjyvWC5V5Eth6XGJlahk6I7ltPJY76V0u5MZezBN87kWSoDjMw==
 
 "@kwsites/file-exists@^1.1.1":
   version "1.1.1"
