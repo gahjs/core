@@ -5,6 +5,7 @@ $inputUpdateShared = "$(updateShared)";
 $inputUpdateCli = "$(updateCli)";
 
 
+Write-output "test"
 Write-output " inputVersionShared: $inputVersionShared"
 Write-output " inputVersionCli: $inputVersionCli"
 Write-output " inputupdateShared: $inputUpdateShared"
