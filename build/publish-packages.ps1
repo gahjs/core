@@ -5,7 +5,6 @@ $inputUpdateShared = "$(updateShared)";
 $inputUpdateCli = "$(updateCli)";
 
 
-Write-output "test"
 Write-output " inputVersionShared: $inputVersionShared"
 Write-output " inputVersionCli: $inputVersionCli"
 Write-output " inputupdateShared: $inputUpdateShared"
@@ -36,7 +35,7 @@ else {
 if ($updateCli) {   
     if (-not [string]::IsNullOrEmpty($inputVersionCli) -and $inputVersionCli -ne '0.0.0') {
         $cliVersion = $inputVersionCli
-        Write-Output "NEW SHARED VERSION: $cliVersion"
+        Write-Output "NEW CLI VERSION: $cliVersion"
     }
     else {
         $cliVersion = ((yarn info @gah/cli --json version) | Out-String | ConvertFrom-Json).data
