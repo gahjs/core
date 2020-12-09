@@ -2,7 +2,7 @@ import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 
 import { environment } from './environments/environment';
-import { GahEnvironment } from '@gah/shared';
+import { GahEnvironment } from '@awdware/gah-shared';
 import { init } from './init.app';
 
 if (environment.production) {
