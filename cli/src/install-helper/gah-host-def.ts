@@ -108,9 +108,6 @@ export class GahHostDef extends GahModuleBase {
     this.prog('merging packages');
     this.mergePackageDependencies();
     this.pluginService.triggerEvent('DEPENDENCIES_MERGED', { module: this.data() });
-    this.prog('importing styles');
-    this.generateStyleImports();
-    this.pluginService.triggerEvent('STYLE_IMPORTS_GENERATED', { module: this.data() });
     this.prog('adjusting configurations');
     this.adjustGitignore();
     this.adjustGitignoreForHost();
@@ -127,6 +124,10 @@ export class GahHostDef extends GahModuleBase {
       await this.installPackages();
     }
     this.pluginService.triggerEvent('PACKAGES_INSTALLED', { module: this.data() });
+
+    this.prog('importing styles');
+    this.generateStyleImports();
+    this.pluginService.triggerEvent('STYLE_IMPORTS_GENERATED', { module: this.data() });
 
     this.generateEnvFolderIfNeeded();
 
