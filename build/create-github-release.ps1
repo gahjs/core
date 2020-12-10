@@ -23,4 +23,4 @@ $postParams = @{
 
 Write-Host $postParams
 
-Invoke-WebRequest -Uri https://api.github.com/repos/awdware/gah/releases -Method POST -Headers $postHeaders -Body $postParams
+Invoke-WebRequest -Uri https://api.github.com/repos/gah/core/releases -Method POST -Headers $postHeaders -Body $postParams
