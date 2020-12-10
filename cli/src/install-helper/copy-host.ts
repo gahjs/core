@@ -17,11 +17,14 @@ export class CopyHost {
 
     if (templateVersion !== currentVersion) {
       loggerService.log('Deleting previous host template because a new version is available');
-      const filesToDelete = fileSystemService.getFilesFromGlob(`${destinationFolder}/*`, undefined, true, 'file');
-      filesToDelete.forEach(x => fileSystemService.deleteFile(x));
+      // const filesToDelete = fileSystemService.getFilesFromGlob(`${destinationFolder}/*`, undefined, true, 'file');
 
-      fileSystemService.deleteDirectoryRecursively(fileSystemService.join(destinationFolder, 'src'));
-      fileSystemService.deleteDirectoryRecursively(fileSystemService.join(destinationFolder, '.gah'));
+      // for (const file in filesToDelete) {
+      //   fileSystemService.deleteFile(file);
+      // }
+
+      // fileSystemService.deleteDirectoryRecursively(fileSystemService.join(destinationFolder, 'src'));
+      // fileSystemService.deleteDirectoryRecursively(fileSystemService.join(destinationFolder, '.gah'));
 
       force = true;
     }
