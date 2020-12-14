@@ -23,8 +23,13 @@ export class CopyHost {
         fileSystemService.deleteFile(file);
       }
 
-      fileSystemService.deleteDirectoryRecursively(fileSystemService.join(destinationFolder, 'src'));
-      fileSystemService.deleteDirectoryRecursively(fileSystemService.join(destinationFolder, '.gah'));
+      const dirsToDel = [fileSystemService.join(destinationFolder, 'src'), fileSystemService.join(destinationFolder, '.gah')];
+
+      dirsToDel.forEach(dirToDel => {
+        if (fileSystemService.directoryExists(dirToDel)) {
+          fileSystemService.deleteDirectoryRecursively(dirToDel);
+        }
+      });
 
       force = true;
     }
