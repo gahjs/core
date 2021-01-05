@@ -13,14 +13,16 @@ export class ModuleReferenceHelper {
       msg,
       enabled: () => !dependencyConfigPath,
       validator: (val: string) => {
-        if (!val.endsWith('gah-module.json')) { return false; }
+        if (!val.endsWith('gah-module.json')) {
+          return false;
+        }
         return fileSystemService.fileExists(val);
       }
     });
 
     if (!(dependencyConfigPath || dependencyConfigPath_)) {
       loggerService.warn('No file provided...');
-      return;
+      return undefined;
     }
     dependencyConfigPath = (dependencyConfigPath ?? dependencyConfigPath_).replace(/"/g, '');
 
@@ -47,7 +49,9 @@ export class ModuleReferenceHelper {
       enabled: () => enabled,
     });
 
-    if (!dependencyModuleNames || dependencyModuleNames.length === 0) { dependencyModuleNames = dependencyModuleNames_; }
+    if (!dependencyModuleNames || dependencyModuleNames.length === 0) {
+      dependencyModuleNames = dependencyModuleNames_;
+    }
 
     return dependencyModuleNames;
   }
@@ -72,14 +76,16 @@ export class ModuleReferenceHelper {
         choices: () => [...availableModules]
       });
 
-    if (availableModules.length === 1) { moduleName = availableModules[0]; }
+    if (availableModules.length === 1) {
+      moduleName = availableModules[0];
+    }
 
 
     moduleName = moduleName ?? moduleName_;
 
     if (!moduleName) {
       loggerService.warn('No module selected...');
-      return;
+      return undefined;
     }
     return moduleName;
   }
@@ -94,23 +100,22 @@ export class ModuleReferenceHelper {
 
 
     const existingDependencies =
-      (
-        isHost ?
-          configService.getGahHost().modules
-          :
-          configService.getGahModule().modules.find(x => x.name === moduleName)?.dependencies
-      )
+      (isHost ?
+        configService.getGahHost().modules
+        :
+        configService.getGahModule().modules.find(x => x.name === moduleName)?.dependencies)
         ?.map(x => x.names).reduce((a, b) => a.concat(b));
 
     if (!existingDependencies || existingDependencies.length === 0) {
       loggerService.warn(`The module "${moduleName}" has no references to other modules`);
+      return undefined;
     }
 
     const dependencyNames_ = await promptService
       .checkbox({
         msg: 'Select one or multiple dependencies to remove',
         enabled: () => !dependencyNames || dependencyNames.length === 0,
-        choices: () => [...existingDependencies!]
+        choices: () => [...existingDependencies]
       });
 
     dependencyNames = (dependencyNames?.length === 0 ? dependencyNames_ : dependencyNames) ?? dependencyNames_;

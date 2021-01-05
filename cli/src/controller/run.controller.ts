@@ -15,7 +15,7 @@ export class RunController extends Controller {
 
     if (isHost) {
 
-      const envFileSimpleName = `environment.${configurationName ? `${configurationName}.json` : 'json'}`;
+      const envFileSimpleName = configurationName ? `environment.${configurationName}.json` : 'environment.json';
       const envFileName = `env/${envFileSimpleName}`;
 
       if (!this._fileSystemService.fileExists(envFileName)) {

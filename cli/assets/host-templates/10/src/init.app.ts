@@ -8,6 +8,8 @@ export const init = (env: any) => {
   initRoutes();
 };
 
+const gahOutletName = 'gah-outlet';
+
 const setEnvironmentValues = (moduleEnv: any, env: any) => {
   if (moduleEnv) {
     Object.keys(moduleEnv).forEach(k => {
@@ -92,7 +94,7 @@ const addToGahOutlet = (parentRoutes: Routes, child: GahRouteConfig) => {
   if (!parentRoutes) {
     return false;
   }
-  const gahOutlet = parentRoutes.find(x => x.path === 'gah-outlet');
+  const gahOutlet = parentRoutes.find(x => x.path === gahOutletName);
   if (gahOutlet) {
     addToChildren(gahOutlet, child.routes);
     return true;
@@ -122,8 +124,8 @@ const fixGahOutlets = (routes: Routes) => {
       fixGahOutlets(x.children);
 
       for (const a of x.children) {
-        if (a.path === 'gah-outlet') {
-          x.children = [...x.children.filter(c => c.path !== 'gah-outlet'), ...a.children];
+        if (a.path === gahOutletName) {
+          x.children = [...x.children.filter(c => c.path !== gahOutletName), ...a.children];
         }
       }
     }
