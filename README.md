@@ -1,7 +1,5 @@
 
 # Welcome to gah!
-
-<b>cli</b><br>
 [![npm version](https://badge.fury.io/js/%40gah%2Fcli.svg)](https://badge.fury.io/js/%40gah%2Fcli) [![Build Status](https://dev.azure.com/loaderb0t/gah/_apis/build/status/ci-gah?repoName=gahjs%2Fcore&branchName=main)](https://dev.azure.com/loaderb0t/gah/_build/latest?definitionId=27&repoName=gahjs%2Fcore&branchName=main) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gahjs_core&metric=alert_status)](https://sonarcloud.io/dashboard?id=gahjs_core)
 
 `gah`provides tooling for working with decentralized, modular angular applications.
