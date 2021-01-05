@@ -1,8 +1,7 @@
 import { GahModuleBase } from './gah-module-base';
-import { GahConfig, GahHost, GahModuleData } from '@gah/shared';
+import { GahConfig, GahHost, GahModuleData, GahAngularCompilerOptions } from '@gah/shared';
 import { GahModuleDef } from './gah-module-def';
 import { GahFolder } from './gah-folder';
-import { GahAngularCompilerOptions } from '@gah/shared/lib/models/gah-angular-compiler-options';
 import compareVersions from 'compare-versions';
 
 export class GahHostDef extends GahModuleBase {
@@ -13,7 +12,7 @@ export class GahHostDef extends GahModuleBase {
   private readonly _gahCfgFolder: string;
   private readonly _ngCompilerOptions: GahAngularCompilerOptions;
 
-  constructor(gahCfgPath: string, initializedModules: GahModuleBase[], gahConfigs: GahConfig[]) {
+  constructor(gahCfgPath: string, initializedModules: GahModuleBase[], gahConfigs: { moduleName: string, cfg: GahConfig }[]) {
     super(gahCfgPath);
     this.isHost = true;
     this._gahCfgFolder = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
@@ -46,7 +45,6 @@ export class GahHostDef extends GahModuleBase {
     this._ngOptions.aot = hostCfg.aot ?? true; // If not set the default value is true
     this._ngCompilerOptions = hostCfg.angularCompilerOptions ?? {} as GahAngularCompilerOptions;
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
-    this._baseHref = hostCfg.baseHref ? hostCfg.baseHref : '/';
     this._title = hostCfg.title ?? '';
     this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`, this._gahCfgFolder);
   }

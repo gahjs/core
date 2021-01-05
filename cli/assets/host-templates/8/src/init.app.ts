@@ -19,7 +19,7 @@ const setEnvironmentValues = (moduleEnv: any, env: any) => {
   }
 }
 
-let _routes: Routes = [];
+const _routes: Routes = [];
 let facadeRoutes: Routes = [];
 
 const initRoutes = () => {

@@ -4,7 +4,7 @@ import { GahFolder } from './gah-folder';
 import chalk from 'chalk';
 
 export class GahModuleDef extends GahModuleBase {
-  constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[], gahConfigs: GahConfig[]) {
+  constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[], gahConfigs: { moduleName: string, cfg: GahConfig }[]) {
     super(gahCfgPath, moduleName);
     this.isHost = false;
     initializedModules.push(this);
@@ -40,7 +40,7 @@ export class GahModuleDef extends GahModuleBase {
     this.aliasNames = [];
 
     if (moduleCfg.config) {
-      gahConfigs.push(moduleCfg.config);
+      gahConfigs.push({ cfg: moduleCfg.config, moduleName: this.moduleName });
     }
 
     moduleCfg.dependencies?.forEach(moduleDependency => {
