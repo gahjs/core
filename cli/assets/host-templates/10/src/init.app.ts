@@ -34,7 +34,7 @@ const initRoutes = () => {
   globalRouteCfg = new Array<GahRouteConfig>();
 
   modulePackages.forEach(m => {
-    const mod = m.module as any;
+    const mod = m.module;
     if (mod.routes) {
       const isEntry = m.isEntry;
       const parentGahModule = m.parentGahModule;

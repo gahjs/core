@@ -4,9 +4,8 @@ import { ContextService } from './services/context-service';
 import { InstallController } from './controller/install.controller';
 import { RunController } from './controller/run.controller';
 
-() => {
-  DIContainer.get(ContextService).setContext({ calledFromCli: false });
-};
+
+DIContainer.get(ContextService).setContext({ calledFromCli: false });
 
 export const gah = {
   /**

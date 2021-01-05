@@ -22,7 +22,7 @@ export class PromptService implements IPromptService {
       initial: cfg.default,
       skip: !cfg.enabled(),
       validate: cfg.validator
-    }).then(_ => (_ as any)._);
+    }).then((_: any) => _._);
   }
 
   public async confirm(cfg: PromptConfig) {
@@ -32,7 +32,7 @@ export class PromptService implements IPromptService {
       message: cfg.msg,
       initial: cfg.default ?? false,
       skip: !cfg.enabled()
-    }).then(_ => (_ as any)._);
+    }).then((_: any) => _._);
   }
 
   public async fuzzyPath(cfg: FuzzyPathPromptConfig) {
@@ -62,7 +62,7 @@ export class PromptService implements IPromptService {
       choices: filteredFiles,
       initial: def === -1 ? 0 : def ?? 0,
       skip: !cfg.enabled()
-    } as any).then(_ => (_ as any)._);
+    } as any).then((_: any) => _._);
   }
 
 
@@ -73,7 +73,7 @@ export class PromptService implements IPromptService {
       message: cfg.msg,
       choices: cfg.choices(),
       skip: !cfg.enabled()
-    }).then(_ => (_ as any)._);
+    }).then((_: any) => _._);
   }
 
   public async checkbox(cfg: SelectionPromptConfig) {
@@ -88,6 +88,6 @@ export class PromptService implements IPromptService {
       message: cfg.msg,
       choices: cfg.choices(),
       skip: !cfg.enabled()
-    }).then(_ => (_ as any)._);
+    }).then((_: any) => _._);
   }
 }
