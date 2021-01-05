@@ -147,6 +147,21 @@ export class ConfigService implements IConfigurationService {
     return true;
   }
 
+  public getPluginConfig(moduleName?: string) {
+    const cfgPath = this._fileSystemService.ensureAbsolutePath(this.gahConfigFileName);
+
+    const cfgs = new Array<GahConfig>();
+    this.loadConfigs(cfgPath, cfgs, true);
+    const cfg = GahFile.mergeConfigs(cfgs);
+    const modType = this.getGahModuleType(undefined, true);
+    if (modType !== GahModuleType.UNKNOWN) {
+      const isHost = this.getGahModuleType() === GahModuleType.HOST;
+      const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
+      const gahFile = new GahFile(fileName);
+      return gahFile.getPluginConfigs(cfg, moduleName);
+    }
+  }
+
   private loadGahConfig(): void {
     const cfgPath = this._fileSystemService.ensureAbsolutePath(this.gahConfigFileName);
 

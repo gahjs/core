@@ -3,10 +3,12 @@ import { GahHost } from '../models/gah-host';
 import { GahModule } from '../models/gah-module';
 import { TsConfig } from '../models/ts-config';
 import { GahModuleType } from '../models/gah-module-type';
+import { GahPluginDependencyConfig } from '../models/gah-plugin-dependency-config';
 
 export interface IConfigurationService {
   gahConfigExists(): boolean;
   getGahConfig(): GahConfig;
+  getPluginConfig(moduleName?: string): GahPluginDependencyConfig[] | undefined;
   getPartialGahConfig(): GahConfig;
   getGahModule(forceLoad?: boolean): GahModule;
   getGahHost(forceLoad?: boolean): GahHost;

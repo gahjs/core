@@ -3,7 +3,7 @@ import readline from 'readline';
 import DIContainer from '../di-container';
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
-  IPluginService, GahConfig, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService
+  IPluginService, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService
 } from '@gah/shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -41,7 +41,6 @@ export abstract class GahModuleBase {
   public baseNgModuleName?: string;
   public isHost: boolean;
   protected installed: boolean;
-  protected gahConfig: GahConfig;
   public isEntry: boolean;
   public parentGahModule?: string;
   public excludedPackages: string[];
@@ -99,11 +98,6 @@ export abstract class GahModuleBase {
         this.fileSystemService.copyFile(packageJsonTemplatePath, this._globalPackageStorePath);
       }
     }
-
-    const gahCfgPath = this.fileSystemService.join(this.fileSystemService.getDirectoryPathFromFilePath(gahModulePath), 'gah-config.json');
-    if (this.fileSystemService.fileExists(gahCfgPath)) {
-      this.gahConfig = this.fileSystemService.parseFile<GahConfig>(gahCfgPath);
-    }
   }
 
   public get preCompiled() {
@@ -113,10 +107,21 @@ export abstract class GahModuleBase {
   public abstract specificData(): Partial<GahModuleData>;
 
   public data(): GahModuleData {
+
+    const pluginCfg: { [key: string]: any[] } = {};
+
+    this.cfgService.getPluginConfig(this.moduleName)?.forEach(x => {
+      if (pluginCfg[x.name]) {
+        pluginCfg[x.name].push(x.settings);
+      } else {
+        pluginCfg[x.name] = [x.settings];
+      }
+    });
+
     const myData: GahModuleData = {
       basePath: this.basePath,
       dependencies: this.dependencies.map(x => x.data()),
-      gahConfig: this.gahConfig,
+      gahConfig: this.cfgService.getGahConfig(),
       gahFolder: this.gahFolder.data(),
       installed: this.installed,
       isEntry: this.isEntry,
@@ -129,7 +134,8 @@ export abstract class GahModuleBase {
       stylesPathRelativeToBasePath: this.stylesFilePathRelativeToBasePath,
       moduleName: this.moduleName ?? undefined,
       packageName: this.packageName ?? undefined,
-      packageJson: this.packageJson
+      packageJson: this.packageJson,
+      pluginCfg
     };
 
     const specificData = this.specificData();
@@ -165,7 +171,7 @@ export abstract class GahModuleBase {
     }
   }
 
-  public abstract async install(skipPackageInstall: boolean): Promise<void>;
+  public abstract install(skipPackageInstall: boolean): Promise<void>;
 
   public get fullName(): string {
     return this.packageName ? `@${this.packageName}/${this.moduleName}` : this.moduleName!;

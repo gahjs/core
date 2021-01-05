@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import DIContainer from '../di-container';
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig
+  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig, GahPluginDependencyConfig
 } from '@gah/shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
@@ -18,7 +18,7 @@ export class GahFile {
   private readonly _workspaceService: IWorkspaceService;
   private readonly _loggerService: ILoggerService;
   private readonly _pluginService: IPluginService;
-  private readonly _configs: GahConfig[];
+  private readonly _configs: { moduleName: string, cfg: GahConfig }[];
 
   private readonly _gahFileName: string;
 
@@ -37,7 +37,7 @@ export class GahFile {
     this._pluginService = DIContainer.get(PluginService);
     this.isInstalled = false;
     this._modules = new Array<GahModuleBase>();
-    this._configs = new Array<GahConfig>();
+    this._configs = new Array<{ moduleName: string, cfg: GahConfig }>();
 
     this._gahFileName = this._fileSystemService.getFilenameFromFilePath(filePath);
 
@@ -73,7 +73,11 @@ export class GahFile {
   }
 
   public getConfig(globalCfg: GahConfig): GahConfig {
-    return GahFile.mergeConfigs([globalCfg, ...this._configs]);
+    return GahFile.mergeConfigs([globalCfg, ...this._configs.map(x => x.cfg)]);
+  }
+
+  public getPluginConfigs(globalCfg: GahConfig, moduleName?: string): GahPluginDependencyConfig[] | undefined {
+    return GahFile.mergeConfigs([globalCfg, ...this._configs.filter(x => x.moduleName === moduleName).map(x => x.cfg)]).plugins;
   }
 
   public static mergeConfigs(cfgs: GahConfig[]): GahConfig {
