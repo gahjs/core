@@ -15,6 +15,7 @@ export class CleanupSevice implements ICleanupService {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _loggerService: ILoggerService;
   private readonly _gitService: IGitService;
+  private _temporaryJsonFileChanges: { filePath: string, propertyPath: string, previousValue: any }[] = [];
 
   constructor() {
     this._fileSystemService = DIContainer.get(FileSystemService);
@@ -53,5 +54,24 @@ export class CleanupSevice implements ICleanupService {
         }
       }
     }
+  }
+
+  public registerJsonFileTemporaryChange(filePath: string, propertyPath: string, previousValue: any) {
+    this._temporaryJsonFileChanges.push({ filePath, propertyPath, previousValue });
+  }
+
+  public cleanJsonFileTemporaryChanges() {
+    this._temporaryJsonFileChanges.forEach(change => {
+      const content = this._fileSystemService.parseFile<any>(change.filePath);
+      let property = content;
+      const pathSteps = change.propertyPath.split('.');
+      const lastPathStep = pathSteps.pop()!;
+      pathSteps.forEach(propPathSegment => {
+        property = property[propPathSegment];
+      });
+      property[lastPathStep] = change.previousValue;
+      this._fileSystemService.saveObjectToFile(change.filePath, content);
+    });
+    this._temporaryJsonFileChanges = [];
   }
 }

@@ -139,8 +139,7 @@ export class ConfigService implements IConfigurationService {
       const extendsPath = this._fileSystemService.join(parentPath, cfg.extends);
       const extendCfg = this.loadConfigs(extendsPath, cfgs);
       if (!extendCfg) {
-        this._loggerService.error(`Cannot find config file '${cfg.extends}' referenced from '${path}'`);
-        process.exit(1);
+        throw new Error(`Cannot find config file '${cfg.extends}' referenced from '${path}'`);
       }
     }
     cfgs.push(cfg);

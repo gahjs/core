@@ -21,8 +21,7 @@ export class WhyController extends Controller {
   public async whyPackage(packageName: string) {
     const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
     if (!isHost) {
-      this._loggerService.error('This command can only be executed in a gah host folder.');
-      process.exit();
+      throw new Error('This command can only be executed in a gah host folder.');
     }
 
     const gahFile = new GahFile('gah-host.json');

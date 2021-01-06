@@ -269,11 +269,16 @@ export abstract class GahModuleBase {
 
       if (dep.preCompiled) {
         const precompiledModulePath = this.fileSystemService.join(this._globalPackageStoreArchivePath, dep.fullName);
+        this.cleanupService.registerJsonFileTemporaryChange(this.packageJsonPath, `dependencies.${dep.fullName}`, this.packageJson.dependencies![dep.fullName]);
         this.packageJson.dependencies![dep.fullName] = `file:${precompiledModulePath}`;
 
         if (dep.aliasNames) {
           const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
           if (aliasForThisModule) {
+            this.cleanupService.registerJsonFileTemporaryChange(this.packageJsonPath,
+              `dependencies.${aliasForThisModule.alias}`,
+              this.packageJson.dependencies![aliasForThisModule.alias]);
+
             this.packageJson.dependencies![aliasForThisModule.alias] = `file:${precompiledModulePath}`;
           }
         }
@@ -386,7 +391,6 @@ export abstract class GahModuleBase {
         this.loggerService.success(`Finnished ${preinstall ? 'pre' : 'post'}-install script.`);
       } else {
         this.loggerService.error(this.executionService.executionErrorResult);
-
         throw new Error(`Error during ${preinstall ? 'pre' : 'post'}-install script.`);
       }
     }
@@ -438,8 +442,8 @@ export abstract class GahModuleBase {
     if (success) {
       this.loggerService.success('Packages installed successfully');
     } else {
-      this.loggerService.error('Installing packages failed');
       this.loggerService.error(this.executionService.executionErrorResult);
+      throw new Error('Installing packages failed');
     }
   }
 
