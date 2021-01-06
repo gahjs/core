@@ -30,12 +30,12 @@
 `gah` can be used both as a CLI tool and integrated into your NodeJS scripts or JS build systems.
 
 ### From CLI
-To use the `gah`-cli install the `@awdware/gah` package globally.
+To use the `gah`-cli install the `@gah/cli` package globally.
 ```
 // For yarn use
-$ yarn global add @awdware/gah
+$ yarn global add @gah/cli
 // For npm use
-$ npm i -g @awdware/gah
+$ npm i -g @gah/cli
 ```
 To get started you can generate an empty host with:
 ```
@@ -70,10 +70,10 @@ $ gah run ng build --prod
 You can also use `gah install` and `gah run` from code. See the example below.
 ```TypeScript
 // commonJS import style
-const gah = require('@awdware/gah').gah;
+const gah = require('@gah/cli').gah;
 
 // ES6 import style
-import { gah } from '@awdware/gah';
+import { gah } from '@gah/cli';
 
 await gah.install();
 
@@ -87,8 +87,8 @@ The following Table contains some example plugins:
 
 | package name                                                                    | description                                                                    |
 |---------------------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| [gah-plugin-template](https://github.com/awdware/gah-plugin-template)           | An empty example for a new plugin to get started.                              |
-| [gah-angular-json-plugin](https://github.com/awdware/gah-angular-json-plugin)   | Adjust the generated angular.json file                                         |
-| [gah-ie11-plugin](https://github.com/awdware/gah-ie11-plugin)                   | Make the generated application compatible with IE11                            |
-| [gah-translation-merger](https://github.com/awdware/gah-translation-merger)     | Merge multiple translation files into one (per language) eg. for ngx-translate |
-| [gah-for-root-initializer](https://github.com/awdware/gah-for-root-initializer) | Call forRoot on selected NgModules instead of using their class name           |
+| [gah-plugin-template](https://github.com/gahjs/gah-plugin-template)             | An empty example for a new plugin to get started.                              |
+| [gah-angular-json-plugin](https://github.com/gahjs/gah-angular-json-plugin)     | Adjust the generated angular.json file                                         |
+| [gah-ie11-plugin](https://github.com/gahjs/gah-ie11-plugin)                     | Make the generated application compatible with IE11                            |
+| [gah-translation-merger](https://github.com/gahjs/gah-translation-merger)       | Merge multiple translation files into one (per language) eg. for ngx-translate |
+| [gah-for-root-initializer](https://github.com/gahjs/gah-for-root-initializer)   | Call forRoot on selected NgModules instead of using their class name           |
