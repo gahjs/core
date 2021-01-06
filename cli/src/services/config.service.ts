@@ -126,12 +126,12 @@ export class ConfigService implements IConfigurationService {
   }
 
 
-  private loadConfigs(path: string, cfgs: GahConfig[], first = false) {
+  private loadConfigs(path: string, cfgs: GahConfig[], isHost: boolean = false) {
     const cfg = this._fileSystemService.tryParseFile<GahConfig>(path);
     if (!cfg) {
       return false;
     }
-    if (first) {
+    if (isHost) {
       this._partialCfg = cfg;
     }
     if (cfg.extends) {
@@ -150,7 +150,7 @@ export class ConfigService implements IConfigurationService {
     const cfgPath = this._fileSystemService.ensureAbsolutePath(this.gahConfigFileName);
 
     const cfgs = new Array<GahConfig>();
-    this.loadConfigs(cfgPath, cfgs, true);
+    this.loadConfigs(cfgPath, cfgs);
     const cfg = GahFile.mergeConfigs(cfgs);
     const modType = this.getGahModuleType(undefined, true);
     if (modType !== GahModuleType.UNKNOWN) {
@@ -163,16 +163,23 @@ export class ConfigService implements IConfigurationService {
 
   private loadGahConfig(): void {
     const cfgPath = this._fileSystemService.ensureAbsolutePath(this.gahConfigFileName);
+    const modType = this.getGahModuleType(undefined, true);
+    const isHost = this.getGahModuleType() === GahModuleType.HOST;
 
     const cfgs = new Array<GahConfig>();
-    this.loadConfigs(cfgPath, cfgs, true);
+
+    this.loadConfigs(cfgPath, cfgs, isHost);
     let cfg = GahFile.mergeConfigs(cfgs);
-    const modType = this.getGahModuleType(undefined, true);
     if (modType !== GahModuleType.UNKNOWN) {
-      const isHost = this.getGahModuleType() === GahModuleType.HOST;
       const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
       const gahFile = new GahFile(fileName);
       cfg = gahFile.getConfig(cfg);
+
+      if (!isHost) {
+        // TODO: refactor config resolving
+        const firstModuleName = this.getGahModule().modules[0].name;
+        this._partialCfg = gahFile.getPartialConfig(firstModuleName) ?? {} as GahConfig;
+      }
     }
     this._cfg = cfg;
   }
