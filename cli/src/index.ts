@@ -9,10 +9,10 @@ import { ContextService } from './services/context-service';
 
 const pjson = require(path.join(__dirname, '../package.json'));
 console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
-
+let mainController: MainController;
 (async () => {
   DIContainer.load();
-  const mainController: MainController = DIContainer.resolve<MainController>(MainController);
+  mainController = DIContainer.resolve<MainController>(MainController);
 
   DIContainer.get(ContextService).setContext({ calledFromCli: true });
 
@@ -22,6 +22,10 @@ console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
 })().catch(err => {
   console.log();
   console.error(chalk.red(' ■ ') + err);
-  console.error(err);
+  try {
+    mainController['_cleanupService'].cleanJsonFileTemporaryChanges();
+  } catch (error) {
+    console.error(`${chalk.red(' ■ ')}Error during json file cleanup. Please discard unwanted changes manually`);
+  }
   process.exit(1);
 });
