@@ -241,6 +241,7 @@ export abstract class GahModuleBase {
               destPkgJson.dependencies![destDepKey] = adjustedPath;
               this.loggerService.debug(`Adjusted precompiled dependency path: '${chalk.red(prevPath)}' --> '${chalk.green(adjustedPath)}' in '${chalk.gray(destPathPackageJson)}'`);
               didAdjustPath = true;
+              this.cleanupService.registerJsonFileTemporaryChange(destPathPackageJson, `dependencies.${destDepKey}`, destDep);
             }
           });
           if (didAdjustPath) {
@@ -386,7 +387,6 @@ export abstract class GahModuleBase {
         this.loggerService.success(`Finnished ${preinstall ? 'pre' : 'post'}-install script.`);
       } else {
         this.loggerService.error(this.executionService.executionErrorResult);
-
         throw new Error(`Error during ${preinstall ? 'pre' : 'post'}-install script.`);
       }
     }
@@ -438,8 +438,8 @@ export abstract class GahModuleBase {
     if (success) {
       this.loggerService.success('Packages installed successfully');
     } else {
-      this.loggerService.error('Installing packages failed');
       this.loggerService.error(this.executionService.executionErrorResult);
+      throw new Error('Installing packages failed');
     }
   }
 

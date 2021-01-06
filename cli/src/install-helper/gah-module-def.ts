@@ -101,6 +101,7 @@ export class GahModuleDef extends GahModuleBase {
     this.generateStyleImports();
     this.prog('postinstall scripts');
     await this.executePostinstallScripts();
+    this.cleanupService.cleanJsonFileTemporaryChanges();
   }
 
 }
