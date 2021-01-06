@@ -3,7 +3,7 @@
     "properties": {
         "$schema": {
             "type": "string",
-            "default": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-config-schema.json"
+            "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-config-schema.json"
         },
         "extends": {
             "description": "The path to the config file which this config file extends",
@@ -63,4 +63,3 @@
     },
     "$schema": "http://json-schema.org/draft-07/schema#"
 }
-

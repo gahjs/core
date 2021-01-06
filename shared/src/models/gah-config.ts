@@ -1,7 +1,7 @@
 import { GahPluginDependencyConfig } from './gah-plugin-dependency-config';
 
 export class GahConfig {
-  protected $schema: string = 'https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-config-schema.json';
+  protected $schema: string = 'https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-config-schema.json';
 
   /**
    * The path to the config file which this config file extends

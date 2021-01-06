@@ -3,7 +3,7 @@
     "properties": {
         "$schema": {
             "type": "string",
-            "default": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-host-schema.json"
+            "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-host-schema.json"
         },
         "modules": {
             "description": "The array of the modules that should be loaded for this host.",
@@ -98,4 +98,3 @@
     },
     "$schema": "http://json-schema.org/draft-07/schema#"
 }
-

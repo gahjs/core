@@ -218,7 +218,7 @@ export class MainController extends Controller {
 
     if (checkNewVersion) {
       try {
-        const latestVersion = await this._packageService.findLatestPackageVersion('@awdware/gah');
+        const latestVersion = await this._packageService.findLatestPackageVersion('@gah/cli');
         gahData.latestGahVersion = latestVersion;
         gahData.lastUpdateCheck = new Date();
       } catch (error) {

@@ -1,10 +1,10 @@
 {
   "name": "@gah/cli",
   "version": "0.5.8",
-  "homepage": "https://github.com/awdware/gah",
+  "homepage": "https://github.com/gahjs/core",
   "repository": {
     "type": "git",
-    "url": "https://github.com/awdware/gah.git"
+    "url": "https://github.com/gahjs/core.git"
   },
   "description": "Generic Angular Host Tooling",
   "main": "./lib/public-api.js",

@@ -2,7 +2,7 @@ import { ModuleReference } from './module-reference';
 import { GahAngularCompilerOptions } from './gah-angular-compiler-options';
 
 export class GahHost {
-  protected $schema: string = 'https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-host-schema.json';
+  protected $schema: string = 'https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-host-schema.json';
   /**
    * The array of the modules that should be loaded for this host.
    */

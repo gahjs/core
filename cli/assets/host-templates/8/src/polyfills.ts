@@ -63,7 +63,7 @@
   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
   *   Please do not edit the following content of this file. Changes after this areas might be overwriten by gah.   *
   *    If you really need to edit a section that is not marked for editing, please open an issue on github:         *
-  *                               https://github.com/awdware/gah/issues/new                                     *
+  *                                  https://github.com/gahjs/core/issues/new                                       *
   * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 */
 
