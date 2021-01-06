@@ -241,7 +241,6 @@ export abstract class GahModuleBase {
               destPkgJson.dependencies![destDepKey] = adjustedPath;
               this.loggerService.debug(`Adjusted precompiled dependency path: '${chalk.red(prevPath)}' --> '${chalk.green(adjustedPath)}' in '${chalk.gray(destPathPackageJson)}'`);
               didAdjustPath = true;
-              this.cleanupService.registerJsonFileTemporaryChange(destPathPackageJson, `dependencies.${destDepKey}`, destDep);
             }
           });
           if (didAdjustPath) {
@@ -270,11 +269,16 @@ export abstract class GahModuleBase {
 
       if (dep.preCompiled) {
         const precompiledModulePath = this.fileSystemService.join(this._globalPackageStoreArchivePath, dep.fullName);
+        this.cleanupService.registerJsonFileTemporaryChange(this.packageJsonPath, `dependencies.${dep.fullName}`, this.packageJson.dependencies![dep.fullName]);
         this.packageJson.dependencies![dep.fullName] = `file:${precompiledModulePath}`;
 
         if (dep.aliasNames) {
           const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
           if (aliasForThisModule) {
+            this.cleanupService.registerJsonFileTemporaryChange(this.packageJsonPath,
+              `dependencies.${aliasForThisModule.alias}`,
+              this.packageJson.dependencies![aliasForThisModule.alias]);
+
             this.packageJson.dependencies![aliasForThisModule.alias] = `file:${precompiledModulePath}`;
           }
         }

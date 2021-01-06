@@ -64,11 +64,13 @@ export class CleanupSevice implements ICleanupService {
     this._temporaryJsonFileChanges.forEach(change => {
       const content = this._fileSystemService.parseFile<any>(change.filePath);
       let property = content;
-      change.propertyPath.split('.').forEach(propPathSegment => {
+      const pathSteps = change.propertyPath.split('.');
+      const lastPathStep = pathSteps.pop()!;
+      pathSteps.forEach(propPathSegment => {
         property = property[propPathSegment];
       });
-      property = change.previousValue;
-      this._fileSystemService.saveFile(change.filePath, content);
+      property[lastPathStep] = change.previousValue;
+      this._fileSystemService.saveObjectToFile(change.filePath, content);
     });
     this._temporaryJsonFileChanges = [];
   }

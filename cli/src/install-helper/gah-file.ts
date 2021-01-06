@@ -296,12 +296,10 @@ export class GahFile {
       }
     });
     if (entryModuleNames.length === 0) {
-      this._loggerService.error('You do not have any entry modules defined! You need exactly one entry module for the system to work!');
-      process.exit(1);
+      throw new Error('You do not have any entry modules defined! You need exactly one entry module for the system to work!');
     } else if (entryModuleNames.length > 1) {
-      this._loggerService.error(`${'You have too many entry modules defined! You need exactly one entry module for the system to work!'
+      throw new Error(`${'You have too many entry modules defined! You need exactly one entry module for the system to work!'
         + ' The following modules are configured as entry modules: '}${entryModuleNames.join(', ')}`);
-      process.exit(1);
     }
   }
 }

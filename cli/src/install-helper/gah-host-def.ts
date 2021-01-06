@@ -36,8 +36,7 @@ export class GahHostDef extends GahModuleBase {
           if (this.fileSystemService.fileExists(moduleAbsoluteBasepath)) {
             this.dependencies.push(new GahModuleDef(moduleAbsoluteBasepath, depModuleName, initializedModules, gahConfigs));
           } else {
-            this.loggerService.error(`Module '${depModuleName}' could not be found at '${moduleAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
-            process.exit(1);
+            throw new Error(`Module '${depModuleName}' could not be found at '${moduleAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
           }
         }
       });
@@ -205,8 +204,7 @@ export class GahHostDef extends GahModuleBase {
 
           finalStyleImportPath = this.fileSystemService.join(dependencyPathRelativeFromSrcBase, dep.moduleName!, depStylesPathRelativeToSrcBase);
         } else {
-          this.loggerService.error(`Could not find styles file "${dep.stylesFilePathRelativeToBasePath}" defined by module "${dep.moduleName}"`);
-          process.exit(1);
+          throw new Error(`Could not find styles file "${dep.stylesFilePathRelativeToBasePath}" defined by module "${dep.moduleName}"`);
         }
       }
       stylesScss.push(`@import "${finalStyleImportPath}";`);

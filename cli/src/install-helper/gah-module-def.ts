@@ -60,8 +60,7 @@ export class GahModuleDef extends GahModuleBase {
             }
             this.dependencies.push(newModuleDef);
           } else {
-            this.loggerService.error(`Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
-            process.exit(1);
+            throw new Error(`Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
           }
         }
       });
