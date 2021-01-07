@@ -182,7 +182,8 @@ export class ConfigService implements IConfigurationService {
           if (!this._moduleCfg) {
             this.loadGahModuleConfig(this.getGahModuleType() === GahModuleType.HOST);
           }
-          this._currentConfig = (this._moduleCfg as GahModule).modules[0].config ?? {} as GahConfig;
+          (this._moduleCfg as GahModule).modules[0].config ??= {} as GahConfig;
+          this._currentConfig = (this._moduleCfg as GahModule).modules[0].config!;
         }
       }
     }
