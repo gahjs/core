@@ -12,6 +12,7 @@ export class FuzzyPathPromptConfig extends PromptConfig {
   excludePattern?: string[];
   exclude?: (val: string) => boolean;
   optional?: boolean = false;
+  startingDirectory?: string;
 }
 
 export class SelectionPromptConfig extends PromptConfig {

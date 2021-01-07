@@ -37,7 +37,11 @@ export class PromptService implements IPromptService {
 
   public async fuzzyPath(cfg: FuzzyPathPromptConfig) {
     const excludes = cfg.excludePattern || [];
-    const allFiles = this._fileSystemService.getFilesFromGlob('**', ['node_modules', ...excludes], undefined, cfg.itemType);
+    const allFiles = this._fileSystemService.getFilesFromGlob(
+      cfg.startingDirectory ? `${cfg.startingDirectory}/**` : '**',
+      ['node_modules', ...excludes],
+      undefined,
+      cfg.itemType);
 
     const filteredFiles = (cfg.exclude ? allFiles.filter(x => !cfg.exclude!(x)) : allFiles).map(x => x.replace(/\\/g, '/'));
 
