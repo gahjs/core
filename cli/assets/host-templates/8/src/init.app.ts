@@ -35,8 +35,8 @@ const initRoutes = () => {
 }
 
 const readModuleRoutes = (mod: any, isEntry: boolean) => {
-  if (mod.routes) {
-    const routes = mod.routes;
+  if (mod['routes']) {
+    const routes = mod['routes'];
     if (isEntry) {
       facadeRoutes = routes;
     } else {

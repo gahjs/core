@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import DIContainer from '../di-container';
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig, GahPluginDependencyConfig
+  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig
 } from '@gah/shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
@@ -76,12 +76,8 @@ export class GahFile {
     return GahFile.mergeConfigs([globalCfg, ...this._configs.map(x => x.cfg)]);
   }
 
-  public getPartialConfig(moduleName: string): GahConfig | undefined {
-    return this._configs.find(x => x.moduleName === moduleName)?.cfg;
-  }
-
-  public getPluginConfigs(globalCfg: GahConfig, moduleName?: string): GahPluginDependencyConfig[] | undefined {
-    return GahFile.mergeConfigs([globalCfg, ...this._configs.filter(x => x.moduleName === moduleName).map(x => x.cfg)]).plugins;
+  public getConfigs() {
+    return this._configs;
   }
 
   public static mergeConfigs(cfgs: GahConfig[]): GahConfig {

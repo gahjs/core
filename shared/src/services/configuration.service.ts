@@ -9,12 +9,12 @@ export interface IConfigurationService {
   gahConfigExists(): boolean;
   getGahConfig(): GahConfig;
   getPluginConfig(moduleName?: string): GahPluginDependencyConfig[] | undefined;
-  getPartialGahConfig(): GahConfig;
+  getCurrentConfig(): GahConfig;
   getGahModule(forceLoad?: boolean): GahModule;
   getGahHost(forceLoad?: boolean): GahHost;
   getGahModuleType(inFolder?: string): GahModuleType;
   getGahAnyType(inFolder: string): GahModule | GahHost;
-  saveGahConfig(): void;
+  saveCurrentConfig(): void;
   saveGahModuleConfig(): void;
   getTsConfig(): TsConfig
   saveTsConfig(): void;

@@ -21,7 +21,10 @@ let mainController: MainController;
 
 })().catch(err => {
   console.log();
-  console.error(chalk.red(' ■ ') + err);
+  console.error(chalk.red(' ■ ') + err.message);
+  if (mainController['_contextService'].getContext().debug) {
+    console.log(err.stack);
+  }
   try {
     mainController['_cleanupService'].cleanJsonFileTemporaryChanges();
   } catch (error) {
