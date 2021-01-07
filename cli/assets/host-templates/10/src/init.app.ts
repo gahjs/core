@@ -35,10 +35,10 @@ const initRoutes = () => {
 
   modulePackages.forEach(m => {
     const mod = m.module;
-    if (mod.routes) {
+    if (mod['routes']) {
       const isEntry = m.isEntry;
       const parentGahModule = m.parentGahModule;
-      const routes = mod.routes;
+      const routes = mod['routes'];
       const name = m.moduleName;
       globalRouteCfg.push({
         isEntry,

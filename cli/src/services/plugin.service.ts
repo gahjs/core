@@ -60,7 +60,7 @@ export class PluginService implements IPluginService {
     if (!this._configService.gahConfigExists()) {
       return false;
     }
-    const cfg = this._configService.getPartialGahConfig();
+    const cfg = this._configService.getCurrentConfig();
     if (!cfg.plugins || cfg.plugins.length === 0) {
       return false;
     }
@@ -180,13 +180,13 @@ export class PluginService implements IPluginService {
     }
     this.initPluginServices(plugin);
 
-    const cfg = this._configService.getPartialGahConfig();
+    const cfg = this._configService.getCurrentConfig();
     const pluginCfg = cfg.plugins!.find(x => x.name === pluginName)!;
 
     this._loggerService.log(`Starting settings configuration for '${pluginName}'`);
     pluginCfg.settings = await plugin.onInstall(pluginCfg.settings);
     this._loggerService.log('Plugin settings configuration finished');
-    this._configService.saveGahConfig();
+    this._configService.saveCurrentConfig();
 
     return true;
   }
@@ -207,7 +207,7 @@ export class PluginService implements IPluginService {
   }
 
   private async saveChangesToGahConfig(pluginName: string) {
-    const cfg = this._configService.getPartialGahConfig();
+    const cfg = this._configService.getCurrentConfig();
     let pluginCfg: GahPluginDependencyConfig;
 
     cfg.plugins ??= new Array<GahPluginDependencyConfig>();
@@ -230,7 +230,7 @@ export class PluginService implements IPluginService {
     if (!cfg.plugins.some(x => x.name === pluginName)) {
       cfg.plugins.push(pluginCfg);
     }
-    this._configService.saveGahConfig();
+    this._configService.saveCurrentConfig();
 
     return pluginCfg;
   }
@@ -278,12 +278,12 @@ export class PluginService implements IPluginService {
   public async removePlugin(pluginName: string): Promise<boolean> {
     this._loggerService.startLoadingAnimation(`Uninstalling plugin: ${pluginName}`);
 
-    const cfg = this._configService.getPartialGahConfig();
+    const cfg = this._configService.getCurrentConfig();
     const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
     if (idx === -1) { throw new Error(`Error uninstalling plugin ${pluginName}`); }
 
     cfg.plugins?.splice(idx, 1);
-    this._configService.saveGahConfig();
+    this._configService.saveCurrentConfig();
 
     const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this._pluginFolder);
     if (success) {
@@ -303,7 +303,7 @@ export class PluginService implements IPluginService {
 
 
   public async getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null> {
-    const cfg = this._configService.getPartialGahConfig();
+    const cfg = this._configService.getCurrentConfig();
     if (!cfg.plugins) {
       this._loggerService.log('No plugins installed!');
       return null;
@@ -340,12 +340,12 @@ export class PluginService implements IPluginService {
       this._loggerService.stopLoadingAnimation(false, false, 'Updating plugin(s) failed');
       throw new Error(`Updating plugin(s) failed\n${this._executionService.executionErrorResult}`);
     }
-    const gahCfg = this._configService.getPartialGahConfig();
+    const gahCfg = this._configService.getCurrentConfig();
     pluginUpdates.forEach(pluginUpdate => {
       const plugin = gahCfg.plugins?.find(x => x.name === pluginUpdate.name);
       plugin!.version = pluginUpdate.toVersion;
     });
-    this._configService.saveGahConfig();
+    this._configService.saveCurrentConfig();
   }
 
   registerCommandHandler(pluginName: string, commandName: string, handler: (args: string[]) => Promise<boolean>): void {
