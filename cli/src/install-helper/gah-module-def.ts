@@ -88,10 +88,14 @@ export class GahModuleDef extends GahModuleBase {
     this.gahFolder.tryHideGahFolder();
     this.prog('linking dependencies');
     await this.createSymlinksToDependencies();
+    this.pluginService.triggerEvent('SYMLINKS_CREATED', { module: this.data() });
     this.prog('referencing dependencies');
     await this.addDependenciesToTsConfigFile();
+    this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
     this.prog('adjusting configurations');
     this.adjustGitignore();
+    this.pluginService.triggerEvent('GITIGNORE_ADJUSTED', { module: this.data() });
+    this.pluginService.triggerEvent('BEFORE_INSTALL_PACKAGES', { module: this.data() });
     this.prog('installing packages');
     if (!skipPackageInstall) {
       await this.installPackages();

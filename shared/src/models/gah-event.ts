@@ -22,7 +22,8 @@ export type GahEvent =
   { type: 'ANGULAR_JSON_ADJUSTED', module?: GahModuleData } |
   { type: 'INDEX_HTML_ADJUSTED', module?: GahModuleData } |
   { type: 'WEB_CONFIG_ADJUSTED', module?: GahModuleData } |
-  { type: 'PACKAGES_INSTALLED', module?: GahModuleData }
+  { type: 'PACKAGES_INSTALLED', module?: GahModuleData } |
+  { type: 'BEFORE_INSTALL_PACKAGES', module?: GahModuleData } 
 
 export type GahEventType = GahEvent['type'];
 export type ExtractEventPayload<A, T> = A extends { type: T } ? A : never

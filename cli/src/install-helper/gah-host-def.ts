@@ -116,6 +116,7 @@ export class GahHostDef extends GahModuleBase {
 
     this.collectModuleScripts();
 
+    this.pluginService.triggerEvent('BEFORE_INSTALL_PACKAGES', { module: this.data() });
     this.prog('installing packages');
     if (!skipPackageInstall) {
       await this.installPackages();
