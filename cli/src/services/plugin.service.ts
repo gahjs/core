@@ -57,11 +57,8 @@ export class PluginService implements IPluginService {
   }
 
   public isPluginConfigured(pluginName: string): boolean {
-    if (!this._configService.gahConfigExists()) {
-      return false;
-    }
     const cfg = this._configService.getCurrentConfig();
-    if (!cfg.plugins || cfg.plugins.length === 0) {
+    if (!cfg?.plugins || cfg.plugins.length === 0) {
       return false;
     }
     return cfg.plugins.some(x => x.name === pluginName);
@@ -80,11 +77,8 @@ export class PluginService implements IPluginService {
 
 
   public async loadInstalledPlugins(): Promise<void> {
-    if (!this._configService.gahConfigExists()) {
-      return;
-    }
     const cfg = this._configService.getGahConfig();
-    if (!cfg.plugins || cfg.plugins.length < 1) {
+    if (!cfg?.plugins || cfg.plugins.length < 1) {
       return;
     }
     for (const pluginCfg of cfg.plugins) {
