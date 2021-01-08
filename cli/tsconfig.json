@@ -27,6 +27,7 @@
     "newLine": "lf"
   },
   "exclude": [
-    "assets"
+    "assets",
+    "lib"
   ]
 }
