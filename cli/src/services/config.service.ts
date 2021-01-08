@@ -171,20 +171,18 @@ export class ConfigService implements IConfigurationService {
   }
 
   public getCurrentConfig() {
-    if (!this._currentConfig) {
-      if (this._isHost) {
-        this._currentConfig = this.gahConfigFileExists ? this._fileSystemService.parseFile<GahConfig>(this.gahConfigFileName) : {} as GahConfig;
+    if (this._isHost) {
+      this._currentConfig = this.gahConfigFileExists ? this._fileSystemService.parseFile<GahConfig>(this.gahConfigFileName) : {} as GahConfig;
+    } else {
+      this._currentConfig = {} as GahConfig;
+      if (this.gahConfigFileExists) {
+        this._currentConfig = this._fileSystemService.parseFile<GahConfig>(this.gahConfigFileName);
       } else {
-        this._currentConfig = {} as GahConfig;
-        if (this.gahConfigFileExists) {
-          this._currentConfig = this._fileSystemService.parseFile<GahConfig>(this.gahConfigFileName);
-        } else {
-          if (!this._moduleCfg) {
-            this.loadGahModuleConfig(this.getGahModuleType() === GahModuleType.HOST);
-          }
-          (this._moduleCfg as GahModule).modules[0].config ??= {} as GahConfig;
-          this._currentConfig = (this._moduleCfg as GahModule).modules[0].config!;
+        if (!this._moduleCfg) {
+          this.loadGahModuleConfig(this.getGahModuleType() === GahModuleType.HOST);
         }
+        (this._moduleCfg as GahModule).modules[0].config ??= {} as GahConfig;
+        this._currentConfig = (this._moduleCfg as GahModule).modules[0].config!;
       }
     }
     return this._currentConfig;
