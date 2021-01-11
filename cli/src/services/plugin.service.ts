@@ -185,15 +185,17 @@ export class PluginService implements IPluginService {
     return true;
   }
 
-  public async doInstallPlugin(pluginName: string, pluginVersion?: string, saveChangesToConfig: boolean = false): Promise<boolean> {
-    this._loggerService.startLoadingAnimation('Downloading Plugin');
-    const pluginVersionOrEmpty = pluginVersion ? `@${pluginVersion}` : '';
-    const success = await this._executionService.execute(`yarn add ${pluginName}${pluginVersionOrEmpty} -D -E`, false, undefined, this._pluginFolder);
-    if (!success) {
-      this._loggerService.stopLoadingAnimation(false, false, 'Downloading Plugin failed (check the package name again)');
-      return false;
+  public async doInstallPlugin(pluginName: string, pluginVersion?: string, saveChangesToConfig: boolean = false, skipDownload: boolean = false): Promise<boolean> {
+    if (!skipDownload) {
+      this._loggerService.startLoadingAnimation('Downloading Plugin');
+      const pluginVersionOrEmpty = pluginVersion ? `@${pluginVersion}` : '';
+      const success = await this._executionService.execute(`yarn add ${pluginName}${pluginVersionOrEmpty} -D -E`, false, undefined, this._pluginFolder);
+      if (!success) {
+        this._loggerService.stopLoadingAnimation(false, false, 'Downloading Plugin failed (check the package name again)');
+        return false;
+      }
+      this._loggerService.stopLoadingAnimation(false, true, 'Downloading Plugin succeeded');
     }
-    this._loggerService.stopLoadingAnimation(false, true, 'Downloading Plugin succeeded');
     if (saveChangesToConfig) {
       await this.saveChangesToGahConfig(pluginName);
     }
@@ -256,13 +258,11 @@ export class PluginService implements IPluginService {
 
   public async installPlugin(pluginName: string): Promise<boolean> {
     let plugin = await this.tryLoadInstalledPlugin(pluginName);
-    if (!plugin) {
-      const success = await this.doInstallPlugin(pluginName, undefined, true);
-      if (!success) {
-        throw new Error('Failed to install the plugin');
-      }
-      plugin = await this.tryLoadInstalledPlugin(pluginName);
+    const success = await this.doInstallPlugin(pluginName, undefined, true, !!plugin);
+    if (!success) {
+      throw new Error('Failed to install the plugin');
     }
+    plugin ??= await this.tryLoadInstalledPlugin(pluginName);
     if (!plugin) {
       throw new Error('Failed to install the plugin');
     }
