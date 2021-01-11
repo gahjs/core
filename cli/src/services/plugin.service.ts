@@ -100,7 +100,7 @@ export class PluginService implements IPluginService {
   }
 
   private async ensurePluginIsInstalled(pluginDepCfg: GahPluginDependencyConfig): Promise<GahPlugin> {
-    let plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version);
+    let { plugin } = await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version) ?? { plugin: undefined };
     if (plugin) {
       return plugin;
     }
@@ -109,7 +109,7 @@ export class PluginService implements IPluginService {
     if (!success) {
       throw new Error('Failed');
     }
-    plugin = await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version);
+    plugin ??= (await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version))?.plugin;
     if (plugin) {
       return plugin;
     }
@@ -117,7 +117,7 @@ export class PluginService implements IPluginService {
     throw new Error('Failed');
   }
 
-  private async tryLoadInstalledPlugin(pluginName: string, pluginVersion?: string): Promise<GahPlugin | undefined> {
+  private async tryLoadInstalledPlugin(pluginName: string, pluginVersion?: string): Promise<{ plugin: GahPlugin, version: string } | undefined> {
     const cfg = this._configService.getGahConfig();
     if (!cfg?.plugins?.some(x => x.name === pluginName)) {
       this._loggerService.debug(`Plugin ${pluginName} not yet specified in gah config`);
@@ -127,13 +127,13 @@ export class PluginService implements IPluginService {
     const pluginPkgJsonPath = this._fileSystemService.join(this._pluginFolder, 'package.json');
     const pluginPkgJson = this._fileSystemService.parseFile<PackageJson>(pluginPkgJsonPath);
     if (!pluginPkgJson || !pluginPkgJson.devDependencies || !pluginPkgJson.devDependencies[pluginName]) {
-      return;
+      return undefined;
     }
 
     const actualPluginVersion = pluginPkgJson.devDependencies[pluginName];
 
     if (pluginVersion && pluginVersion !== actualPluginVersion) {
-      return;
+      return undefined;
     }
 
     const pluginFolderPath = this._fileSystemService.join(this._pluginFolder, 'node_modules', pluginName);
@@ -152,7 +152,7 @@ export class PluginService implements IPluginService {
     try {
       const pluginModule = require(importFileName);
       const plugin = new pluginModule.PluginType() as GahPlugin;
-      return plugin;
+      return { plugin, version: actualPluginVersion };
     } catch (error) {
       this._loggerService.debug('Plugin package folder exists, but import failed');
       this._loggerService.debug(error);
@@ -185,7 +185,13 @@ export class PluginService implements IPluginService {
     return true;
   }
 
-  public async doInstallPlugin(pluginName: string, pluginVersion?: string, saveChangesToConfig: boolean = false, skipDownload: boolean = false): Promise<boolean> {
+  public async doInstallPlugin(
+    pluginName: string,
+    pluginVersion?: string,
+    saveChangesToConfig: boolean = false,
+    skipDownload: boolean = false,
+    downloadedVersion?: string
+  ): Promise<boolean> {
     if (!skipDownload) {
       this._loggerService.startLoadingAnimation('Downloading Plugin');
       const pluginVersionOrEmpty = pluginVersion ? `@${pluginVersion}` : '';
@@ -197,12 +203,12 @@ export class PluginService implements IPluginService {
       this._loggerService.stopLoadingAnimation(false, true, 'Downloading Plugin succeeded');
     }
     if (saveChangesToConfig) {
-      await this.saveChangesToGahConfig(pluginName);
+      await this.saveChangesToGahConfig(pluginName, downloadedVersion);
     }
     return true;
   }
 
-  private async saveChangesToGahConfig(pluginName: string) {
+  private async saveChangesToGahConfig(pluginName: string, downloadedVersion?: string) {
     const cfg = this._configService.getCurrentConfig();
     let pluginCfg: GahPluginDependencyConfig;
 
@@ -215,13 +221,17 @@ export class PluginService implements IPluginService {
     }
     pluginCfg.name = pluginName!;
 
-    const vOut = this._executionService.executionResult;
-    const versionRegex = new RegExp(`${pluginName}@([\\w\\d.-]+)$`, 'm');
-    const v = vOut.match(versionRegex)?.[1];
-    if (!v) {
-      throw Error('Could not find version of the newly installed plugin');
+    if (downloadedVersion) {
+      pluginCfg.version = downloadedVersion;
+    } else {
+      const vOut = this._executionService.executionResult;
+      const versionRegex = new RegExp(`${pluginName}@([\\w\\d.-]+)$`, 'm');
+      const v = vOut.match(versionRegex)?.[1];
+      if (!v) {
+        throw Error('Could not find version of the newly installed plugin');
+      }
+      pluginCfg.version = v;
     }
-    pluginCfg.version = v;
 
     if (!cfg.plugins.some(x => x.name === pluginName)) {
       cfg.plugins.push(pluginCfg);
@@ -257,12 +267,13 @@ export class PluginService implements IPluginService {
   }
 
   public async installPlugin(pluginName: string): Promise<boolean> {
-    let plugin = await this.tryLoadInstalledPlugin(pluginName);
-    const success = await this.doInstallPlugin(pluginName, undefined, true, !!plugin);
+    const pluginRes = await this.tryLoadInstalledPlugin(pluginName);
+    let plugin = pluginRes?.plugin;
+    const success = await this.doInstallPlugin(pluginName, undefined, true, !!plugin, pluginRes?.version);
     if (!success) {
       throw new Error('Failed to install the plugin');
     }
-    plugin ??= await this.tryLoadInstalledPlugin(pluginName);
+    plugin ??= (await this.tryLoadInstalledPlugin(pluginName))?.plugin;
     if (!plugin) {
       throw new Error('Failed to install the plugin');
     }
