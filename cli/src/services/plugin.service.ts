@@ -3,7 +3,7 @@ import { injectable } from 'inversify';
 import {
   GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig, GahCommandHandler,
   IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
-  ILoggerService, IFileSystemService, IContextService, PlguinUpdate, GahEventType, ExtractEventPayload, PackageJson
+  ILoggerService, IFileSystemService, PlguinUpdate, GahEventType, ExtractEventPayload, PackageJson
 } from '@gah/shared';
 
 import { FileSystemService } from './file-system.service';
@@ -13,7 +13,6 @@ import { TemplateService } from './template.service';
 import { PromptService } from './prompt.service';
 import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
-import { ContextService } from './context-service';
 import DIContainer from '../di-container';
 import chalk from 'chalk';
 
@@ -35,7 +34,7 @@ export class PluginService implements IPluginService {
   private readonly _promptService: IPromptService;
   private readonly _workspaceService: IWorkspaceService;
   private readonly _executionService: IExecutionService;
-  private readonly _contextService: IContextService;
+  private readonly _pluginData: { [pluginName: string]: { [key: string]: any } } = {};
 
   constructor() {
     this._fileSystemService = DIContainer.get(FileSystemService);
@@ -45,7 +44,6 @@ export class PluginService implements IPluginService {
     this._promptService = DIContainer.get(PromptService);
     this._workspaceService = DIContainer.get(WorkspaceService);
     this._executionService = DIContainer.get(ExecutionService);
-    this._contextService = DIContainer.get(ContextService);
 
     this._pluginFolder = this._fileSystemService.join(this._workspaceService.getWorkspaceFolder(), 'plugins');
     this._fileSystemService.ensureDirectory(this._pluginFolder);
@@ -369,5 +367,14 @@ export class PluginService implements IPluginService {
     }
     this._loggerService.debug(`executing command '${chalk.yellow(cmd)}' from '${chalk.yellow(cmdHandler.pluginName)}'`);
     return cmdHandler.handler(args);
+  }
+
+  public storeData<T>(pluginName: string, key: string, data: T): void {
+    this._pluginData[pluginName] ??= {};
+    this._pluginData[pluginName][key] = data;
+  }
+
+  public readData<T>(pluginName: string, key: string): T {
+    return this._pluginData[pluginName]?.[key];
   }
 }

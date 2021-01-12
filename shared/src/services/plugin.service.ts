@@ -12,4 +12,6 @@ export interface IPluginService {
   isPluginConfigured(pluginName: string): boolean;
   registerCommandHandler(pluginName: string, commandName: string, handler: (args: string[]) => Promise<boolean> | boolean): void;
   run(cmd: string, args: string[]): Promise<boolean>;
+  storeData<T>(pluginName: string, key: string, data: T): void;
+  readData<T>(pluginName: string, key: string): T;
 }
