@@ -38,4 +38,12 @@ export abstract class GahPlugin {
   protected registerCommandHandler(commandName: string, handler: (args: string[]) => Promise<boolean> | boolean): void {
     this.pluginService.registerCommandHandler(this.name, commandName, handler);
   }
+
+  protected storeData<T>(key: string, data: T) {
+    this.pluginService.storeData<T>(this.name, key, data);
+  }
+
+  protected readData<T>(key: string, fromOtherPlugin?: string): T {
+    return this.pluginService.readData<T>(fromOtherPlugin ?? this.name, key);
+  }
 }
