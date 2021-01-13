@@ -12,6 +12,6 @@
 	],
 	"settings": {
 		"files.associations": {},
-		"typescript.tsdk": "node_modules\\typescript\\lib"
+		"typescript.tsdk": "cli\\node_modules\\typescript\\lib"
 	}
 }
