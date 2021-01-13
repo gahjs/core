@@ -18,6 +18,7 @@ export class InstallController extends Controller {
     const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
 
     const gahFile = new GahFile(fileName);
+    await gahFile.init();
 
     this._pluginService.triggerEvent('BEFORE_INSTALL', { gahFile: await gahFile.data() });
 

@@ -16,6 +16,7 @@ export class TidyController extends Controller {
       return;
     }
     const gahFile = new GahFile('gah-host.json');
+    await gahFile.init();
     await gahFile.tidyPackages();
   }
 }

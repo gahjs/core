@@ -8,7 +8,7 @@ export enum InstallUnitResult {
   skipped = 4
 }
 
-type InstallUnitReturn = void | InstallUnitResult | (void | InstallUnitResult)[];
+export type InstallUnitReturn = void | InstallUnitResult | (void | InstallUnitResult)[];
 
 export class InstallUnit<T extends GahEventName> {
   public id: GahEventName;
@@ -16,6 +16,8 @@ export class InstallUnit<T extends GahEventName> {
   public text: string;
   public action: () => Promise<InstallUnitReturn>;
   public eventPayload: ExtractEventPayloadFromName<GahEventDefinitions, T>;
+  public started = false;
+  public finished = false;
 
   constructor(
     id: T,

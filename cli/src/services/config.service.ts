@@ -143,6 +143,7 @@ export class ConfigService implements IConfigurationService {
     if (modType !== GahModuleType.UNKNOWN) {
       const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
       const gahFile = new GahFile(fileName);
+      await gahFile.init();
       cfg = gahFile.getConfig(cfg);
       this._configs = gahFile.getConfigs();
     }

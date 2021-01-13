@@ -19,7 +19,8 @@ import { ContextService } from '../services/context-service';
 import { ConfigService } from '../services/config.service';
 import { PackageService } from '../services/package.service';
 import { CleanupSevice } from '../services/cleanup.service';
-import { InstallUnit, InstallUnitResult } from './install-unit';
+import { InstallUnit, InstallUnitResult, InstallUnitReturn } from './install-unit';
+import { AwesomeChecklistLoggerControl, AwesomeChecklistLoggerItem, AwesomeLogger } from 'awesome-logging';
 
 export abstract class GahModuleBase {
   protected cleanupService: ICleanupService;
@@ -64,6 +65,8 @@ export abstract class GahModuleBase {
   public installStepCount: number;
   protected _installDescriptionText: string;
   private readonly _installUnits: InstallUnit<any>[] = [];
+  private _progressLogger: AwesomeChecklistLoggerControl;
+  private _installDone: (_: void) => void;
 
 
   constructor(moduleName?: string, gahCfgPath?: string) {
@@ -176,6 +179,33 @@ export abstract class GahModuleBase {
   }
 
   public abstract install(skipPackageInstall: boolean): Promise<void>;
+
+  protected async doInstall() {
+    this._progressLogger = AwesomeLogger.log('checklist', { items: this._installUnits.map(x => { return { text: x.text, state: 'failed' } as AwesomeChecklistLoggerItem; }) });
+    this.checkUnitDependencies();
+    return new Promise((resolve) => { this._installDone = resolve; });
+  }
+
+  private listenForFinishedUnit(unit: InstallUnit<any>, result: Promise<InstallUnitReturn>) {
+    result.then(res => {
+      const index = this._installUnits.findIndex(x => x.id === unit.id);
+      unit.finished = true;
+      this.checkUnitDependencies();
+      this._progressLogger.changeState(index, 'succeeded');
+
+      if (!this._installUnits.some(x => !x.finished)) {
+        this._installDone();
+      }
+    });
+  }
+
+  private checkUnitDependencies() {
+    this._installUnits.filter(x => !x.started).forEach(x => {
+      if (!x.parents || !x.parents.some(parent => !this._installUnits.find(x => x.id === parent)?.finished)) {
+        this.listenForFinishedUnit(x, x.action());
+      }
+    });
+  }
 
   public get fullName(): string {
     return this.packageName ? `@${this.packageName}/${this.moduleName}` : this.moduleName!;
