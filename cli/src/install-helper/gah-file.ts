@@ -247,25 +247,28 @@ export class GahFile {
     }
   }
 
-  private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
-
-    cfg.modules.forEach(moduleRef => {
-      moduleRef.names.forEach(moduleName => {
-        this._modules.push(new GahModuleDef(moduleRef.path, moduleName, initializedModules, this._configs));
-      });
-    });
+  private async loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
+    for (const moduleRef of cfg.modules) {
+      for (const moduleName of moduleRef.names) {
+        const newModule = new GahModuleDef(moduleRef.path, moduleName, initializedModules, this._configs);
+        await newModule.init();
+        this._modules.push(newModule);
+      }
+    }
 
     const newHost = new GahHostDef(cfgPath, initializedModules, this._configs);
+    await newHost.init();
     this._rootModule = newHost;
     this._modules.push(newHost);
   }
 
-  private loadModule(cfg: GahModule, cfgPath: string, initializedModules: GahModuleBase[]) {
-    cfg.modules.forEach(moduleDef => {
+  private async loadModule(cfg: GahModule, cfgPath: string, initializedModules: GahModuleBase[]) {
+    for (const moduleDef of cfg.modules) {
       const newModule = new GahModuleDef(cfgPath, moduleDef.name, initializedModules, this._configs);
+      await newModule.init();
       this._rootModule = newModule;
       this._modules.push(newModule);
-    });
+    }
   }
 
   private setModuleType(filePath: string) {
