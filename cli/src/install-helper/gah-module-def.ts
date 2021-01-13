@@ -136,6 +136,8 @@ export class GahModuleDef extends GahModuleBase {
     this.addInstallUnit(new InstallUnit('CLEAN_TEMPORARY_CHANGES', { module: await this.data() }, ['POST_INSTALL_SCRIPTS'], 'Preinstall Scripts', async () => {
       return this.cleanupService.cleanJsonFileTemporaryChanges();
     }));
+
+    await this.doInstall();
   }
 
 }

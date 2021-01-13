@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import DIContainer from '../di-container';
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
-  IPluginService, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService, GahConfig, GahEventName
+  IPluginService, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService, GahConfig, GahEventName, GahFolderData
 } from '@gah/shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -137,7 +137,8 @@ export abstract class GahModuleBase {
       basePath: this.basePath,
       dependencies: await Promise.all(this.dependencies.map(x => x.data())),
       gahConfig: await this.cfgService.getGahConfig(),
-      gahFolder: this.gahFolder.data(),
+      // gahFolder: this.gahFolder.data(),
+      gahFolder: {} as GahFolderData,
       installed: this.installed,
       isEntry: this.isEntry,
       isHost: this.isHost,
@@ -202,6 +203,7 @@ export abstract class GahModuleBase {
   private checkUnitDependencies() {
     this._installUnits.filter(x => !x.started).forEach(x => {
       if (!x.parents || !x.parents.some(parent => !this._installUnits.find(x => x.id === parent)?.finished)) {
+        x.started = true;
         this.listenForFinishedUnit(x, x.action());
       }
     });
