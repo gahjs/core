@@ -10,7 +10,7 @@ export class DependencyController extends Controller {
 
   public async remove(): Promise<void> {
 
-    if (this._configService.getGahModuleType() === GahModuleType.HOST) {
+    if (await this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._loggerService.error('This command is unavailable for hosts');
       this._loggerService.error('Please use the "reference" command instead');
       return;
@@ -31,7 +31,7 @@ export class DependencyController extends Controller {
     }
 
     for (const depName of dependencyNames) {
-      const mod = this._configService.getGahModule().modules.find(x => x.name === moduleName);
+      const mod = (await this._configService.getGahModule()).modules.find(x => x.name === moduleName);
       const idx = mod?.dependencies?.findIndex(x => x.names.some(y => y === depName))!;
       const dep = mod?.dependencies?.[idx]!;
       if (dep.names.length > 1) {
@@ -42,13 +42,13 @@ export class DependencyController extends Controller {
       }
     }
 
-    this._configService.saveGahModuleConfig();
+    await this._configService.saveGahModuleConfig();
 
     this._loggerService.success(`${dependencyNames.length === 1 ? 'Depdendency' : 'Dependencies'} ${dependencyNames.join(', ')} removed successfully`);
   }
 
   public async add(): Promise<void> {
-    if (this._configService.getGahModuleType() === GahModuleType.HOST) {
+    if (await this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._loggerService.error('This command is unavailable for hosts');
       this._loggerService.error('Please use the "reference" command instead');
       return;
@@ -68,11 +68,11 @@ export class DependencyController extends Controller {
       this._loggerService.warn('No dependency selected.');
       return;
     }
-    this._configService.readExternalConfig(dependencyConfigPath);
+    await this._configService.readExternalConfig(dependencyConfigPath);
 
     const dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService);
 
-    const module = this._configService.getGahModule().modules.find(x => x.name === moduleName);
+    const module = (await this._configService.getGahModule()).modules.find(x => x.name === moduleName);
     if (!module) { throw new Error(`Module '${moduleName}' could not be found`); }
 
     const newDep = new ModuleReference();
@@ -90,7 +90,7 @@ export class DependencyController extends Controller {
     module.dependencies ??= new Array<ModuleReference>();
     module.dependencies.push(newDep);
 
-    this._configService.saveGahModuleConfig();
+    await this._configService.saveGahModuleConfig();
     this._loggerService.success('Dependency added successfully.');
   }
 }
