@@ -27,9 +27,9 @@ export class GahFile {
 
   private readonly _modules: GahModuleBase[];
   private _rootModule: GahModuleBase;
+  private readonly _filePath: string;
 
   constructor(filePath: string) {
-    const initializedModules = new Array<GahModuleBase>();
 
     this._fileSystemService = DIContainer.get(FileSystemService);
     this._workspaceService = DIContainer.get(WorkspaceService);
@@ -42,33 +42,38 @@ export class GahFile {
     this._gahFileName = this._fileSystemService.getFilenameFromFilePath(filePath);
 
     this.setModuleType(filePath);
+    this._filePath = filePath;
+  }
+
+  public async init() {
+    const initializedModules = new Array<GahModuleBase>();
 
     if (this.isHost) {
       let hostCfg: GahHost;
       try {
-        hostCfg = this._fileSystemService.parseFile<GahHost>(filePath);
+        hostCfg = await this._fileSystemService.parseFile<GahHost>(this._filePath);
       } catch (error) {
-        this._loggerService.error(`could not parse host file at ${filePath}`);
+        this._loggerService.error(`could not parse host file at ${this._filePath}`);
         throw error;
       }
-      this.loadHost(hostCfg, filePath, initializedModules);
+      await this.loadHost(hostCfg, this._filePath, initializedModules);
     } else {
       let moduleCfg: GahModule;
       try {
-        moduleCfg = this._fileSystemService.parseFile<GahModule>(filePath);
+        moduleCfg = await this._fileSystemService.parseFile<GahModule>(this._filePath);
       } catch (error) {
-        this._loggerService.error(`could not parse module file at ${filePath}`);
+        this._loggerService.error(`could not parse module file at ${this._filePath}`);
         throw error;
       }
-      this.loadModule(moduleCfg, filePath, initializedModules);
+      await this.loadModule(moduleCfg, this._filePath, initializedModules);
     }
   }
 
-  public data(): GahFileData {
+  public async data(): Promise<GahFileData> {
     return {
       isHost: this.isHost,
       isInstalled: this.isInstalled,
-      modules: this._modules.map(x => x.data())
+      modules: await Promise.all(this._modules.map(x => x.data()))
     };
   }
 
@@ -100,18 +105,16 @@ export class GahFile {
   }
 
   public async install(skipPackageInstall: boolean) {
-
-    this._rootModule.prog('Copying host');
-
     if (this.isHost) {
       this.checkValidConfiguration();
-      this.copyHostFiles();
-      this._pluginService.triggerEvent('HOST_COPIED', { gahFile: this.data() });
+      this._pluginService.triggerEvent('BEFORE_COPY_HOST', { gahFile: await this.data() });
+      await this.copyHostFiles();
+      this._pluginService.triggerEvent('AFTER_COPY_HOST', { gahFile: await this.data() });
     }
 
-    this._pluginService.triggerEvent('STARTING_MODULE_INSTALL', { module: this._rootModule.data() });
+    this._pluginService.triggerEvent('BEFORE_INSTALL_MODULE', { module: await this._rootModule.data() });
     await this._rootModule.install(skipPackageInstall);
-    this._pluginService.triggerEvent('FINISHED_MODULE_INSTALL', { module: this._rootModule.data() });
+    this._pluginService.triggerEvent('AFTER_INSTALL_MODULE', { module: await this._rootModule.data() });
 
     // workaround
     for (const m of this._modules) {
@@ -170,67 +173,78 @@ export class GahFile {
     return chains;
   }
 
-  public whyPackage(packageName: string) {
+  public async whyPackage(packageName: string) {
     const host = this._modules.find(x => x.isHost);
     if (!host) {
       throw new Error('Host could not be found');
     }
-    const becauseOfus = host.allRecursiveDependencies
-      .filter(x => x.packageJson.dependencies?.[packageName] || x.packageJson.devDependencies?.[packageName]);
-    if (becauseOfus.length <= 1) {
+
+    const becauseOfUs: GahModuleDef[] = [];
+
+    for (const x of host.allRecursiveDependencies) {
+      if ((await x.getPackageJson()).dependencies?.[packageName] || (await x.getPackageJson()).devDependencies?.[packageName]) {
+        becauseOfUs.push(x);
+      }
+    }
+    if (becauseOfUs.length <= 1) {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is not referenced`);
     } else {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is referenced by the following configurations: (red means it is excluded)`);
-      becauseOfus.forEach(module => {
 
-        const packageVersion = (module.packageJson.dependencies ?? module.packageJson.devDependencies)?.[packageName];
+      for (const module of becauseOfUs) {
+        const modulePackageJson = await module.getPackageJson();
+        const packageVersion = (modulePackageJson.dependencies ?? modulePackageJson.devDependencies)?.[packageName];
 
         if (module.excludedPackages.indexOf(packageName) !== -1) {
           this._loggerService.log(`'${chalk.red(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);
         } else {
           this._loggerService.log(`'${chalk.green(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);
         }
-      });
+      }
     }
   }
 
-  public tidyPackages() {
+  public async tidyPackages() {
     const host = this._modules.find(x => x.isHost);
     if (!host) {
       this._loggerService.error('Could not find host');
       return;
     }
     const modulesThatChanged: GahModuleBase[] = [];
-    const hostPackageJson = host.packageJson;
-    Object.keys(hostPackageJson.dependencies!).forEach(dep => {
-      this._modules.filter(x => !x.isHost).forEach(mod => {
-        if (mod.packageJson.dependencies?.[dep] && compareVersions(
-          mod.packageJson.dependencies[dep].replace('~', '').replace('^', ''),
+    const hostPackageJson = await host.getPackageJson();
+    for (const dep of Object.keys(hostPackageJson.dependencies!)) {
+      const modules = this._modules.filter(x => !x.isHost);
+      for (const mod of modules) {
+        const modPackageJson = await mod.getPackageJson();
+        if (modPackageJson.dependencies?.[dep] && compareVersions(
+          modPackageJson.dependencies[dep].replace('~', '').replace('^', ''),
           hostPackageJson.dependencies![dep].replace('~', '').replace('^', '')
         )) {
-          mod.packageJson.dependencies[dep] = hostPackageJson.dependencies![dep];
+          modPackageJson.dependencies[dep] = hostPackageJson.dependencies![dep];
           if (!modulesThatChanged.includes(mod)) {
             modulesThatChanged.push(mod);
           }
         }
-      });
-    });
-    Object.keys(hostPackageJson.devDependencies!).forEach(dep => {
-      this._modules.filter(x => !x.isHost).forEach(mod => {
-        if (mod.packageJson.devDependencies?.[dep] && compareVersions(
-          mod.packageJson.devDependencies[dep].replace('~', '').replace('^', ''),
+      }
+    }
+    for (const dep of Object.keys(hostPackageJson.devDependencies!)) {
+      const modules = this._modules.filter(x => !x.isHost);
+      for (const mod of modules) {
+        const modPackageJson = await mod.getPackageJson();
+        if (modPackageJson.devDependencies?.[dep] && compareVersions(
+          modPackageJson.devDependencies[dep].replace('~', '').replace('^', ''),
           hostPackageJson.devDependencies![dep].replace('~', '').replace('^', '')
         )) {
-          mod.packageJson.devDependencies[dep] = hostPackageJson.devDependencies![dep];
+          modPackageJson.devDependencies[dep] = hostPackageJson.devDependencies![dep];
           if (!modulesThatChanged.includes(mod)) {
             modulesThatChanged.push(mod);
           }
         }
-      });
-    });
-    modulesThatChanged.forEach(mod => {
-      this._fileSystemService.saveObjectToFile(this._fileSystemService.join(mod.basePath, 'package.json'), mod.packageJson);
-    });
+      }
+    }
+    for (const mod of modulesThatChanged) {
+      await this._fileSystemService.saveObjectToFile(this._fileSystemService.join(mod.basePath, 'package.json'), await mod.getPackageJson());
+    }
   }
 
   private loadHost(cfg: GahHost, cfgPath: string, initializedModules: GahModuleBase[]) {
@@ -266,8 +280,8 @@ export class GahFile {
     }
   }
 
-  private copyHostFiles() {
-    const entryPackageJson = this._modules.find(x => x.isEntry)!.packageJson;
+  private async copyHostFiles() {
+    const entryPackageJson = await this._modules.find(x => x.isEntry)!.getPackageJson();
     let angularCoreVersion = entryPackageJson.dependencies?.['@angular/core']?.match(/(\d+)\.\d+\.\d+/)?.[1];
 
     switch (angularCoreVersion) {
@@ -285,7 +299,7 @@ export class GahFile {
     }
 
 
-    CopyHost.copy(this._fileSystemService, this._workspaceService, this._loggerService, angularCoreVersion, true);
+    await CopyHost.copy(this._fileSystemService, this._workspaceService, this._loggerService, angularCoreVersion, true);
   }
 
   private checkValidConfiguration() {
