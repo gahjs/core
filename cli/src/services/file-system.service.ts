@@ -19,91 +19,95 @@ export class FileSystemService implements IFileSystemService {
 
   constructor() { }
 
-  fileExists(path: string): boolean {
-    return fs.existsSync(path);
+  async fileExists(path: string): Promise<boolean> {
+    return new Promise(r => fs.access(path, fs.constants.F_OK, e => r(!e)));
   }
 
-  readFile(path: string): string {
-    const content = this.tryReadFile(path);
+  async readFile(path: string): Promise<string> {
+    const content = await this.tryReadFile(path);
     if (content === null) {
       throw new Error(`File could not be found at: ${path}`);
     }
     return content;
   }
 
-  readFileLineByLine(path: string) {
-    return this.readFile(path).replace('\r\n', '\n').split('\n');
+  async readFileLineByLine(path: string) {
+    return (await this.readFile(path)).replace('\r\n', '\n').split('\n');
   }
 
-  tryReadFile(path: string): string | null {
-    if (!this.fileExists(path)) {
+  async tryReadFile(path: string): Promise<string | null> {
+    if (!await this.fileExists(path)) {
       return null;
     }
-    return fs.readFileSync(path).toString();
+    return fs.promises.readFile(path).then(b => b.toString());
   }
 
-  tryParseFile<T>(path: string): T | null {
-    if (!this.fileExists(path)) {
+  async tryParseFile<T>(path: string): Promise<T | null> {
+    if (!await this.fileExists(path)) {
       return null;
     }
     return this.parseFile<T>(path);
   }
 
-  parseFile<T>(path: string): T {
-    const str = this.readFile(path);
+  async parseFile<T>(path: string): Promise<T> {
+    const str = await this.readFile(path);
     return parse(str) as T;
   }
 
-  saveFile(path: string, content: string): void {
-    fs.writeFileSync(path, content);
+  async saveFile(path: string, content: string): Promise<void> {
+    return fs.promises.writeFile(path, content);
   }
 
-  saveObjectToFile<T>(path: string, obj: T, beautify = true): void {
+  async saveObjectToFile<T>(path: string, obj: T, beautify = true): Promise<void> {
     const objStr = stringify(obj, null, beautify ? 2 : 0);
-    this.saveFile(path, objStr);
+    return this.saveFile(path, objStr);
   }
 
-  ensureRelativePath(path: string, relativeFrom?: string, dontCheck = false) {
-    if (!dontCheck && !this.directoryExists(path)) { throw new Error(`Could not find path ${path}`); }
+  async ensureRelativePath(path: string, relativeFrom?: string, dontCheck = false): Promise<string> {
+    if (!dontCheck && !await this.directoryExists(path)) { throw new Error(`Could not find path ${path}`); }
     relativeFrom = relativeFrom ?? process.cwd();
-    if (!dontCheck && !this.directoryExists(relativeFrom)) { throw new Error(`Could not find path ${relativeFrom}`); }
+    if (!dontCheck && !await this.directoryExists(relativeFrom)) { throw new Error(`Could not find path ${relativeFrom}`); }
 
     path = path_.relative(relativeFrom, path).replace(/\\/g, '/');
     return path;
   }
 
 
-  directoryExists(path: string): boolean {
-    return fs.existsSync(path);
+  async directoryExists(path: string): Promise<boolean> {
+    return fs.pathExists(path);
   }
 
-  createDirectory(path: string): void {
-    fs.mkdirSync(path);
+  async createDirectory(path: string): Promise<void> {
+    return fs.mkdir(path);
   }
 
-  ensureDirectory(path: string): void {
-    fs.ensureDirSync(path);
+  async ensureDirectory(path: string): Promise<void> {
+    return fs.ensureDir(path);
   }
 
-  deleteFile(path: string): void {
-    if (this.fileExists(path)) { fs.unlinkSync(path); }
+  async deleteFile(path: string): Promise<void> {
+    if (await this.fileExists(path)) {
+      return fs.unlink(path);
+    }
   }
 
-  deleteFilesInDirectory(path: string): void {
-    fs.emptyDirSync(path);
+  async deleteFilesInDirectory(path: string): Promise<void> {
+    return fs.emptyDir(path);
   }
 
-  deleteDirectory(path: string): void {
-    fs.rmdirSync(path, { recursive: true });
+  async deleteDirectory(path: string): Promise<void> {
+    return fs.promises.rmdir(path, { recursive: true });
   }
 
-  copyFilesInDirectory(fromDirectory: string, toDirectory: string) {
-    if (!this.directoryExists(fromDirectory)) { throw new Error('Directory to copy from not found'); }
-    this.ensureDirectory(toDirectory);
-    fs.copySync(fromDirectory, toDirectory, { recursive: true });
+  async copyFilesInDirectory(fromDirectory: string, toDirectory: string): Promise<void> {
+    if (!await this.directoryExists(fromDirectory)) {
+      throw new Error('Directory to copy from not found');
+    }
+    await this.ensureDirectory(toDirectory);
+    return fs.copy(fromDirectory, toDirectory, { recursive: true });
   }
 
-  getFilesFromGlob(glob_: string, ignore?: string | string[], noDefaultIgnore?: boolean, type: FileSystemType = 'any'): string[] {
+  async getFilesFromGlob(glob_: string, ignore?: string | string[], noDefaultIgnore?: boolean, type: FileSystemType = 'any'): Promise<string[]> {
     const ignore_ = new Array<string>();
     if (!noDefaultIgnore) {
       ignore_.push('**/node_modules/**');
@@ -116,14 +120,14 @@ export class FileSystemService implements IFileSystemService {
     const onlyFiles = type && type === 'file';
     const onlyDirectories = type && type === 'directory';
 
-    return globby.sync(glob_, { ignore: ignore_, onlyFiles, onlyDirectories });
+    return globby(glob_, { ignore: ignore_, onlyFiles, onlyDirectories });
   }
 
-  copyFile(file: string, destinationFolder: string) {
-    fs.copyFileSync(file, path_.join(destinationFolder, path_.basename(file)));
+  async copyFile(file: string, destinationFolder: string): Promise<void> {
+    return fs.copyFile(file, path_.join(destinationFolder, path_.basename(file)));
   }
 
-  async createDirLink(linkPath: string, realPath: string) {
+  async createDirLink(linkPath: string, realPath: string): Promise<void> {
     if (platform() === 'win32') {
       const cmd = `mklink /j "${linkPath}" "${realPath}"`;
       await this._executionService.execute(cmd, false).then(success => {
@@ -134,7 +138,7 @@ export class FileSystemService implements IFileSystemService {
     }
   }
 
-  async createFileLink(linkPath: string, realPath: string) {
+  async createFileLink(linkPath: string, realPath: string): Promise<void> {
     if (platform() === 'win32') {
       const cmd = `mklink /h "${linkPath}" "${realPath}"`;
       await this._executionService.execute(cmd, false).then(success => {
@@ -184,11 +188,11 @@ export class FileSystemService implements IFileSystemService {
       });
   }
 
-  rename(oldPath: string, newPath: string) {
-    fs.renameSync(oldPath, newPath);
+  async rename(oldPath: string, newPath: string): Promise<void> {
+    return fs.rename(oldPath, newPath);
   }
 
-  deleteDirectoryRecursively(path: string) {
-    fs.rmdirSync(path, { recursive: true });
+  async deleteDirectoryRecursively(path: string): Promise<void> {
+    return fs.promises.rmdir(path, { recursive: true });
   }
 }
