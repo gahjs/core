@@ -20,7 +20,7 @@ import { ConfigService } from '../services/config.service';
 import { PackageService } from '../services/package.service';
 import { CleanupSevice } from '../services/cleanup.service';
 import { InstallUnit, InstallUnitResult, InstallUnitReturn } from './install-unit';
-import { AwesomeChecklistLoggerControl, AwesomeChecklistLoggerItem, AwesomeLogger } from 'awesome-logging';
+import { AwesomeChecklistLoggerControl, AwesomeChecklistLoggerItem, AwesomeChecklistLoggerState, AwesomeLogger } from 'awesome-logging';
 
 export abstract class GahModuleBase {
   protected cleanupService: ICleanupService;
@@ -182,9 +182,18 @@ export abstract class GahModuleBase {
   public abstract install(skipPackageInstall: boolean): Promise<void>;
 
   protected async doInstall() {
-    this._progressLogger = AwesomeLogger.log('checklist', { items: this._installUnits.map(x => { return { text: x.text, state: 'failed' } as AwesomeChecklistLoggerItem; }) });
+    this._progressLogger = AwesomeLogger.log('checklist', { items: this._installUnits.map(x => { return { text: x.text, state: 'pending' } as AwesomeChecklistLoggerItem; }) });
     this.checkUnitDependencies();
     return new Promise((resolve) => { this._installDone = resolve; });
+  }
+
+  private loggerStateFromRes(res: InstallUnitReturn): AwesomeChecklistLoggerState {
+    switch (res) {
+      case InstallUnitResult.failed: return 'failed';
+      case InstallUnitResult.skipped: return 'skipped';
+      case InstallUnitResult.warnings: return 'partiallySucceeded';
+      default: return 'succeeded';
+    }
   }
 
   private listenForFinishedUnit(unit: InstallUnit<any>, result: Promise<InstallUnitReturn>) {
@@ -192,7 +201,8 @@ export abstract class GahModuleBase {
       const index = this._installUnits.findIndex(x => x.id === unit.id);
       unit.finished = true;
       this.checkUnitDependencies();
-      this._progressLogger.changeState(index, 'succeeded');
+
+      this._progressLogger.changeState(index, this.loggerStateFromRes(res));
 
       if (!this._installUnits.some(x => !x.finished)) {
         this._installDone();
@@ -201,10 +211,12 @@ export abstract class GahModuleBase {
   }
 
   private checkUnitDependencies() {
-    this._installUnits.filter(x => !x.started).forEach(x => {
-      if (!x.parents || !x.parents.some(parent => !this._installUnits.find(x => x.id === parent)?.finished)) {
-        x.started = true;
-        this.listenForFinishedUnit(x, x.action());
+    this._installUnits.filter(x => !x.started).forEach(unit => {
+      if (!unit.parents || !unit.parents.some(parent => !this._installUnits.find(x => x.id === parent)?.finished)) {
+        unit.started = true;
+        const index = this._installUnits.findIndex(x => x.id === unit.id);
+        this._progressLogger.changeState(index, 'inProgress');
+        this.listenForFinishedUnit(unit, unit.action());
       }
     });
   }
