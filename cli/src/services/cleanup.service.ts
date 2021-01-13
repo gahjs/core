@@ -60,9 +60,9 @@ export class CleanupSevice implements ICleanupService {
     this._temporaryJsonFileChanges.push({ filePath, propertyPath, previousValue });
   }
 
-  public cleanJsonFileTemporaryChanges() {
-    this._temporaryJsonFileChanges.forEach(change => {
-      const content = this._fileSystemService.parseFile<any>(change.filePath);
+  public async cleanJsonFileTemporaryChanges() {
+    for (const change of this._temporaryJsonFileChanges) {
+      const content = await this._fileSystemService.parseFile<any>(change.filePath);
       let property = content;
       const pathSteps = change.propertyPath.split('.');
       const lastPathStep = pathSteps.pop()!;
@@ -70,8 +70,8 @@ export class CleanupSevice implements ICleanupService {
         property = property[propPathSegment];
       });
       property[lastPathStep] = change.previousValue;
-      this._fileSystemService.saveObjectToFile(change.filePath, content);
-    });
+      await this._fileSystemService.saveObjectToFile(change.filePath, content);
+    }
     this._temporaryJsonFileChanges = [];
   }
 }
