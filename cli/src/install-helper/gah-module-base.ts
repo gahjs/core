@@ -1,7 +1,8 @@
 import chalk from 'chalk';
 import DIContainer from '../di-container';
+import { AwesomeChecklistLoggerControl, AwesomeChecklistLoggerItem, AwesomeChecklistLoggerState, AwesomeLogger } from 'awesome-logging';
 import {
-  IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService,
+  IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, GahEventType,
   IPluginService, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService, GahConfig, GahEventName, GahFolderData
 } from '@gah/shared';
 
@@ -20,7 +21,6 @@ import { ConfigService } from '../services/config.service';
 import { PackageService } from '../services/package.service';
 import { CleanupSevice } from '../services/cleanup.service';
 import { InstallUnit, InstallUnitResult, InstallUnitReturn } from './install-unit';
-import { AwesomeChecklistLoggerControl, AwesomeChecklistLoggerItem, AwesomeChecklistLoggerState, AwesomeLogger } from 'awesome-logging';
 
 export abstract class GahModuleBase {
   protected cleanupService: ICleanupService;
@@ -197,9 +197,10 @@ export abstract class GahModuleBase {
   }
 
   private listenForFinishedUnit(unit: InstallUnit<any>, result: Promise<InstallUnitReturn>) {
-    result.then(res => {
+    return result.then(res => {
       const index = this._installUnits.findIndex(x => x.id === unit.id);
       unit.finished = true;
+      this.pluginService.triggerEvent(`AFTER_${unit.id}` as GahEventType, unit.eventPayload);
       this.checkUnitDependencies();
 
       this._progressLogger.changeState(index, this.loggerStateFromRes(res));
@@ -211,14 +212,16 @@ export abstract class GahModuleBase {
   }
 
   private checkUnitDependencies() {
-    this._installUnits.filter(x => !x.started).forEach(unit => {
+    const unstarted = this._installUnits.filter(x => !x.started);
+    for (const unit of unstarted) {
       if (!unit.parents || !unit.parents.some(parent => !this._installUnits.find(x => x.id === parent)?.finished)) {
         unit.started = true;
         const index = this._installUnits.findIndex(x => x.id === unit.id);
         this._progressLogger.changeState(index, 'inProgress');
+        this.pluginService.triggerEvent(`BEFORE_${unit.id}` as GahEventType, unit.eventPayload);
         this.listenForFinishedUnit(unit, unit.action());
       }
-    });
+    }
   }
 
   public get fullName(): string {
