@@ -49,7 +49,8 @@ export type GahEvent = GahEventFull<GahEventDefinitions, any>;
 export type GahEventType = GahEvent['type'];
 export type GahEventName = GahEventDefinitions['name'];
 
-// This resolves into one of the GahEvents but without the name and type property, based on which type is passed in T.
+// This resolves into one of the GahEvents but without the name and type property, based on which *type* is passed in T.
 export type ExtractEventPayload<A, T> = A extends { type: T } ? Omit<A, 'type'> : never;
 
+// This resolves into one of the GahEvents but without the name and type property, based on which *name* is passed in T.
 export type ExtractEventPayloadFromName<A, T> = A extends { name: T } ? Omit<A, 'name'> : never;
