@@ -130,12 +130,12 @@ export class GahHostDef extends GahModuleBase {
       return this.adjustIndexHtml();
     }));
 
-    this.addInstallUnit(new InstallUnit('PRE_INSTALL_SCRIPTS', { module: await this.data() }, undefined, 'Executing preinstall scripts', async () => {
+    this.addInstallUnit(new InstallUnit('PRE_INSTALL_SCRIPTS', { module: await this.data() }, ['MERGE_DEPENDENCIES'], 'Executing preinstall scripts', async () => {
       await this.collectModuleScripts();
       return this.executePreinstallScripts();
     }));
 
-    this.addInstallUnit(new InstallUnit('INSTALL_PACKAGES', { module: await this.data() }, undefined, 'Installing packages', async () => {
+    this.addInstallUnit(new InstallUnit('INSTALL_PACKAGES', { module: await this.data() }, ['PRE_INSTALL_SCRIPTS'], 'Installing packages', async () => {
       return this.installPackages(skipPackageInstall);
     }));
 
