@@ -17,7 +17,7 @@ export class ExecutionService implements IExecutionService {
 
 
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string, cwd?: string): Promise<boolean> {
-    return new Promise(async (resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.executionResult = '';
       this.executionErrorResult = '';
       const usedCwd =
@@ -28,7 +28,7 @@ export class ExecutionService implements IExecutionService {
           : process.cwd();
       this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(usedCwd)}'`);
       let childProcess: ChildProcess;
-      if (!await fs.pathExists(usedCwd)) {
+      if (!fs.pathExistsSync(usedCwd)) {
         reject(new Error('Path does not exist'));
         return;
       }
