@@ -24,15 +24,15 @@
     "build": "yarn run prebuild && tsc -p . && yarn run postbuild"
   },
   "engines": {
-    "node": ">=10.0"
+    "node": ">=12.0"
   },
   "author": "LoaderB0T",
   "license": "MIT",
   "private": false,
   "dependencies": {
     "@gah/shared": "^0.5.7",
+    "awesome-logging": "0.0.1-pre1",
     "chalk": "^4.1.0",
-    "awesome-logging": "0.0.1-pre-alpha10",
     "change-case": "^4.1.2",
     "commander": "^6.2.1",
     "comment-json": "^4.1.0",

@@ -15,6 +15,9 @@
     "drop": "yarn run build && yarn publish --access public --no-git-tag-version",
     "schema": "node generate-schema.js"
   },
+  "engines": {
+    "node": ">=12.0"
+  },
   "author": "LoaderB0T",
   "license": "MIT",
   "private": false,
