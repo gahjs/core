@@ -8,6 +8,7 @@ import { ExecutionService } from './execution.service';
 import { LoggerService } from './logger.service';
 import { parse, stringify } from 'comment-json';
 import decompress from 'decompress';
+import chalk from 'chalk';
 const decompressTargz = require('decompress-targz');
 
 @injectable()
@@ -51,7 +52,12 @@ export class FileSystemService implements IFileSystemService {
 
   async parseFile<T>(path: string): Promise<T> {
     const str = await this.readFile(path);
-    return parse(str) as T;
+    try {
+      return parse(str) as T;
+    } catch (error) {
+      this._loggerService.error(`Failed to parse file: '${chalk.gray(path)}'`);
+      throw error;
+    }
   }
 
   async saveFile(path: string, content: string): Promise<void> {
