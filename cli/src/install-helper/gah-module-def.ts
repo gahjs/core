@@ -105,11 +105,11 @@ export class GahModuleDef extends GahModuleBase {
       );
     }));
 
-    this.addInstallUnit(new InstallUnit('GENERATE_SYMLINKS', { module: await this.data() }, undefined, 'Cleanup', () => {
+    this.addInstallUnit(new InstallUnit('GENERATE_SYMLINKS', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Cleanup', () => {
       return this.createSymlinksToDependencies();
     }));
 
-    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data() }, undefined, 'Cleanup', () => {
+    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data() }, ['CLEAN_TS_CONFIG'], 'Cleanup', () => {
       return this.addDependenciesToTsConfigFile();
     }));
 
