@@ -8,7 +8,6 @@ import path from 'path';
 import { ContextService } from './services/context-service';
 
 export const gahMain = async () => {
-
   const pjson = require(path.join(__dirname, '../package.json'));
   console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
   let mainController: MainController;
@@ -35,5 +34,3 @@ export const gahMain = async () => {
     process.exit(1);
   });
 };
-
-gahMain();
