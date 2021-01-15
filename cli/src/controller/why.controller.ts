@@ -16,7 +16,7 @@ export class WhyController extends Controller {
     const gahFile = new GahFile(fileName);
 
     await gahFile.init();
-    await gahFile.whyModule(moduleName);
+    gahFile.whyModule(moduleName);
   }
 
   public async whyPackage(packageName: string) {
