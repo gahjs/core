@@ -2,6 +2,11 @@
   "name": "@gah/shared",
   "version": "0.4.2",
   "description": "Provides types and interfaces for gah",
+  "homepage": "https://github.com/gahjs/core",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gahjs/core.git"
+  },
   "main": "./lib/index.js",
   "scripts": {
     "prebuild": "del-cli lib",
