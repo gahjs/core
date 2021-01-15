@@ -88,25 +88,25 @@ export class GahHostDef extends GahModuleBase {
       );
     }));
 
-    this.addInstallUnit(new InstallUnit('GENERATE_STYLES_FILE', { module: await this.data() }, undefined, 'Cleaning and generating styles file', () => {
+    this.addInstallUnit(new InstallUnit('GENERATE_STYLES_FILE', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Cleaning and generating styles file', () => {
       return this.cleanAndGenerateStylesScssFile();
     }));
 
-    this.addInstallUnit(new InstallUnit('GENERATE_SYMLINKS', { module: await this.data() }, undefined, 'Linking modules', () => {
+    this.addInstallUnit(new InstallUnit('GENERATE_SYMLINKS', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Linking modules', () => {
       return this.createSymlinksToDependencies();
     }));
 
-    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data() }, undefined, 'Adjusting tsconfig.json', () => {
+    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data() }, ['CLEAN_TS_CONFIG'], 'Adjusting tsconfig.json', () => {
       return Promise.all([
         this.addDependenciesToTsConfigFile(),
         this.setAngularCompilerOptionsInTsConfig()]);
     }));
 
-    this.addInstallUnit(new InstallUnit('GENERATE_TEMPLATE', { module: await this.data() }, undefined, 'Generating module file', () => {
+    this.addInstallUnit(new InstallUnit('GENERATE_TEMPLATE', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Generating module file', () => {
       return this.generateFromTemplate();
     }));
 
-    this.addInstallUnit(new InstallUnit('COPY_ASSETS', { module: await this.data() }, undefined, 'Linking assets', () => {
+    this.addInstallUnit(new InstallUnit('COPY_ASSETS', { module: await this.data() }, ['CLEAN_GAH_FOLDER', 'MERGE_DEPENDENCIES'], 'Linking assets', () => {
       return this.linkAssets();
     }));
 
@@ -308,7 +308,7 @@ export class GahHostDef extends GahModuleBase {
     }
 
     // Saving the file back into the host package.json
-    this.fileSystemService.saveObjectToFile(packageJsonPath, thisPackageJson);
+    await this.fileSystemService.saveObjectToFile(packageJsonPath, thisPackageJson);
   }
 
   private async adjustAngularJsonConfig() {
