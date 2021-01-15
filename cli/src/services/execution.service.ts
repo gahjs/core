@@ -3,7 +3,7 @@ import { exec, spawn } from 'child_process';
 import { IExecutionService, ILoggerService } from '@gah/shared';
 import { LoggerService } from './logger.service';
 import chalk from 'chalk';
-
+import path from 'path';
 /**
  * TODO: Use loggerservice to ensure that this works with loading animations, but without any square before the msg
  */
@@ -14,12 +14,14 @@ export class ExecutionService implements IExecutionService {
   @inject(LoggerService)
   private readonly _loggerService: ILoggerService;
 
+
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string, cwd?: string): Promise<boolean> {
     return new Promise((resolve) => {
       this.executionResult = '';
       this.executionErrorResult = '';
-      this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(cwd ?? process.cwd())}'`);
-      const childProcess = exec(cmd, { cwd, env: process.env });
+      const usedCwd = cwd ? path.join(process.cwd(), cwd) : process.cwd();
+      this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(usedCwd)}'`);
+      const childProcess = exec(cmd, { cwd: usedCwd, env: process.env });
 
       childProcess.stdout?.on('data', buffer => {
         this.executionResult += buffer;
