@@ -7,11 +7,23 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Run AVA test",
-      "program": "${workspaceRoot}/node_modules/ava/cli.js",
-      "args": [],
+      "name": "Mocha All",
+      "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
+      "args": [
+        "-r",
+        "ts-node/register",
+        "--timeout",
+        "999999",
+        "--colors",
+        "-p",
+        "tsconfig.json",
+        "${workspaceFolder}/src/**/*.spec.ts",
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "protocol": "inspector",
       "skipFiles": [
-        "<node_internals>/**/*.js"
+        "<node_internals>/**"
       ]
     }
   ]
