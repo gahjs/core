@@ -1,4 +1,4 @@
-import gahMain from '@gah/cli/lib/gah-main';
+import * as gahMain from '@gah/cli/lib/gah-main';
 import path from 'path';
 import sinon from 'sinon';
 export class GahHelper {
