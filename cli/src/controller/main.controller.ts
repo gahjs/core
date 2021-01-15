@@ -88,6 +88,10 @@ export class MainController extends Controller {
     // This is so useless, I love it.
     const fontWidth = process.stdout.columns > 111 ? 'full' : process.stdout.columns > 96 ? 'fitted' : 'controlled smushing';
 
+    program
+      .storeOptionsAsProperties()
+      .version(this._version);
+
     program.on('--help', () => {
       console.log(
         chalk.yellow(
@@ -97,8 +101,6 @@ export class MainController extends Controller {
     });
     console.log();
 
-    program
-      .version(this._version);
 
     program
       .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
