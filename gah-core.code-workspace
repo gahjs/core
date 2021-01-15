@@ -8,6 +8,9 @@
 		},
 		{
 			"path": "build"
+		},
+		{
+			"path": "test"
 		}
 	],
 	"settings": {
