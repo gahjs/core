@@ -31,7 +31,7 @@ export abstract class GahPlugin {
   public abstract onInit(): void;
   public abstract onInstall(existingSettings?: GahPluginConfig): Promise<GahPluginConfig>;
 
-  protected registerEventListener<T extends GahEventType>(type: T, handler: (payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>) => void): void {
+  protected registerEventListener<T extends GahEventType>(type: T, handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void): void {
     this.pluginService.registerEventHandler(this.name, type, handler);
   }
 

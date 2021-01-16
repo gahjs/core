@@ -1,1 +1,4 @@
 **/*.ejs.t
+lib/**
+node_modules/**
+type-compat

@@ -10,9 +10,8 @@ export class TemplateService implements ITemplateService {
   @inject(FileSystemService)
   private readonly _fileSystemService: IFileSystemService;
 
-  public renderFile<T>(sourceFilePath: string, data: T, outputFilePath: string) {
-    ejs.renderFile(sourceFilePath, data).then(renderedString => {
-      this._fileSystemService.saveFile(outputFilePath, renderedString);
-    });
+  public async renderFile<T>(sourceFilePath: string, data: T, outputFilePath: string) {
+    const renderedString = await ejs.renderFile(sourceFilePath, data);
+    await this._fileSystemService.saveFile(outputFilePath, renderedString);
   }
 }

@@ -1,9 +1,10 @@
 import { inject, injectable } from 'inversify';
-import { exec, spawn } from 'child_process';
+import { ChildProcess, exec, spawn } from 'child_process';
 import { IExecutionService, ILoggerService } from '@gah/shared';
 import { LoggerService } from './logger.service';
 import chalk from 'chalk';
-
+import path from 'path';
+import fs from 'fs-extra';
 /**
  * TODO: Use loggerservice to ensure that this works with loading animations, but without any square before the msg
  */
@@ -14,12 +15,29 @@ export class ExecutionService implements IExecutionService {
   @inject(LoggerService)
   private readonly _loggerService: ILoggerService;
 
+
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string, cwd?: string): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       this.executionResult = '';
       this.executionErrorResult = '';
-      this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(cwd ?? process.cwd())}'`);
-      const childProcess = exec(cmd, { cwd, env: process.env });
+      const usedCwd =
+        cwd
+          ? path.isAbsolute(cwd)
+            ? cwd
+            : path.join(process.cwd(), cwd)
+          : process.cwd();
+      this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(usedCwd)}'`);
+      let childProcess: ChildProcess;
+      if (!fs.pathExistsSync(usedCwd)) {
+        reject(new Error('Path does not exist'));
+        return;
+      }
+      try {
+        childProcess = exec(cmd, { cwd: usedCwd, env: process.env });
+      } catch (error) {
+        reject(error);
+        return;
+      }
 
       childProcess.stdout?.on('data', buffer => {
         this.executionResult += buffer;

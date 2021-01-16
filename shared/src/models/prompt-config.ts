@@ -4,7 +4,7 @@ export class PromptConfig {
   msg: string;
   default?: any;
   enabled: () => boolean = () => true;
-  validator?: (val: any) => boolean;
+  validator?: (val: any) => boolean | Promise<boolean>;
 }
 
 export class FuzzyPathPromptConfig extends PromptConfig {
