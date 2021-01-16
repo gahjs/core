@@ -229,8 +229,8 @@ export abstract class GahModuleBase {
           const destPathPackageJson = this.fileSystemService.join(destPath, 'package.json');
           const destPkgJson = this.fileSystemService.parseFile<PackageJson>(destPathPackageJson);
           const destDepKeys = Object.keys(destPkgJson.dependencies!);
-          const isGahSourceRegex = /awdware\/gah\/([a-zA-Z0-9]+)\/precompiled/;
-          const getNameRegex = /.*awdware\/gah\/[a-zA-Z0-9]+\/precompiled\/targz\/(.+)/;
+          const isGahSourceRegex = /gah\/([a-zA-Z0-9]+)\/precompiled/;
+          const getNameRegex = /.*gah\/[a-zA-Z0-9]+\/precompiled\/targz\/(.+)/;
           let didAdjustPath: boolean = false;
           destDepKeys.forEach(destDepKey => {
             const destDep = destPkgJson.dependencies![destDepKey];
