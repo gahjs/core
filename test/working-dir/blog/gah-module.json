@@ -1,0 +1,20 @@
+{
+  "$schema": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-module-schema.json",
+  "modules": [
+    {
+      "name": "blog",
+      "packageName": "awdware",
+      "publicApiPath": "projects/awdware-blog/src/public-api.ts",
+      "baseNgModuleName": "AwdwareLazyBlogModule",
+      "isEntry": false,
+      "dependencies": [
+        {
+          "path": "../core/gah-module.json",
+          "names": [
+            "core"
+          ]
+        }
+      ]
+    }
+  ]
+}

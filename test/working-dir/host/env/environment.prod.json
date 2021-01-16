@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/awdware/gah/master/assets/gah-environment-schema.json",
+  "production": true,
+  "apiUrl": "https://api.awdware.de",
+  "test": false
+}

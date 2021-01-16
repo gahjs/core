@@ -16,13 +16,16 @@
     "@gah/shared": "^0.5.7"
   },
   "devDependencies": {
+    "@angular/cli": "^11.0.7",
     "@awdware/eslint-config-nodejs": "^0.0.6",
+    "@types/fs-extra": "^9.0.6",
     "@types/mocha": "^8.2.0",
-    "@types/node": "^14.14.21",
+    "@types/node": "^12.0.0",
     "@types/sinon": "^9.0.10",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "eslint": "^7.17.0",
+    "fs-extra": "^9.0.1",
     "mocha": "^8.2.1",
     "should": "^13.2.3",
     "sinon": "^9.2.3",

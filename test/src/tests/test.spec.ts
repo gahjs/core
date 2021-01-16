@@ -1,15 +1,19 @@
 import { GahHelper } from '../helper/gah-helper'
 require('should');
 
-const gah = new GahHelper();
+let gah: GahHelper;
+
+beforeEach(async function () {
+  const title = this.currentTest?.title;
+  gah = new GahHelper(title!);
+  await gah.clean();
+});
 
 describe('', async () => {
-  it('one plus one is two', async () => {
-    await gah.runInstall()
-      .catch((err) => {
-        console.log(err)
-      }
-      );
+  it('1_InstallWorks', async () => {
+    await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
+    // await gah.initModule('frame', true);
+    await gah.runInstall('host', true);
     (1 + 1).should.equal(2);
   });
 });

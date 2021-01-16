@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/awdware/gah/master/shared/assets/gah-module-schema.json",
+  "modules": [
+    {
+      "name": "shared",
+      "packageName": "awdware",
+      "publicApiPath": "projects/awdware-shared/src/public-api.ts",
+      "baseNgModuleName": "AwdwareCoreSharedModule"
+    }
+  ]
+}
