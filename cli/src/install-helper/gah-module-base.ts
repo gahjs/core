@@ -454,7 +454,7 @@ export abstract class GahModuleBase {
 
     const yarnTimeout = this.contextService.getContext().yarnTimeout;
     const networkTimeout = yarnTimeout ? ` --network-timeout ${yarnTimeout}` : '';
-    const success = await this.executionService.execute(`yarn${networkTimeout}`, true, (test) => {
+    const success = await this.executionService.execute(`yarn${networkTimeout}`, true, () => {
 
       return '';
 
