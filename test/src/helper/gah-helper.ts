@@ -37,6 +37,10 @@ export class GahHelper {
     await this.runGah(dir, skipPackageInstall ? ['i', '--skipPackageInstall'] : ['i']);
   }
 
+  async runPluginUpdate(dir: string) {
+    await this.runGah(dir, ['plugin', 'update']);
+  }
+
   async copyModules(moduleNames: string[]) {
     const allModuleCopyTasks = moduleNames.map(moduleName => fs.copy(path.join(resourcesDir, moduleName), path.join(workingDir, moduleName)));
     await Promise.all(allModuleCopyTasks);

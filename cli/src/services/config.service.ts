@@ -176,7 +176,7 @@ export class ConfigService implements IConfigurationService {
         this._currentConfig = await this._fileSystemService.parseFile<GahConfig>(this.gahConfigFileName);
       } else {
         if (!this._moduleCfg) {
-          this.loadGahModuleConfig(await this.getGahModuleType() === GahModuleType.HOST);
+          await this.loadGahModuleConfig(await this.getGahModuleType() === GahModuleType.HOST);
         }
         (this._moduleCfg as GahModule).modules[0].config ??= {} as GahConfig;
         this._currentConfig = (this._moduleCfg as GahModule).modules[0].config!;
