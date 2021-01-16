@@ -16,14 +16,14 @@ export class WorkspaceService implements IWorkspaceService {
     this._loggerService = DIContainer.get(LoggerService);
   }
 
-  public async ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string): Promise<void> {
+  public ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string) {
     const gitIgnorePath = baseDir ? this._fileSystemService.join(baseDir, '.gitignore') : '.gitignore';
 
-    if (!await this._fileSystemService.fileExists(gitIgnorePath)) {
-      await this._fileSystemService.saveFile(gitIgnorePath, '## Added by gah\n\n');
+    if (!this._fileSystemService.fileExists(gitIgnorePath)) {
+      this._fileSystemService.saveFile(gitIgnorePath, '## Added by gah\n\n');
     }
 
-    const gitIgnoreLines = await this._fileSystemService.readFileLineByLine(gitIgnorePath);
+    const gitIgnoreLines = this._fileSystemService.readFileLineByLine(gitIgnorePath);
     if (!gitIgnoreLines.some(x => x.indexOf(gitIgnorePattern) !== -1)) {
       if (gitIgnoreLines[gitIgnoreLines.length - 1]) {
         gitIgnoreLines.push('');
@@ -32,7 +32,7 @@ export class WorkspaceService implements IWorkspaceService {
         gitIgnoreLines.push(`# ${description}`);
       }
       gitIgnoreLines.push(gitIgnorePattern);
-      await this._fileSystemService.saveFile(gitIgnorePath, gitIgnoreLines.join('\n'));
+      this._fileSystemService.saveFile(gitIgnorePath, gitIgnoreLines.join('\n'));
     }
   }
 
@@ -44,18 +44,17 @@ export class WorkspaceService implements IWorkspaceService {
     }
   }
 
-  public async getGlobalData(): Promise<GlobalGahData> {
+  public getGlobalData(): GlobalGahData {
     const globalDataPath = this._fileSystemService.join(this.getGlobalGahFolder(), 'data.json');
-    if (!await this._fileSystemService.fileExists(globalDataPath)) {
+    if (!this._fileSystemService.fileExists(globalDataPath)) {
       return {} as GlobalGahData;
     }
-    return await this._fileSystemService.parseFile<GlobalGahData>(globalDataPath);
+    return this._fileSystemService.parseFile<GlobalGahData>(globalDataPath);
   }
-
-  public async saveGlobalGahData(data: GlobalGahData) {
+  public saveGlobalGahData(data: GlobalGahData) {
     const globalDataPath = this._fileSystemService.join(this.getGlobalGahFolder(), 'data.json');
-    await this._fileSystemService.ensureDirectory(this.getGlobalGahFolder());
-    await this._fileSystemService.saveObjectToFile(globalDataPath, data);
+    this._fileSystemService.ensureDirectory(this.getGlobalGahFolder());
+    return this._fileSystemService.saveObjectToFile(globalDataPath, data);
   }
 
   public getWorkspaceHash(): string {

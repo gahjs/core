@@ -5,7 +5,7 @@ export class TsConfigFile {
   private readonly _cleanupService: ICleanupService;
 
   private readonly _path: string;
-  private _tsConfig: TsConfig;
+  private readonly _tsConfig: TsConfig;
 
 
   public data(): TsConfigFileData {
@@ -15,7 +15,7 @@ export class TsConfigFile {
     };
   }
 
-  public async clean() {
+  public clean() {
     if (!this._tsConfig.compilerOptions.paths) {
       this._tsConfig.compilerOptions.paths = new TsConfigCompilerOptionsPaths();
     }
@@ -32,25 +32,24 @@ export class TsConfigFile {
       this._tsConfig.compilerOptions.baseUrl = './';
     }
 
-    return this.save();
+    this.save();
   }
 
   constructor(path: string, fileSystemService: IFileSystemService, cleanupService: ICleanupService) {
     this._fileSystemService = fileSystemService;
     this._cleanupService = cleanupService;
     this._path = path;
+
+    this._tsConfig = this._fileSystemService.parseFile<TsConfig>(this._path);
+
   }
 
-  public async init(): Promise<void> {
-    this._tsConfig = await this._fileSystemService.parseFile<TsConfig>(this._path);
-  }
-
-  public async save() {
+  public save() {
     const oldData = this._fileSystemService.parseFile<TsConfig>(this._path);
 
     const equals = JSON.stringify(oldData) === JSON.stringify(this._tsConfig);
     if (!equals) {
-      await this._fileSystemService.saveObjectToFile(this._path, this._tsConfig);
+      this._fileSystemService.saveObjectToFile(this._path, this._tsConfig);
     }
   }
 

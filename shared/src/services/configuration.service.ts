@@ -6,20 +6,20 @@ import { GahModuleType } from '../models/gah-module-type';
 import { GahPluginDependencyConfig } from '../models/gah-plugin-dependency-config';
 
 export interface IConfigurationService {
-  gahConfigExists(): Promise<boolean>;
-  getGahConfig(): Promise<GahConfig>;
-  getPluginConfig(moduleName?: string): Promise<GahPluginDependencyConfig[] | undefined>;
-  getCurrentConfig(): Promise<GahConfig>;
-  getGahModule(forceLoad?: boolean): Promise<GahModule>;
-  getGahHost(forceLoad?: boolean): Promise<GahHost>;
-  getGahModuleType(inFolder?: string): Promise<GahModuleType>;
-  getGahAnyType(inFolder: string): Promise<GahModule | GahHost>;
-  saveCurrentConfig(): Promise<void>;
-  saveGahModuleConfig(): Promise<void>;
-  getTsConfig(): Promise<TsConfig>;
-  saveTsConfig(): Promise<void>;
-  readExternalConfig(cfgPath: string): Promise<boolean>;
-  deleteGahConfig(): Promise<void>;
+  gahConfigExists(): boolean;
+  getGahConfig(): GahConfig;
+  getPluginConfig(moduleName?: string): GahPluginDependencyConfig[] | undefined;
+  getCurrentConfig(): GahConfig;
+  getGahModule(forceLoad?: boolean): GahModule;
+  getGahHost(forceLoad?: boolean): GahHost;
+  getGahModuleType(inFolder?: string): GahModuleType;
+  getGahAnyType(inFolder: string): GahModule | GahHost;
+  saveCurrentConfig(): void;
+  saveGahModuleConfig(): void;
+  getTsConfig(): TsConfig
+  saveTsConfig(): void;
+  readExternalConfig(cfgPath: string): boolean;
+  deleteGahConfig(): void;
   externalConfigPath: string;
   externalConfig: GahModule;
 }

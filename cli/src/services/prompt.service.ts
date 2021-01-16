@@ -37,7 +37,7 @@ export class PromptService implements IPromptService {
 
   public async fuzzyPath(cfg: FuzzyPathPromptConfig) {
     const excludes = cfg.excludePattern || [];
-    const allFiles = await this._fileSystemService.getFilesFromGlob(
+    const allFiles = this._fileSystemService.getFilesFromGlob(
       cfg.startingDirectory ? `${cfg.startingDirectory}/**` : '**',
       ['node_modules', ...excludes],
       undefined,

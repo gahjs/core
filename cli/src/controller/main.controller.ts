@@ -46,14 +46,16 @@ export class MainController extends Controller {
   }
 
   public async main() {
-    if (await this._configService.getGahModuleType() === GahModuleType.HOST) {
+    if (this._configService.getGahModuleType() === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
       this._contextService.setContext({ currentBaseFolder: this._fileSystemService.join(process.cwd(), '.gah') });
     } else {
       this._contextService.setContext({ currentBaseFolder: process.cwd() });
     }
 
-    await this._pluginService.init();
+
+
+
 
     // This sets the debug context variable depending on the used options
     this._contextService.setContext({ debug: process.argv.some(x => x.toLowerCase() === '--debug') });
@@ -88,10 +90,6 @@ export class MainController extends Controller {
     // This is so useless, I love it.
     const fontWidth = process.stdout.columns > 111 ? 'full' : process.stdout.columns > 96 ? 'fitted' : 'controlled smushing';
 
-    program
-      .storeOptionsAsProperties()
-      .version(this._version);
-
     program.on('--help', () => {
       console.log(
         chalk.yellow(
@@ -101,6 +99,8 @@ export class MainController extends Controller {
     });
     console.log();
 
+    program
+      .version(this._version);
 
     program
       .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
@@ -205,7 +205,7 @@ export class MainController extends Controller {
 
 
   private async checkForUpdates() {
-    const gahData = await this._workspaceService.getGlobalData();
+    const gahData = this._workspaceService.getGlobalData();
     let checkNewVersion = false;
     if (gahData.lastUpdateCheck) {
       const hoursPassed = Math.abs(new Date().getTime() - new Date(gahData.lastUpdateCheck).getTime()) / 36e5;
@@ -237,7 +237,7 @@ export class MainController extends Controller {
       this._loggerService.warn('  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *');
     }
 
-    await this._workspaceService.saveGlobalGahData(gahData);
+    this._workspaceService.saveGlobalGahData(gahData);
   }
 
 }

@@ -19,7 +19,7 @@ export class PluginController extends Controller {
       return;
     }
 
-    const cfg = await this._configService.getCurrentConfig();
+    const cfg = this._configService.getCurrentConfig();
     cfg.plugins ??= new Array<GahPluginDependencyConfig>();
 
     if (cfg.plugins.some(x => x.name.toLowerCase() === pluginName?.toLowerCase())) {
@@ -79,11 +79,11 @@ export class PluginController extends Controller {
   public async run(command: string[]) {
     const cmd = command.splice(0, 1)[0];
     const args = command;
-    await this._pluginService.run(cmd, args);
+    this._pluginService.run(cmd, args);
   }
 
   private async askForInstalledPlugin(msg: string, pluginName?: string): Promise<string | null> {
-    const cfg = await this._configService.getCurrentConfig();
+    const cfg = this._configService.getCurrentConfig();
     if (!cfg.plugins) {
       this._loggerService.log('No plugins installed!');
       return null;

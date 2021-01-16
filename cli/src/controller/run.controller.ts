@@ -9,7 +9,7 @@ import { Controller } from './controller';
 export class RunController extends Controller {
 
   public async exec(command: string[], configurationName?: string) {
-    const isHost = await this._configService.getGahModuleType() === GahModuleType.HOST;
+    const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
 
     const likedEnvFile = '.gah/src/environment.json';
 
@@ -18,15 +18,15 @@ export class RunController extends Controller {
       const envFileSimpleName = configurationName ? `environment.${configurationName}.json` : 'environment.json';
       const envFileName = `env/${envFileSimpleName}`;
 
-      if (!await this._fileSystemService.fileExists(envFileName)) {
+      if (!this._fileSystemService.fileExists(envFileName)) {
         throw new Error(`Cannot find configuration file "${envFileSimpleName}"`);
       }
 
-      if (await this._fileSystemService.fileExists(likedEnvFile)) {
-        await this._fileSystemService.deleteFile(likedEnvFile);
+      if (this._fileSystemService.fileExists(likedEnvFile)) {
+        this._fileSystemService.deleteFile(likedEnvFile);
       }
 
-      await this._fileSystemService.createFileLink(likedEnvFile, envFileName);
+      this._fileSystemService.createFileLink(likedEnvFile, envFileName);
     }
 
     const opts = ['run', ...command];

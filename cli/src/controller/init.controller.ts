@@ -21,7 +21,7 @@ export class InitController extends Controller {
     if (!isHost) {
 
 
-      const packageJson = await this.getPackageJson();
+      const packageJson = this.getPackageJson();
 
       const newModuleName = await this.askModuleName(isHost, packageJson);
       if (!newModuleName && !isHost) {
@@ -76,15 +76,15 @@ export class InitController extends Controller {
 
     newModule.name = newModuleName;
 
-    const gahCfg = await this._configService.getGahModule();
+    const gahCfg = this._configService.getGahModule();
     if (assetsFolderPath) {
-      newModule.assetsPath = await this._fileSystemService.ensureRelativePath(assetsFolderPath);
+      newModule.assetsPath = this._fileSystemService.ensureRelativePath(assetsFolderPath);
     }
     if (stylesFilePath) {
-      newModule.stylesPath = await this._fileSystemService.ensureRelativePath(stylesFilePath);
+      newModule.stylesPath = this._fileSystemService.ensureRelativePath(stylesFilePath);
     }
     newModule.packageName = packageName;
-    newModule.publicApiPath = await this._fileSystemService.ensureRelativePath(publicApiPath);
+    newModule.publicApiPath = this._fileSystemService.ensureRelativePath(publicApiPath);
     newModule.baseNgModuleName = baseModuleName;
     newModule.isEntry = isEntry;
     if (overwrite) {
@@ -94,30 +94,29 @@ export class InitController extends Controller {
       gahCfg.modules.push(newModule);
     }
 
-    await this._configService.saveGahModuleConfig();
+    this._configService.saveGahModuleConfig();
   }
 
   private async doInitHost() {
-    if (await this._configService.gahConfigExists()) {
-      await this._configService.deleteGahConfig();
+    if (this._configService.gahConfigExists()) {
+      this._configService.deleteGahConfig();
     }
-    await this._configService.getGahHost(true);
+    this._configService.getGahHost(true);
 
-    await this._configService.saveGahModuleConfig();
+    this._configService.saveGahModuleConfig();
   }
 
   private async askBaseModuleName() {
-    const guessedName = await this.tryGuessbaseModuleName();
     return await this._promptService
       .input({
         msg: 'Enter the class name of the base NgModule for this GahModule (empty if there is none)',
         enabled: () => true,
-        default: guessedName
+        default: this.tryGuessbaseModuleName()
       });
   }
 
-  private async getPackageJson() {
-    const packageJson = await this._fileSystemService.tryReadFile('package.json');
+  private getPackageJson() {
+    const packageJson = this._fileSystemService.tryReadFile('package.json');
     if (packageJson) {
       return JSON.parse(packageJson) as PackageJson;
     }
@@ -125,8 +124,8 @@ export class InitController extends Controller {
   }
 
   private async askForPublicApiPath(isHost: boolean | undefined) {
-    let defaultPublicApiPath = (await this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist']))?.[0]
-      ?? (await this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist']))?.[0];
+    let defaultPublicApiPath = this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist'])?.[0]
+      ?? this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist'])?.[0];
 
 
     if (process.platform === 'win32' && defaultPublicApiPath) {
@@ -146,7 +145,7 @@ export class InitController extends Controller {
   }
 
   private async askForAssetsFolderPath(isHost: boolean | undefined) {
-    const defaultAssetsFolder = (await this._fileSystemService.getFilesFromGlob('**/assets', ['.gah', 'dist']))?.[0];
+    const defaultAssetsFolder = this._fileSystemService.getFilesFromGlob('**/assets', ['.gah', 'dist'])?.[0];
 
     const assetsFolderPath = await this._promptService
       .fuzzyPath({
@@ -162,8 +161,8 @@ export class InitController extends Controller {
 
   private async askForGlobalStylesPath(isHost: boolean | undefined) {
     let defaultStylesPath: string | null = null;
-    defaultStylesPath = (await this._fileSystemService.getFilesFromGlob('**/styles.scss', ['.gah', 'dist']))?.[0];
-    defaultStylesPath ??= (await this._fileSystemService.getFilesFromGlob('**/index.scss', ['.gah', 'dist']))?.[0];
+    defaultStylesPath = this._fileSystemService.getFilesFromGlob('**/styles.scss', ['.gah', 'dist'])?.[0];
+    defaultStylesPath ??= this._fileSystemService.getFilesFromGlob('**/index.scss', ['.gah', 'dist'])?.[0];
 
     if (process.platform === 'win32') {
       defaultStylesPath = defaultStylesPath?.replace(/\//g, '\\');
@@ -183,12 +182,11 @@ export class InitController extends Controller {
   }
 
   private async askForModuleOverwrite(newModuleName: string, packageName: string) {
-    const module = await this._configService.getGahModule();
     return await this._promptService
       .confirm({
         msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
         enabled: () => {
-          this.doesNameAndPackageExist(module, newModuleName, packageName);
+          this.doesNameAndPackageExist(this._configService.getGahModule(), newModuleName, packageName);
           return this.nameExists;
         }
       });
@@ -231,7 +229,7 @@ export class InitController extends Controller {
   }
 
   private async askForOverwrite(isHost: boolean | undefined) {
-    const alreadyInitialized = await this._configService.gahConfigExists();
+    const alreadyInitialized = this._configService.gahConfigExists();
 
     const overwriteHost = await this._promptService
       .confirm({
@@ -248,13 +246,13 @@ export class InitController extends Controller {
     return this.nameExists;
   }
 
-  private async tryGuessbaseModuleName(): Promise<string | undefined> {
-    const possibleModuleFiles = await this._fileSystemService.getFilesFromGlob('projects/**/src/lib/!(*routing*).module.ts');
+  private tryGuessbaseModuleName(): string | undefined {
+    const possibleModuleFiles = this._fileSystemService.getFilesFromGlob('projects/**/src/lib/!(*routing*).module.ts');
     if (!possibleModuleFiles || possibleModuleFiles.length === 0) {
       return undefined;
     }
 
-    const firtsPossibleModuleContent = await this._fileSystemService.readFile(possibleModuleFiles[0]);
+    const firtsPossibleModuleContent = this._fileSystemService.readFile(possibleModuleFiles[0]);
     const match = firtsPossibleModuleContent.match(/export class (\S+) {/);
     return match?.[1];
   }

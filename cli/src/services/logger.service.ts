@@ -1,9 +1,8 @@
 import { injectable, inject } from 'inversify';
 import { ILoggerService, IContextService } from '@gah/shared';
+import ora, { Ora } from 'ora';
+import chalk from 'chalk';
 import { ContextService } from './context-service';
-import { AwesomeLogger } from 'awesome-logging';
-import { TextObject } from 'awesome-logging/lib/models/text-object';
-import { AwesomeLoggerSpinnerControl } from 'awesome-logging/lib/logger/models/config/spinner';
 
 /**
  * TODO: Add logging to a file (error only or all)
@@ -12,8 +11,8 @@ import { AwesomeLoggerSpinnerControl } from 'awesome-logging/lib/logger/models/c
 
 @injectable()
 export class LoggerService implements ILoggerService {
-  private _isSpinning: boolean;
-  private _spinnerControl: AwesomeLoggerSpinnerControl;
+  private _ora: Ora;
+  private _lastOraText: string;
 
   @inject(ContextService)
   private readonly _contextService: IContextService;
@@ -23,46 +22,78 @@ export class LoggerService implements ILoggerService {
   }
 
   public log(text: string) {
-    const textObj = new TextObject(' ■ ', 'BLUE');
-    textObj.append(text);
-    AwesomeLogger.interrupt('text', { text: textObj });
+    this.interruptLoading(() => {
+      console.log(chalk.blue(' ■ ') + text);
+    });
   }
 
   public warn(text: string) {
-    const textObj = new TextObject(' ■ ', 'YELLOW');
-    textObj.append(text);
-    AwesomeLogger.interrupt('text', { text: textObj });
+    this.interruptLoading(() => {
+      console.warn(chalk.yellow(' ■ ') + text);
+    });
   }
   public error(text: string) {
-    const textObj = new TextObject(' ■ ', 'RED');
-    textObj.append(text);
-    AwesomeLogger.interrupt('text', { text: textObj });
+    this.interruptLoading(() => {
+      console.error(chalk.red(' ■ ') + text);
+    });
   }
   public debug(text: string) {
     if (this.debugLoggingEnabled) {
-      const textObj = new TextObject(' ■ ', 'MAGENTA');
-      textObj.append(text);
-      AwesomeLogger.interrupt('text', { text: textObj });
+      this.interruptLoading(() => {
+        console.log(chalk.magenta(' ■ ') + text);
+      });
     }
   }
   public success(text: string) {
-    const textObj = new TextObject(' ■ ', 'GREEN');
-    textObj.append(text);
-    AwesomeLogger.interrupt('text', { text: textObj });
+    this.interruptLoading(() => {
+      console.log(chalk.green(' ■ ') + text);
+    });
   }
 
   public startLoadingAnimation(text: string) {
-    const textObj = new TextObject(' ■ ', 'BLUE');
-    textObj.append(text);
-    this._spinnerControl = AwesomeLogger.log('spinner', { spinnerFrames: [' ▄', ' ■', ' ▀', ' ▀', ' ■'], spinnerColor: 'BLUE', spinnerDelay: 80, text });
-    this._isSpinning = true;
+    this._ora = ora({
+      text: text,
+      spinner: {
+        interval: 80,
+        frames: [' ▄', ' ■', ' ▀', ' ▀', ' ■']
+      }
+    }).start();
+    this._lastOraText = text;
   }
 
   public stopLoadingAnimation(removeLine: boolean = false, succeeded: boolean = true, text?: string): void {
-    if (!this._isSpinning) {
+    if (!this._ora?.isSpinning) {
       return;
     }
-    this._isSpinning = false;
-    this._spinnerControl.stop({ removeLine, succeeded, text });
+    if (removeLine) {
+      this._ora.stop();
+      return;
+    }
+    if (text) {
+      this._ora.stop();
+    }
+    if (succeeded) {
+      text && this.success(text);
+      text || this._ora.succeed();
+    }
+    else {
+      text && this.error(text);
+      text || this._ora.fail();
+    }
+  }
+
+  public getProgressBarString(total: number, current: number, length: number = 30, char0: string = '·', char1: string = '■'): string {
+    return chalk.gray('■') + chalk.blue(char1.repeat(current / total * length) + char0.repeat((1 - current / total) * length)) + chalk.gray('■');
+  }
+
+  public interruptLoading(interruptForAction: () => void) {
+    const isSpinning = this._ora?.isSpinning;
+    if (isSpinning) {
+      this._ora.stop();
+    }
+    interruptForAction();
+    if (isSpinning) {
+      this.startLoadingAnimation(this._lastOraText);
+    }
   }
 }

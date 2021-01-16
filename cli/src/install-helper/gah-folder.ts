@@ -54,39 +54,34 @@ export class GahFolder {
     return this._fileSystemService.join(this._pathRelativeToModuleBaseFolder, 'generated');
   }
 
-  public async cleanDependencyDirectory() {
-    await this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
-    await this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
+  public cleanDependencyDirectory() {
+    this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
   }
 
-  public async cleanStylesDirectory() {
-    await this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
-    await this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
+  public cleanStylesDirectory() {
+    this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.stylesPath));
   }
 
-  public async cleanPrecompiledFolder() {
-    await this._fileSystemService.deleteFilesInDirectory(this.precompiledPath);
-    await this._fileSystemService.ensureDirectory(this.precompiledPath);
+  public cleanPrecompiledFolder() {
+    this._fileSystemService.deleteFilesInDirectory(this.precompiledPath);
+    this._fileSystemService.ensureDirectory(this.precompiledPath);
     if (platform() === 'win32') {
       const fswin = require('fswin');
       fswin.setAttributesSync(this.precompiledPath, { IS_HIDDEN: true });
     }
   }
 
-  public async cleanGeneratedDirectory() {
-    await this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
-    await this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
+  public cleanGeneratedDirectory() {
+    this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
+    this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
   }
 
-  public async tryHideGahFolder() {
+  public tryHideGahFolder() {
     if (platform() === 'win32') {
       const fswin = require('fswin');
-      await new Promise((resolve, reject) => {
-        fswin.setAttributes(
-          this._fileSystemService.join(this._moduleBaseFolder, this._pathRelativeToModuleBaseFolder),
-          { IS_HIDDEN: true },
-          (succeeded: boolean) => succeeded ? resolve(null) : reject(null));
-      });
+      fswin.setAttributesSync(this._fileSystemService.join(this._moduleBaseFolder, this._pathRelativeToModuleBaseFolder), { IS_HIDDEN: true });
     }
   }
 
@@ -106,7 +101,7 @@ export class GahFolder {
     this._modulesTemplateData.modules.push(newTemplateData);
   }
 
-  public async generateFileFromTemplate() {
+  public generateFileFromTemplate() {
     this._templateService.renderFile(
       this._fileSystemService.join(__dirname, '../templates/modules.ejs.t'),
       this._modulesTemplateData,
