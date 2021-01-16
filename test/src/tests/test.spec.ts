@@ -14,6 +14,7 @@ describe('', async () => {
     await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
     // await gah.initModule('frame', true);
     await gah.runInstall('host', true);
-    (1 + 1).should.equal(2);
+
+    await gah.compareHost();
   });
 });
