@@ -38,9 +38,9 @@ export class WorkspaceService implements IWorkspaceService {
 
   public getGlobalGahFolder(): string {
     if (platform() === 'win32') {
-      return this._fileSystemService.join(process.env.APPDATA!, '..', 'Local', 'awdware', 'gah');
+      return this._fileSystemService.join(process.env.APPDATA!, '..', 'Local', 'gah');
     } else {
-      return this._fileSystemService.join(homedir(), 'awdware', 'gah');
+      return this._fileSystemService.join(homedir(), 'gah');
     }
   }
 

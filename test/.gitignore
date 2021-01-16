@@ -2,3 +2,4 @@ node_modules
 lib
 type-compat
 yarn-error.log
+working-dir

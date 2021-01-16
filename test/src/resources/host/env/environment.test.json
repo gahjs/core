@@ -1,0 +1,6 @@
+{
+  "$schema": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-environment-schema.json",
+  "production": false,
+  "apiUrl": "http://localhost:5555",
+  "test": true
+}

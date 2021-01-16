@@ -1,0 +1,71 @@
+{
+  "account": {
+    "help": {
+      "description": "Probleme beim Anmelden?",
+      "heading": "Hilfe"
+    },
+    "login": {
+      "description": "Mit existierendem Konto anmelden",
+      "form": {
+        "password": {
+          "name": "Passwort"
+        },
+        "submit": {
+          "name": "Anmelden"
+        },
+        "username": {
+          "name": "Benutzername"
+        }
+      },
+      "heading": "Anmelden"
+    },
+    "loginHelp": {
+      "form": {
+        "email": {
+          "name": "E-Mail"
+        },
+        "submitPassword": {
+          "name": "Passwort vergessen"
+        },
+        "submitUsername": {
+          "name": "Benutzername vergessen"
+        }
+      }
+    },
+    "register": {
+      "description": "Ein neues Konto erstellen",
+      "form": {
+        "email": {
+          "name": "E-Mail"
+        },
+        "firstname": {
+          "name": "Vorname"
+        },
+        "lastname": {
+          "name": "Nachname"
+        },
+        "password": {
+          "name": "Passwort"
+        },
+        "password2": {
+          "name": "Passwort wiederholen"
+        },
+        "submit": {
+          "name": "Konto erstellen"
+        },
+        "username": {
+          "name": "Benutzername"
+        }
+      },
+      "heading": "Registrieren"
+    }
+  },
+  "home": {
+    "theater": {
+      "hi": "Hi!",
+      "iam": "Ich bin",
+      "ilike": "Ich mag:",
+      "skills": {}
+    }
+  }
+}
