@@ -11,6 +11,8 @@ export class GahHostDef extends GahModuleBase {
   private _indexHtmlLines: string[];
   private _title: string;
   private _ngCompilerOptions: GahAngularCompilerOptions;
+  private _angularJson: any;
+  private _ngJsonPath: string;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[], gahConfigs: { moduleName: string, cfg: GahConfig }[]) {
     super(undefined, gahCfgPath);
@@ -54,8 +56,12 @@ export class GahHostDef extends GahModuleBase {
     this._indexHtmlLines = hostCfg.htmlHeadContent ? (Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent : [hostCfg.htmlHeadContent]) : [];
     this._title = hostCfg.title ?? '';
     this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`, this._gahCfgFolder);
-
     await this.initBase();
+  }
+
+  private async initAngularConfigObject() {
+    this._ngJsonPath = this.fileSystemService.join(this.basePath, 'angular.json');
+    this._angularJson = await this.fileSystemService.parseFile<any>(this._ngJsonPath);
   }
 
   public specificData(): Partial<GahModuleData> {
@@ -69,6 +75,7 @@ export class GahHostDef extends GahModuleBase {
       return;
     }
     await this.initTsConfigObject();
+    await this.initAngularConfigObject();
     this.installed = true;
 
     this.addInstallUnit(new InstallUnit('CLEAN_TS_CONFIG', { module: await this.data() }, undefined, 'Cleaning tsconfig.json', () => {
@@ -96,11 +103,16 @@ export class GahHostDef extends GahModuleBase {
       return this.createSymlinksToDependencies();
     }));
 
-    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data() }, ['CLEAN_TS_CONFIG'], 'Adjusting tsconfig.json', () => {
-      return Promise.all([
-        this.addDependenciesToTsConfigFile(),
-        this.setAngularCompilerOptionsInTsConfig()]);
-    }));
+    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG',
+      {
+        module: await this.data(),
+        tsConfig: this.tsConfigFile.getFileContents()
+      }, ['CLEAN_TS_CONFIG'], 'Adjusting tsconfig.json',
+      () => {
+        return Promise.all([
+          this.addDependenciesToTsConfigFile(),
+          this.setAngularCompilerOptionsInTsConfig()]);
+      }));
 
     this.addInstallUnit(new InstallUnit('GENERATE_TEMPLATE', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Generating module file', () => {
       return this.generateFromTemplate();
@@ -122,7 +134,7 @@ export class GahHostDef extends GahModuleBase {
       return Promise.all([this.adjustGitignore(), this.adjustGitignoreForHost()]);
     }));
 
-    this.addInstallUnit(new InstallUnit('ADJUST_ANGULAR_JSON', { module: await this.data() }, undefined, 'Adjusting angular.json', () => {
+    this.addInstallUnit(new InstallUnit('ADJUST_ANGULAR_JSON', { module: await this.data(), ngJson: this._angularJson }, undefined, 'Adjusting angular.json', () => {
       return this.adjustAngularJsonConfig();
     }));
 
@@ -312,12 +324,11 @@ export class GahHostDef extends GahModuleBase {
   }
 
   private async adjustAngularJsonConfig() {
-    const ngJsonPath = this.fileSystemService.join(this.basePath, 'angular.json');
-    const ngJson = await this.fileSystemService.parseFile<any>(ngJsonPath);
-    if (!this._ngOptions.aot) {
-      ngJson.projects['gah-host'].architect.build.options.aot = false;
 
-      const configs = ngJson.projects['gah-host'].architect.build.configurations;
+    if (!this._ngOptions.aot) {
+      this._angularJson.projects['gah-host'].architect.build.options.aot = false;
+
+      const configs = this._angularJson.projects['gah-host'].architect.build.configurations;
       const keys = Object.keys(configs);
       keys.forEach(key => {
         // buildOptimizer is only available when using aot. We have to disable it for all configurations
@@ -326,7 +337,7 @@ export class GahHostDef extends GahModuleBase {
         }
       });
     }
-    await this.fileSystemService.saveObjectToFile(ngJsonPath, ngJson, true);
+    await this.fileSystemService.saveObjectToFile(this._ngJsonPath, this._angularJson, true);
   }
 
   private async adjustIndexHtml() {

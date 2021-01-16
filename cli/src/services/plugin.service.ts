@@ -242,24 +242,25 @@ export class PluginService implements IPluginService {
     return pluginCfg;
   }
 
-  triggerEvent<T extends GahEventType>(type: T, payload: ExtractEventPayload<GahEvent, T>): void {
+  async triggerEvent<T extends GahEventType>(type: T, payload: ExtractEventPayload<GahEvent, T>): Promise<void> {
     this._loggerService.debug(`Event '${type}' fired`);
-    this._eventHandlers.forEach(handler => {
+    for (const handler of this._eventHandlers) {
       if (handler.eventType === type) {
         this._loggerService.debug(`Calling handler '${handler.pluginName}'`);
         try {
-          handler.handler(payload);
+          await handler.handler(payload);
         } catch (error) {
           this._loggerService.error(`Error in plugin ${handler.pluginName}.\nCallstack from plugin:`);
           this._loggerService.error(error);
           this._loggerService.log('--------------------------------------------------------------------------------');
           this._loggerService.log('Trying to continue with execution...\n');
+          return;
         }
       }
-    });
+    }
   }
 
-  registerEventHandler<T extends GahEventType>(pluginName: string, type: T, handler: (payload: ExtractEventPayload<GahEvent, T>) => void): void {
+  registerEventHandler<T extends GahEventType>(pluginName: string, type: T, handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void): void {
     const newHandler = new GahEventHandler<T>();
     newHandler.pluginName = pluginName;
     newHandler.eventType = type;

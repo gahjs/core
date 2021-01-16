@@ -21,7 +21,7 @@
         "plugins": [
           {
             "name": "@awdware/gah-translation-merger",
-            "version": "1.0.0",
+            "version": "2.0.0",
             "settings": {
               "searchGlobPattern": "src/assets/**/translations/*.json",
               "destinationPath": "src/assets/i18n",
@@ -29,8 +29,8 @@
             }
           },
           {
-            "name": "@awdware/gah-angular-json-plugin",
-            "version": "0.1.0",
+            "name": "@gah/json-config-plugin",
+            "version": "0.4.0-pre4",
             "settings": {
               "ngJson": {
                 "projects": {

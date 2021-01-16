@@ -196,29 +196,26 @@ export abstract class GahModuleBase {
     }
   }
 
-  private listenForFinishedUnit(unit: InstallUnit<any>, result: Promise<InstallUnitReturn>) {
-    return result.then(res => {
-      const index = this._installUnits.findIndex(x => x.id === unit.id);
-      unit.finished = true;
-      this.pluginService.triggerEvent(`AFTER_${unit.id}` as GahEventType, unit.eventPayload);
-      this.checkUnitDependencies();
-
-      this._progressLogger.changeState(index, this.loggerStateFromRes(res));
-
-      if (!this._installUnits.some(x => !x.finished)) {
-        this._installDone();
-      }
-    });
+  private async listenForFinishedUnit(unit: InstallUnit<any>, result: Promise<InstallUnitReturn>) {
+    const res = await result;
+    const index = this._installUnits.findIndex(x => x.id === unit.id);
+    unit.finished = true;
+    this.pluginService.triggerEvent((`AFTER_${unit.id}` as GahEventType), unit.eventPayload);
+    await this.checkUnitDependencies();
+    this._progressLogger.changeState(index, this.loggerStateFromRes(res));
+    if (!this._installUnits.some(x_1 => !x_1.finished)) {
+      this._installDone();
+    }
   }
 
-  private checkUnitDependencies() {
+  private async checkUnitDependencies() {
     const unstarted = this._installUnits.filter(x => !x.started);
     for (const unit of unstarted) {
       if (!unit.parents || !unit.parents.some(parent => !this._installUnits.find(x => x.id === parent)?.finished)) {
         unit.started = true;
         const index = this._installUnits.findIndex(x => x.id === unit.id);
         this._progressLogger.changeState(index, 'inProgress');
-        this.pluginService.triggerEvent(`BEFORE_${unit.id}` as GahEventType, unit.eventPayload);
+        await this.pluginService.triggerEvent(`BEFORE_${unit.id}` as GahEventType, unit.eventPayload);
         this.listenForFinishedUnit(unit, unit.action());
       }
     }

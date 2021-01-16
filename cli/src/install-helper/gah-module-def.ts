@@ -109,7 +109,7 @@ export class GahModuleDef extends GahModuleBase {
       return this.createSymlinksToDependencies();
     }));
 
-    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data() }, ['CLEAN_TS_CONFIG'], 'Cleanup', () => {
+    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data(), tsConfig: this.tsConfigFile.getFileContents() }, ['CLEAN_TS_CONFIG'], 'Cleanup', () => {
       return this.addDependenciesToTsConfigFile();
     }));
 

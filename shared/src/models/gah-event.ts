@@ -1,8 +1,9 @@
 import { GahFileData } from './install-helper/gah-file-data';
 import { GahModuleData } from './install-helper/gah-module-data';
+import { PackageJson } from './package-json';
 
 export type GahEventDefinitions =
-  { name: 'INSTALL', gahFile?: GahFileData, count: number } |
+  { name: 'INSTALL', gahFile?: GahFileData } |
   { name: 'PRE_INSTALL_SCRIPTS', module?: GahModuleData } |
   { name: 'POST_INSTALL_SCRIPTS', module?: GahModuleData } |
   { name: 'COPY_HOST', gahFile?: GahFileData } |
@@ -11,15 +12,15 @@ export type GahEventDefinitions =
   { name: 'CLEAN_GAH_FOLDER', module?: GahModuleData } |
   { name: 'GENERATE_STYLES_FILE', module?: GahModuleData } |
   { name: 'GENERATE_SYMLINKS', module?: GahModuleData } |
-  { name: 'ADJUST_TS_CONFIG', module?: GahModuleData } |
+  { name: 'ADJUST_TS_CONFIG', module?: GahModuleData, tsConfig: any } |
   { name: 'GENERATE_TEMPLATE_DATA', module?: GahModuleData } |
   { name: 'GENERATE_TEMPLATE', module?: GahModuleData } |
   { name: 'COPY_ASSETS', module?: GahModuleData } |
   { name: 'REFERENCE_STYLES', module?: GahModuleData } |
-  { name: 'MERGE_DEPENDENCIES', module?: GahModuleData } |
+  { name: 'MERGE_DEPENDENCIES', module?: GahModuleData, pkgJson: PackageJson } |
   { name: 'GENERATE_STYLE_IMPORTS', module?: GahModuleData } |
   { name: 'ADJUST_GITIGNORE', module?: GahModuleData } |
-  { name: 'ADJUST_ANGULAR_JSON', module?: GahModuleData } |
+  { name: 'ADJUST_ANGULAR_JSON', module?: GahModuleData, ngJson: any } |
   { name: 'ADJUST_INDEX_HTML', module?: GahModuleData } |
   { name: 'ADJUST_WEB_CONFIG', module?: GahModuleData } |
   { name: 'CLEAN_TEMPORARY_CHANGES', module?: GahModuleData } |

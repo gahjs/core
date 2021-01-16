@@ -7,6 +7,9 @@ export class TsConfigFile {
   private readonly _path: string;
   private _tsConfig: TsConfig;
 
+  public getFileContents(): TsConfig {
+    return this._tsConfig;
+  }
 
   public data(): TsConfigFileData {
     return {
