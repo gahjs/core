@@ -14,15 +14,16 @@ export class InstallController extends Controller {
       this._contextService.setContext({ configName });
     }
 
-    const isHost = this._configService.getGahModuleType() === GahModuleType.HOST;
+    const isHost = await this._configService.getGahModuleType() === GahModuleType.HOST;
     const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
 
     const gahFile = new GahFile(fileName);
+    await gahFile.init();
 
-    this._pluginService.triggerEvent('INSTALL_STARTED', { gahFile: gahFile.data() });
+    this._pluginService.triggerEvent('BEFORE_INSTALL', { gahFile: await gahFile.data() });
 
     await gahFile.install(skipPackageInstall);
 
-    this._pluginService.triggerEvent('INSTALL_FINISHED', {});
+    this._pluginService.triggerEvent('AFTER_INSTALL', { gahFile: await gahFile.data() });
   }
 }

@@ -46,16 +46,19 @@ export class PluginService implements IPluginService {
     this._executionService = DIContainer.get(ExecutionService);
 
     this._pluginFolder = this._fileSystemService.join(this._workspaceService.getWorkspaceFolder(), 'plugins');
-    this._fileSystemService.ensureDirectory(this._pluginFolder);
     this._pluginPackageJson = this._fileSystemService.join(this._pluginFolder, 'package.json');
-    if (!this._fileSystemService.fileExists(this._pluginPackageJson)) {
+  }
+
+  public async init(): Promise<void> {
+    await this._fileSystemService.ensureDirectory(this._pluginFolder);
+    if (!await this._fileSystemService.fileExists(this._pluginPackageJson)) {
       const packageJsonTemplatePath = this._fileSystemService.join(__dirname, '..', '..', 'assets', 'plugins', 'package.json');
-      this._fileSystemService.copyFile(packageJsonTemplatePath, this._pluginFolder);
+      await this._fileSystemService.copyFile(packageJsonTemplatePath, this._pluginFolder);
     }
   }
 
-  public isPluginConfigured(pluginName: string): boolean {
-    const cfg = this._configService.getCurrentConfig();
+  public async isPluginConfigured(pluginName: string): Promise<boolean> {
+    const cfg = await this._configService.getCurrentConfig();
     if (!cfg?.plugins || cfg.plugins.length === 0) {
       return false;
     }
@@ -75,7 +78,7 @@ export class PluginService implements IPluginService {
 
 
   public async loadInstalledPlugins(): Promise<void> {
-    const cfg = this._configService.getGahConfig();
+    const cfg = await this._configService.getGahConfig();
     if (!cfg?.plugins || cfg.plugins.length < 1) {
       return;
     }
@@ -116,14 +119,14 @@ export class PluginService implements IPluginService {
   }
 
   private async tryLoadInstalledPlugin(pluginName: string, pluginVersion?: string): Promise<{ plugin: GahPlugin, version: string } | undefined> {
-    const cfg = this._configService.getGahConfig();
+    const cfg = await this._configService.getGahConfig();
     if (!cfg?.plugins?.some(x => x.name === pluginName)) {
       this._loggerService.debug(`Plugin ${pluginName} not yet specified in gah config`);
       return undefined;
     }
 
     const pluginPkgJsonPath = this._fileSystemService.join(this._pluginFolder, 'package.json');
-    const pluginPkgJson = this._fileSystemService.parseFile<PackageJson>(pluginPkgJsonPath);
+    const pluginPkgJson = await this._fileSystemService.parseFile<PackageJson>(pluginPkgJsonPath);
     if (!pluginPkgJson || !pluginPkgJson.devDependencies || !pluginPkgJson.devDependencies[pluginName]) {
       return undefined;
     }
@@ -136,15 +139,15 @@ export class PluginService implements IPluginService {
 
     const pluginFolderPath = this._fileSystemService.join(this._pluginFolder, 'node_modules', pluginName);
 
-    if (!this._fileSystemService.fileExists(pluginFolderPath)) {
+    if (!await this._fileSystemService.fileExists(pluginFolderPath)) {
       this._loggerService.debug(`Cannot find plugin folder at ${pluginFolderPath}`);
       return undefined;
     }
 
     const importFileName = this.calculatePluginImportFileName(pluginName);
-    if (!this._fileSystemService.fileExists(importFileName)) {
+    if (!await this._fileSystemService.fileExists(importFileName)) {
       const importFileContent = `exports.PluginType = require("${pluginName}").default;`;
-      this._fileSystemService.saveFile(importFileName, importFileContent);
+      await this._fileSystemService.saveFile(importFileName, importFileContent);
     }
 
     try {
@@ -172,13 +175,13 @@ export class PluginService implements IPluginService {
     }
     this.initPluginServices(plugin);
 
-    const cfg = this._configService.getCurrentConfig();
+    const cfg = await this._configService.getCurrentConfig();
     const pluginCfg = cfg.plugins!.find(x => x.name === pluginName)!;
 
     this._loggerService.log(`Starting settings configuration for '${pluginName}'`);
     pluginCfg.settings = await plugin.onInstall(pluginCfg.settings);
     this._loggerService.log('Plugin settings configuration finished');
-    this._configService.saveCurrentConfig();
+    await this._configService.saveCurrentConfig();
 
     return true;
   }
@@ -207,7 +210,7 @@ export class PluginService implements IPluginService {
   }
 
   private async saveChangesToGahConfig(pluginName: string, downloadedVersion?: string) {
-    const cfg = this._configService.getCurrentConfig();
+    const cfg = await this._configService.getCurrentConfig();
     let pluginCfg: GahPluginDependencyConfig;
 
     cfg.plugins ??= new Array<GahPluginDependencyConfig>();
@@ -234,12 +237,12 @@ export class PluginService implements IPluginService {
     if (!cfg.plugins.some(x => x.name === pluginName)) {
       cfg.plugins.push(pluginCfg);
     }
-    this._configService.saveCurrentConfig();
+    await this._configService.saveCurrentConfig();
 
     return pluginCfg;
   }
 
-  triggerEvent<T extends GahEventType>(type: T, payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>): void {
+  triggerEvent<T extends GahEventType>(type: T, payload: ExtractEventPayload<GahEvent, T>): void {
     this._loggerService.debug(`Event '${type}' fired`);
     this._eventHandlers.forEach(handler => {
       if (handler.eventType === type) {
@@ -256,7 +259,7 @@ export class PluginService implements IPluginService {
     });
   }
 
-  registerEventHandler<T extends GahEventType>(pluginName: string, type: T, handler: (payload: Omit<ExtractEventPayload<GahEvent, T>, 'type'>) => void): void {
+  registerEventHandler<T extends GahEventType>(pluginName: string, type: T, handler: (payload: ExtractEventPayload<GahEvent, T>) => void): void {
     const newHandler = new GahEventHandler<T>();
     newHandler.pluginName = pluginName;
     newHandler.eventType = type;
@@ -281,18 +284,18 @@ export class PluginService implements IPluginService {
   public async removePlugin(pluginName: string): Promise<boolean> {
     this._loggerService.startLoadingAnimation(`Uninstalling plugin: ${pluginName}`);
 
-    const cfg = this._configService.getCurrentConfig();
+    const cfg = await this._configService.getCurrentConfig();
     const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
     if (idx === -1) { throw new Error(`Error uninstalling plugin ${pluginName}`); }
 
     cfg.plugins?.splice(idx, 1);
-    this._configService.saveCurrentConfig();
+    await this._configService.saveCurrentConfig();
 
     const success = await this._executionService.execute(`yarn remove ${pluginName}`, false, undefined, this._pluginFolder);
     if (success) {
       const pluginFileName = this.calculatePluginImportFileName(pluginName);
-      if (this._fileSystemService.fileExists(pluginFileName)) {
-        this._fileSystemService.deleteFile(pluginFileName);
+      if (await this._fileSystemService.fileExists(pluginFileName)) {
+        await this._fileSystemService.deleteFile(pluginFileName);
       }
 
       this._loggerService.stopLoadingAnimation(false, true, `Plugin '${pluginName}' has been uninstalled.`);
@@ -306,7 +309,7 @@ export class PluginService implements IPluginService {
 
 
   public async getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null> {
-    const cfg = this._configService.getCurrentConfig();
+    const cfg = await this._configService.getCurrentConfig();
     if (!cfg.plugins) {
       this._loggerService.log('No plugins installed!');
       return null;
@@ -343,12 +346,12 @@ export class PluginService implements IPluginService {
       this._loggerService.stopLoadingAnimation(false, false, 'Updating plugin(s) failed');
       throw new Error(`Updating plugin(s) failed\n${this._executionService.executionErrorResult}`);
     }
-    const gahCfg = this._configService.getCurrentConfig();
+    const gahCfg = await this._configService.getCurrentConfig();
     pluginUpdates.forEach(pluginUpdate => {
       const plugin = gahCfg.plugins?.find(x => x.name === pluginUpdate.name);
       plugin!.version = pluginUpdate.toVersion;
     });
-    this._configService.saveCurrentConfig();
+    await this._configService.saveCurrentConfig();
   }
 
   registerCommandHandler(pluginName: string, commandName: string, handler: (args: string[]) => Promise<boolean>): void {

@@ -2,32 +2,37 @@ import { GahModuleBase } from './gah-module-base';
 import { GahConfig, GahModule, GahModuleData } from '@gah/shared';
 import { GahFolder } from './gah-folder';
 import chalk from 'chalk';
+import { InstallUnit } from './install-unit';
 
 export class GahModuleDef extends GahModuleBase {
   constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[], gahConfigs: { moduleName: string, cfg: GahConfig }[]) {
-    super(gahCfgPath, moduleName);
+    super(moduleName, gahCfgPath);
     this.isHost = false;
     initializedModules.push(this);
+    this.initializedModules = initializedModules;
+    this.gahConfigs = gahConfigs;
+    this.moduleName = moduleName;
 
     this.installStepCount = 8;
     this._installDescriptionText = `Installing ${chalk.green(this.moduleName)}`;
+  }
 
+  public async init() {
     let moduleCfgData: GahModule;
     try {
-      moduleCfgData = this.fileSystemService.parseFile<GahModule>(gahCfgPath);
+      moduleCfgData = await this.fileSystemService.parseFile<GahModule>(this.gahCfgPath!);
     } catch (error) {
-      this.loggerService.error(`could not parse module file at ${gahCfgPath}`);
+      this.loggerService.error(`could not parse module file at ${this.gahCfgPath}`);
       throw error;
     }
 
-    const moduleCfg = moduleCfgData.modules.find(x => x.name === moduleName);
+    const moduleCfg = moduleCfgData.modules.find(x => x.name === this.moduleName);
     if (!moduleCfg) {
-      throw new Error(`Cannot find module with name "${moduleName}" in file "${gahCfgPath}"`);
+      throw new Error(`Cannot find module with name "${this.moduleName}" in file "${this.gahCfgPath}"`);
     }
-    this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(gahCfgPath));
+    this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(this.gahCfgPath!));
     this.srcBasePath = this.fileSystemService.getDirectoryPathFromFilePath(moduleCfg.publicApiPath);
-    this.initTsConfigObject();
-    this.moduleName = moduleName;
+    await this.initTsConfigObject();
     this.dependencies = new Array<GahModuleBase>();
     this.packageName = moduleCfg.packageName;
     this.assetsFolderRelativeToBasePaths = moduleCfg.assetsPath;
@@ -40,33 +45,38 @@ export class GahModuleDef extends GahModuleBase {
     this.aliasNames = [];
 
     if (moduleCfg.config) {
-      gahConfigs.push({ cfg: moduleCfg.config, moduleName: this.moduleName });
+      this.gahConfigs.push({ cfg: moduleCfg.config, moduleName: this.moduleName! });
     }
 
-    moduleCfg.dependencies?.forEach(moduleDependency => {
-      moduleDependency.names.forEach(depModuleName => {
-        const depAbsoluteBasepath = this.fileSystemService.join(this.basePath, moduleDependency.path);
-        const alreadyInitialized = initializedModules.find(x => x.moduleName === depModuleName);
-        if (alreadyInitialized) {
-          if (moduleDependency.aliasName) {
-            alreadyInitialized.addAlias(this.moduleName!, moduleDependency.aliasName);
-          }
-          this.dependencies.push(alreadyInitialized);
-        } else {
-          if (this.fileSystemService.fileExists(depAbsoluteBasepath)) {
-            const newModuleDef = new GahModuleDef(depAbsoluteBasepath, depModuleName, initializedModules, gahConfigs);
+    if (moduleCfg.dependencies) {
+      for (const moduleDependency of moduleCfg.dependencies) {
+        for (const depModuleName of moduleDependency.names) {
+          const depAbsoluteBasepath = this.fileSystemService.join(this.basePath, moduleDependency.path);
+          const alreadyInitialized = this.initializedModules.find(x => x.moduleName === depModuleName);
+          if (alreadyInitialized) {
             if (moduleDependency.aliasName) {
-              newModuleDef.addAlias(this.moduleName!, moduleDependency.aliasName);
+              alreadyInitialized.addAlias(this.moduleName!, moduleDependency.aliasName);
             }
-            this.dependencies.push(newModuleDef);
+            this.dependencies.push(alreadyInitialized);
           } else {
-            throw new Error(`Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
+            if (await this.fileSystemService.fileExists(depAbsoluteBasepath)) {
+              const newModuleDef = new GahModuleDef(depAbsoluteBasepath, depModuleName, this.initializedModules, this.gahConfigs);
+              await newModuleDef.init();
+              if (moduleDependency.aliasName) {
+                newModuleDef.addAlias(this.moduleName!, moduleDependency.aliasName);
+              }
+              this.dependencies.push(newModuleDef);
+            } else {
+              throw new Error(`Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
+            }
           }
         }
-      });
-    });
+      }
+    }
 
     this.gahFolder = new GahFolder(this.basePath, this.srcBasePath);
+
+    await this.initBase();
   }
 
   public specificData(): Partial<GahModuleData> {
@@ -77,34 +87,57 @@ export class GahModuleDef extends GahModuleBase {
     if (this.installed) {
       return;
     }
+
     this.installed = true;
-    this.prog('preinstall scripts');
-    await this.executePreinstallScripts();
-    this.prog('cleanup');
-    this.tsConfigFile.clean();
-    this.gahFolder.cleanDependencyDirectory();
-    this.gahFolder.cleanStylesDirectory();
-    this.gahFolder.cleanPrecompiledFolder();
-    this.gahFolder.tryHideGahFolder();
-    this.prog('linking dependencies');
-    await this.createSymlinksToDependencies();
-    this.pluginService.triggerEvent('SYMLINKS_CREATED', { module: this.data() });
-    this.prog('referencing dependencies');
-    await this.addDependenciesToTsConfigFile();
-    this.pluginService.triggerEvent('TS_CONFIG_ADJUSTED', { module: this.data() });
-    this.prog('adjusting configurations');
-    this.adjustGitignore();
-    this.pluginService.triggerEvent('GITIGNORE_ADJUSTED', { module: this.data() });
-    this.pluginService.triggerEvent('BEFORE_INSTALL_PACKAGES', { module: this.data() });
-    this.prog('installing packages');
-    if (!skipPackageInstall) {
-      await this.installPackages();
-    }
-    this.prog('importing styles');
-    this.generateStyleImports();
-    this.prog('postinstall scripts');
-    await this.executePostinstallScripts();
-    this.cleanupService.cleanJsonFileTemporaryChanges();
+
+    this.addInstallUnit(new InstallUnit('CLEAN_TS_CONFIG', { module: await this.data() }, undefined, 'Cleanup', () => {
+      return this.tsConfigFile.clean();
+    }));
+
+    this.addInstallUnit(new InstallUnit('CLEAN_GAH_FOLDER', { module: await this.data() }, undefined, 'Cleanup', () => {
+      return Promise.all(
+        [
+          this.gahFolder.cleanDependencyDirectory(),
+          this.gahFolder.cleanStylesDirectory(),
+          this.gahFolder.cleanPrecompiledFolder(),
+          this.gahFolder.tryHideGahFolder()
+        ]
+      );
+    }));
+
+    this.addInstallUnit(new InstallUnit('GENERATE_SYMLINKS', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Cleanup', () => {
+      return this.createSymlinksToDependencies();
+    }));
+
+    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG', { module: await this.data() }, ['CLEAN_TS_CONFIG'], 'Cleanup', () => {
+      return this.addDependenciesToTsConfigFile();
+    }));
+
+    this.addInstallUnit(new InstallUnit('ADJUST_GITIGNORE', { module: await this.data() }, undefined, 'Cleanup', () => {
+      return this.adjustGitignore();
+    }));
+
+    this.addInstallUnit(new InstallUnit('PRE_INSTALL_SCRIPTS', { module: await this.data() }, undefined, 'Preinstall Scripts', () => {
+      return this.executePreinstallScripts();
+    }));
+
+    this.addInstallUnit(new InstallUnit('INSTALL_PACKAGES', { module: await this.data() }, undefined, 'Preinstall Scripts', async () => {
+      return this.installPackages(skipPackageInstall);
+    }));
+
+    this.addInstallUnit(new InstallUnit('GENERATE_STYLE_IMPORTS', { module: await this.data() }, ['INSTALL_PACKAGES'], 'Preinstall Scripts', async () => {
+      return this.generateStyleImports();
+    }));
+
+    this.addInstallUnit(new InstallUnit('POST_INSTALL_SCRIPTS', { module: await this.data() }, ['GENERATE_STYLE_IMPORTS'], 'Preinstall Scripts', async () => {
+      return this.executePostinstallScripts();
+    }));
+
+    this.addInstallUnit(new InstallUnit('CLEAN_TEMPORARY_CHANGES', { module: await this.data() }, ['POST_INSTALL_SCRIPTS'], 'Preinstall Scripts', async () => {
+      return this.cleanupService.cleanJsonFileTemporaryChanges();
+    }));
+
+    await this.doInstall();
   }
 
 }

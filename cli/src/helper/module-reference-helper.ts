@@ -63,7 +63,9 @@ export class ModuleReferenceHelper {
     isHost: boolean,
     msg: string,
     moduleName?: string) {
-    const availableModules = isHost ? configService.getGahHost().modules.map(x => x.names).reduce((a, b) => a.concat(b)) : configService.getGahModule().modules.map(x => x.name);
+    const availableModules = isHost ?
+      (await configService.getGahHost()).modules.map(x => x.names).reduce((a, b) => a.concat(b)) :
+      (await configService.getGahModule()).modules.map(x => x.name);
 
     if (moduleName && !availableModules.includes(moduleName)) {
       throw new Error(`Cannot find module ${moduleName}`);
@@ -101,9 +103,9 @@ export class ModuleReferenceHelper {
 
     const existingDependencies =
       (isHost ?
-        configService.getGahHost().modules
+        (await configService.getGahHost()).modules
         :
-        configService.getGahModule().modules.find(x => x.name === moduleName)?.dependencies)
+        (await configService.getGahModule()).modules.find(x => x.name === moduleName)?.dependencies)
         ?.map(x => x.names).reduce((a, b) => a.concat(b));
 
     if (!existingDependencies || existingDependencies.length === 0) {

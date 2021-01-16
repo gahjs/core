@@ -2,6 +2,11 @@
   "name": "@gah/shared",
   "version": "0.4.2",
   "description": "Provides types and interfaces for gah",
+  "homepage": "https://github.com/gahjs/core",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gahjs/core.git"
+  },
   "main": "./lib/index.js",
   "scripts": {
     "prebuild": "del-cli lib",
@@ -10,22 +15,25 @@
     "drop": "yarn run build && yarn publish --access public --no-git-tag-version",
     "schema": "node generate-schema.js"
   },
+  "engines": {
+    "node": ">=12.0"
+  },
   "author": "LoaderB0T",
   "license": "MIT",
   "private": false,
   "dependencies": {},
   "devDependencies": {
     "@awdware/eslint-config-nodejs": "^0.0.6",
-    "@types/node": "^14.6.0",
-    "@typescript-eslint/eslint-plugin": "^3.10.1",
-    "@typescript-eslint/parser": "^3.10.1",
+    "@types/node": "^14.14.20",
+    "@typescript-eslint/eslint-plugin": "^4.13.0",
+    "@typescript-eslint/parser": "^4.13.0",
     "del-cli": "^3.0.1",
-    "downlevel-dts": "^0.6.0",
-    "eslint": "^7.7.0",
+    "downlevel-dts": "^0.7.0",
+    "eslint": "^7.17.0",
     "fs-extra": "^9.0.1",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.0.2",
-    "typescript-json-schema": "^0.43.0"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.1.3",
+    "typescript-json-schema": "^0.47.0"
   },
   "types": "lib/index.d.ts",
   "typesVersions": {

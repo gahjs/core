@@ -9,7 +9,7 @@ import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 export class HostModuleController extends Controller {
 
   public async remove(): Promise<void> {
-    if (this._configService.getGahModuleType() === GahModuleType.MODULE) {
+    if (await this._configService.getGahModuleType() === GahModuleType.MODULE) {
       this._loggerService.error('This command is only available for hosts');
       this._loggerService.error('Please use the "dependency" command instead');
       return;
@@ -21,7 +21,7 @@ export class HostModuleController extends Controller {
       return;
     }
 
-    const host = this._configService.getGahHost();
+    const host = await this._configService.getGahHost();
 
     for (const modName of moduleNames) {
 
@@ -35,19 +35,19 @@ export class HostModuleController extends Controller {
       }
     }
 
-    this._configService.saveGahModuleConfig();
+    await this._configService.saveGahModuleConfig();
 
     this._loggerService.success(`${moduleNames.length === 1 ? 'Module' : 'Modules'} ${moduleNames.join(', ')} removed successfully`);
   }
 
   public async add(): Promise<void> {
-    if (this._configService.getGahModuleType() === GahModuleType.MODULE) {
+    if (await this._configService.getGahModuleType() === GahModuleType.MODULE) {
       this._loggerService.error('This command is only available for hosts');
       this._loggerService.error('Please use the "dependency" command instead');
       return;
     }
 
-    const cfg = this._configService.getGahHost();
+    const cfg = await this._configService.getGahHost();
 
     this._loggerService.log('Adding new module to host');
 
@@ -57,14 +57,14 @@ export class HostModuleController extends Controller {
     if (!dependencyConfigPath) {
       return;
     }
-    this._configService.readExternalConfig(dependencyConfigPath);
+    await this._configService.readExternalConfig(dependencyConfigPath);
 
     const dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService);
 
-    this.doAdd(dependencyModuleNames, cfg);
+    await this.doAdd(dependencyModuleNames, cfg);
   }
 
-  private doAdd(dependencyModuleNames: string[], cfg: GahHost) {
+  private async doAdd(dependencyModuleNames: string[], cfg: GahHost) {
     const newDep = new ModuleReference();
     newDep.path = this._configService.externalConfigPath;
     const selectedModules = this._configService.externalConfig.modules.filter(x => dependencyModuleNames!.includes(x.name));
@@ -75,7 +75,7 @@ export class HostModuleController extends Controller {
 
     cfg.modules ??= new Array<ModuleReference>();
     cfg.modules.push(newDep);
-    this._configService.saveGahModuleConfig();
+    await this._configService.saveGahModuleConfig();
     this._loggerService.success('Dependency added successfully.');
   }
 }
