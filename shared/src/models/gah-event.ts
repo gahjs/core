@@ -2,7 +2,7 @@ import { GahFileData } from './install-helper/gah-file-data';
 import { GahModuleData } from './install-helper/gah-module-data';
 
 export type GahEventDefinitions =
-  { name: 'INSTALL', gahFile?: GahFileData } |
+  { name: 'INSTALL', gahFile?: GahFileData, count: number } |
   { name: 'PRE_INSTALL_SCRIPTS', module?: GahModuleData } |
   { name: 'POST_INSTALL_SCRIPTS', module?: GahModuleData } |
   { name: 'COPY_HOST', gahFile?: GahFileData } |
@@ -40,7 +40,7 @@ export type GahEventDefinitions =
 export type GahEventFull<A extends GahEventDefinitions, T> =
   A extends { name: T } ?
   (({ type: `BEFORE_${A['name']}` } & Omit<A, 'name'>) | ({ type: `AFTER_${A['name']}` } & Omit<A, 'name'>))
-  : never
+  : never;
 
 // This uses said type to actually create the new type
 export type GahEvent = GahEventFull<GahEventDefinitions, any>;
