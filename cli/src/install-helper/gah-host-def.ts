@@ -126,9 +126,12 @@ export class GahHostDef extends GahModuleBase {
       return this.referenceGlobalStyles();
     }));
 
-    this.addInstallUnit(new InstallUnit('MERGE_DEPENDENCIES', { module: await this.data() }, undefined, 'Merging dependencies', () => {
-      return this.mergePackageDependencies();
-    }));
+    this.addInstallUnit(new InstallUnit('MERGE_DEPENDENCIES',
+      { module: await this.data(), pkgJson: await this.getPackageJson() },
+      undefined, 'Merging dependencies',
+      () => {
+        return this.mergePackageDependencies();
+      }));
 
     this.addInstallUnit(new InstallUnit('ADJUST_GITIGNORE', { module: await this.data() }, undefined, 'Adjusting .gitignore', () => {
       return Promise.all([this.adjustGitignore(), this.adjustGitignoreForHost()]);
