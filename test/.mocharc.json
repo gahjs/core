@@ -5,7 +5,7 @@
   "require": [
     "ts-node/register"
   ],
-  "reporter": "xunit",
+  // "reporter": "xunit",
   "reporter-option": [
     "output=test-results.xml"
   ]

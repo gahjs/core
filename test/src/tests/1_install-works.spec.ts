@@ -5,49 +5,53 @@ import { SinonSpy, spy } from "sinon";
 import { Asserter } from "../helper/asserter";
 import { GahHelper } from "../helper/gah-helper";
 
-let gah: GahHelper;
-let asserter: Asserter;
-let writeSpy: SinonSpy;
+describe('Basic Tests', () => {
 
-before(() => {
-  writeSpy = spy(process.stdout, 'write') as SinonSpy<[string], boolean>;
-  asserter = new Asserter(writeSpy);
-});
 
-beforeEach(async function () {
-  const title = this.currentTest?.title;
-  gah = new GahHelper(title!);
-  writeSpy.resetHistory();
-  await gah.clean();
-});
+  let gah: GahHelper;
+  let asserter: Asserter;
+  let writeSpy: SinonSpy;
 
-it('1_install-works', async () => {
-  await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
-  await gah.runInstall('host', true);
+  before(() => {
+    writeSpy = spy(process.stdout, 'write') as SinonSpy<[string], boolean>;
+    asserter = new Asserter(writeSpy);
+  });
 
-  await gah.compareHost();
-});
+  beforeEach(async function () {
+    const title = this.currentTest?.title;
+    gah = new GahHelper(title!);
+    writeSpy.resetHistory();
+    await gah.clean();
+  });
 
-it('2_check-plugin-updates-none-installed', async () => {
-  await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
-  await gah.runPluginUpdate('host');
-  asserter.assertLog('No plugins installed!');
-});
+  it('1_install-works', async () => {
+    await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
+    await gah.runInstall('host', true);
 
-it('3_check-plugin-updates-no-updates', async () => {
-  await gah.copyModules(['core', 'shared', 'led']);
-  await gah.runPluginUpdate('led');
-  asserter.assertNoLog('No plugins installed!');
-  asserter.assertLog('No plugins can be updated.');
-});
+    await gah.compareHost();
+  });
 
-it('4_check-plugin-updates-found-updates', async () => {
-  await gah.copyModules(['core', 'shared', 'led']);
-  await gah.modifyModuleConfig('led', 'modules.0.config.plugins.0.version', '0.0.1');
-  PromptMock.addMock(0);
-  await gah.runPluginUpdate('led');
-  asserter.assertNoLog('No plugins installed!');
-  asserter.assertNoLog('No plugins can be updated.');
-  asserter.assertLog('@gah/test-plugin can be updated from version 0.0.1 to version 1.0.0');
-  asserter.assertLog('Updated plugins');
+  it('2_check-plugin-updates-none-installed', async () => {
+    await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
+    await gah.runPluginUpdate('host');
+    asserter.assertLog('No plugins installed!');
+  });
+
+  it('3_check-plugin-updates-no-updates', async () => {
+    await gah.copyModules(['core', 'shared', 'led']);
+    await gah.runPluginUpdate('led');
+    asserter.assertNoLog('No plugins installed!');
+    asserter.assertLog('No plugins can be updated.');
+  });
+
+  it('4_check-plugin-updates-found-updates', async () => {
+    await gah.copyModules(['core', 'shared', 'led']);
+    await gah.modifyModuleConfig('led', 'modules.0.config.plugins.0.version', '0.0.1');
+    PromptMock.addMock(0);
+    await gah.runPluginUpdate('led');
+    asserter.assertNoLog('No plugins installed!');
+    asserter.assertNoLog('No plugins can be updated.');
+    asserter.assertLog('@gah/test-plugin can be updated from version 0.0.1 to version 1.0.0');
+    asserter.assertLog('Updated plugins');
+  });
 });

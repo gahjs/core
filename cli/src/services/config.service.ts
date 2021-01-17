@@ -77,7 +77,7 @@ export class ConfigService implements IConfigurationService {
     if (hasHostCfg) {
       return GahModuleType.HOST;
     }
-    return GahModuleType.UNKNOWN;
+    throw new Error('Neither a gah-module.json nor a gah-host.json file was found');
   }
 
   private async loadGahModuleConfig(isHost?: boolean): Promise<void> {
