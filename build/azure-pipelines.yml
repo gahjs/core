@@ -99,7 +99,7 @@ steps:
     testResultsFormat: 'XUnit'
     testResultsFiles: '*.xml'
     searchFolder: '$(Build.SourcesDirectory)/test/results'
-    testRunTitle: 'Gah Regression Tests'
+    testRunTitle: 'Gah tests'
   displayName: "\U0001F680 Publish test results"
 
 - task: PublishPipelineArtifact@1
