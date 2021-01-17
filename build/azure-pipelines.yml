@@ -98,7 +98,7 @@ steps:
   inputs:
     testResultsFiles: 'test/test-results.xml'
     testResultsFormat: 'xunit'
-  displayName: "\U0001F680 Publish test resolts"
+  displayName: "\U0001F680 Publish test results"
 
 - task: PublishPipelineArtifact@1
   inputs:
