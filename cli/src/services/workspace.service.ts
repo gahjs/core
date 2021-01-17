@@ -1,19 +1,19 @@
 import { injectable } from 'inversify';
 import { FileSystemService } from './file-system.service';
-import { IWorkspaceService, IFileSystemService, GlobalGahData, ILoggerService } from '@gah/shared';
+import { IWorkspaceService, IFileSystemService, GlobalGahData, IContextService } from '@gah/shared';
 import { platform, homedir } from 'os';
 import { createHash } from 'crypto';
-import { LoggerService } from './logger.service';
 import DIContainer from '../di-container';
+import { ContextService } from './context-service';
 
 @injectable()
 export class WorkspaceService implements IWorkspaceService {
   private readonly _fileSystemService: IFileSystemService;
-  private readonly _loggerService: ILoggerService;
+  private readonly _contextService: IContextService;
 
   constructor() {
     this._fileSystemService = DIContainer.get(FileSystemService);
-    this._loggerService = DIContainer.get(LoggerService);
+    this._contextService = DIContainer.get(ContextService);
   }
 
   public async ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string): Promise<void> {
@@ -37,10 +37,11 @@ export class WorkspaceService implements IWorkspaceService {
   }
 
   public getGlobalGahFolder(): string {
+    const isTextContext = this._contextService.getContext().test;
     if (platform() === 'win32') {
-      return this._fileSystemService.join(process.env.APPDATA!, '..', 'Local', 'gah');
+      return this._fileSystemService.join(process.env.APPDATA!, '..', 'Local', isTextContext ? 'gah-test' : 'gah');
     } else {
-      return this._fileSystemService.join(homedir(), 'gah');
+      return this._fileSystemService.join(homedir(), isTextContext ? 'gah-test' : 'gah');
     }
   }
 

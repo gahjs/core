@@ -14,7 +14,7 @@ export class PromptService implements IPromptService {
 
   }
 
-  public async input(cfg: PromptConfig) {
+  public async input(cfg: PromptConfig): Promise<string> {
     return prompt({
       type: 'input',
       name: '_',
@@ -25,7 +25,7 @@ export class PromptService implements IPromptService {
     }).then((_: any) => _._);
   }
 
-  public async confirm(cfg: PromptConfig) {
+  public async confirm(cfg: PromptConfig): Promise<boolean> {
     return prompt({
       type: 'confirm',
       name: '_',
@@ -35,7 +35,7 @@ export class PromptService implements IPromptService {
     }).then((_: any) => _._);
   }
 
-  public async fuzzyPath(cfg: FuzzyPathPromptConfig) {
+  public async fuzzyPath(cfg: FuzzyPathPromptConfig): Promise<string> {
     const excludes = cfg.excludePattern || [];
     const allFiles = await this._fileSystemService.getFilesFromGlob(
       cfg.startingDirectory ? `${cfg.startingDirectory}/**` : '**',
@@ -50,7 +50,7 @@ export class PromptService implements IPromptService {
     const def = cfg.optional ? 0 : cfg.default && defaultIndex || undefined;
 
     if (filteredFiles.length === 0) {
-      return;
+      return '';
     }
 
     if (cfg.optional) {
@@ -70,7 +70,7 @@ export class PromptService implements IPromptService {
   }
 
 
-  public async list(cfg: SelectionPromptConfig) {
+  public async list(cfg: SelectionPromptConfig): Promise<string> {
     return prompt({
       type: 'select',
       name: '_',
@@ -80,10 +80,10 @@ export class PromptService implements IPromptService {
     }).then((_: any) => _._);
   }
 
-  public async checkbox(cfg: SelectionPromptConfig) {
+  public async checkbox(cfg: SelectionPromptConfig): Promise<string[]> {
     // Workaround for https://github.com/enquirer/enquirer/issues/298
     if (!cfg.enabled()) {
-      return null;
+      return undefined as any as string[];
     }
 
     return prompt({

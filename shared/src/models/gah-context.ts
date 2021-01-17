@@ -7,4 +7,5 @@ export interface GahContext {
   oneTimeClearDone?: boolean;
   yarnTimeout?: number;
   configName?: string;
+  test?: boolean;
 }

@@ -13,7 +13,23 @@
             "core"
           ]
         }
-      ]
+      ],
+      "config": {
+        "plugins": [
+          {
+            "name": "@gah/test-plugin",
+            "version": "1.0.0",
+            "settings": {
+              "someSetting": "yee.json",
+              "somePathSetting": "angular.json",
+              "someArraySetting": [
+                "Option1",
+                "Option2"
+              ]
+            }
+          }
+        ]
+      }
     }
   ]
 }

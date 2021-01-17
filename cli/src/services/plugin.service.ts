@@ -22,8 +22,8 @@ export class PluginService implements IPluginService {
   private readonly _plugins = new Array<GahPlugin>();
   private readonly _eventHandlers = new Array<GahEventHandler<any>>();
   private readonly _commandHandlers = new Array<GahCommandHandler>();
-  private readonly _pluginFolder: string;
-  private readonly _pluginPackageJson: string;
+  private _pluginFolder: string;
+  private _pluginPackageJson: string;
 
   public pluginNames: { name: string, version: string }[] = [];
 
@@ -44,12 +44,12 @@ export class PluginService implements IPluginService {
     this._promptService = DIContainer.get(PromptService);
     this._workspaceService = DIContainer.get(WorkspaceService);
     this._executionService = DIContainer.get(ExecutionService);
-
-    this._pluginFolder = this._fileSystemService.join(this._workspaceService.getWorkspaceFolder(), 'plugins');
-    this._pluginPackageJson = this._fileSystemService.join(this._pluginFolder, 'package.json');
   }
 
   public async init(): Promise<void> {
+    this._pluginFolder = this._fileSystemService.join(this._workspaceService.getWorkspaceFolder(), 'plugins');
+    this._pluginPackageJson = this._fileSystemService.join(this._pluginFolder, 'package.json');
+
     await this._fileSystemService.ensureDirectory(this._pluginFolder);
     if (!await this._fileSystemService.fileExists(this._pluginPackageJson)) {
       const packageJsonTemplatePath = this._fileSystemService.join(__dirname, '..', '..', 'assets', 'plugins', 'package.json');
@@ -152,11 +152,11 @@ export class PluginService implements IPluginService {
 
     try {
       const pluginModule = require(importFileName);
-      const plugin = new pluginModule.PluginType() as GahPlugin;
-      return { plugin, version: actualPluginVersion };
+      const plugin = new pluginModule.PluginType();
+      return { plugin: plugin as GahPlugin, version: actualPluginVersion };
     } catch (error) {
-      this._loggerService.debug('Plugin package folder exists, but import failed');
-      this._loggerService.debug(error);
+      this._loggerService.error('Plugin package folder exists, but import failed');
+      this._loggerService.error(error);
       return undefined;
     }
   }

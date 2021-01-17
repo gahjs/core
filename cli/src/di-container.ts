@@ -24,7 +24,7 @@ import { TemplateService } from './services/template.service';
 import { WorkspaceService } from './services/workspace.service';
 
 
-const DIContainer = new Container();
+export const DIContainer = new Container();
 DIContainer.bind<DependencyController>(DependencyController).toSelf().inSingletonScope();
 DIContainer.bind<HostModuleController>(HostModuleController).toSelf().inSingletonScope();
 DIContainer.bind<InitController>(InitController).toSelf().inSingletonScope();

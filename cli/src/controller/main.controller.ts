@@ -1,7 +1,7 @@
 import { injectable, inject } from 'inversify';
 import chalk from 'chalk';
 import figlet from 'figlet';
-import { program } from 'commander';
+import { Option, Command } from 'commander';
 import compareVersions from 'compare-versions';
 
 import { InitController } from './init.controller';
@@ -53,11 +53,11 @@ export class MainController extends Controller {
       this._contextService.setContext({ currentBaseFolder: process.cwd() });
     }
 
-    await this._pluginService.init();
-
     // This sets the debug context variable depending on the used options
     this._contextService.setContext({ debug: process.argv.some(x => x.toLowerCase() === '--debug') });
+    this._contextService.setContext({ test: process.argv.some(x => x.toLowerCase() === '--usetestcontext') });
     this._contextService.setContext({ skipScripts: process.argv.some(x => x.toLowerCase() === '--skipscripts') });
+
     // Yarn timeout
     const yarnTimeoutIndex = process.argv.findIndex(x => x.toLowerCase() === '--yarntimeout');
     if (yarnTimeoutIndex !== -1) {
@@ -81,12 +81,16 @@ export class MainController extends Controller {
 
     this._loggerService.debug(`WORKSPACE HASH: ${chalk.red(this._workspaceService.getWorkspaceHash())}`);
 
+    await this._pluginService.init();
+
     await this._gitService.init();
 
     await this._pluginService.loadInstalledPlugins();
 
     // This is so useless, I love it.
     const fontWidth = process.stdout.columns > 111 ? 'full' : process.stdout.columns > 96 ? 'fitted' : 'controlled smushing';
+
+    const program = new Command();
 
     program
       .storeOptionsAsProperties()
@@ -105,7 +109,8 @@ export class MainController extends Controller {
     program
       .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
       .option('--debug', 'Enables verbose debug logging')
-      .option('--config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)');
+      .option('--config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)')
+      .addOption(new Option('--useTestContext', 'enables the test context. Used in automated tests, never in production!').hideHelp());
 
     const cmdModule = program
       .command('module')
