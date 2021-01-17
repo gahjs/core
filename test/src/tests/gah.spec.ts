@@ -56,6 +56,6 @@ describe('Basic Tests', () => {
     asserter.assertNoLog('No plugins installed!');
     asserter.assertNoLog('No plugins can be updated.');
     asserter.assertLog('@gah/test-plugin can be updated from version 0.0.1 to version 1.0.0');
-    asserter.assertLog('Updated plugins');
+    asserter.assertNoLog('Updated plugins');
   });
 });
