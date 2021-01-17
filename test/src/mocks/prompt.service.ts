@@ -1,7 +1,7 @@
-import { injectable } from 'inversify';
 import { PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig } from '@gah/shared';
 import { PromptService } from '@gah/cli/lib/services/prompt.service';
 import { PromptMock } from '../helper/prompt';
+import { FileSystemService } from '@gah/cli/lib/services/file-system.service';
 
 
 const respose = (cfg: PromptConfig, type: "string" | "number" | "boolean" | "object") => {
@@ -25,11 +25,9 @@ const respose = (cfg: PromptConfig, type: "string" | "number" | "boolean" | "obj
   return res;
 }
 
-
-@injectable()
 export class MockPromptService extends PromptService {
-  constructor() {
-    super();
+  constructor(fileSystemService: FileSystemService) {
+    super(fileSystemService);
   }
 
   public async input(cfg: PromptConfig): Promise<string> {

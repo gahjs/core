@@ -13,7 +13,8 @@
   "private": false,
   "dependencies": {
     "@gah/cli": "^0.5.15",
-    "@gah/shared": "^0.5.7"
+    "@gah/shared": "^0.5.7",
+    "awilix": "^4.3.1"
   },
   "devDependencies": {
     "@angular/cli": "^11.0.7",

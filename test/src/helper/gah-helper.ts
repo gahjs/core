@@ -9,6 +9,7 @@ import fs from 'fs-extra';
 import { homedir, platform } from 'os';
 import { parse, stringify } from 'comment-json';
 import { PromptMock } from './prompt';
+import { asClass } from 'awilix';
 require('should');
 
 const workingDir = path.join(__dirname, '../../working-dir');
@@ -21,14 +22,12 @@ export class GahHelper {
   constructor(title: string) {
     this.testTitle = title;
     this.testId = Number.parseInt(title.split('_')[0]);
-
     PromptMock.reset();
-
   }
 
   async clean() {
-    // gahDiContainer.unbind(PromptService);
-    // gahDiContainer.bind(PromptService).to(MockPromptService);
+    gahDiContainer.register({ promptService: asClass(MockPromptService) });
+    gahDiContainer.dispose();
 
     await fs.promises.rmdir(workingDir, { recursive: true });
     await fs.ensureDir(workingDir);
