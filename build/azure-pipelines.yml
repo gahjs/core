@@ -96,8 +96,10 @@ steps:
 
 - task: PublishTestResults@2
   inputs:
-    testResultsFiles: 'test/test-results.xml'
-    testResultsFormat: 'xunit'
+    testResultsFormat: 'XUnit'
+    testResultsFiles: '*.xml'
+    searchFolder: '$(Build.SourcesDirectory)/test/results'
+    testRunTitle: 'Gah Regression Tests'
   displayName: "\U0001F680 Publish test results"
 
 - task: PublishPipelineArtifact@1
