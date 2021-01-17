@@ -64,6 +64,36 @@ steps:
     projectDirectory: 'cli'
   displayName: "\U0001F6E0 Build cli"
 
+- task: Yarn@3
+  inputs:
+    arguments: 'install'
+    projectDirectory: 'test'
+  displayName: "\U0001F4E6 Install packages for tests"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'link @gah/shared'
+    projectDirectory: 'test'
+  displayName: "\U0001F503 use linked shared in test"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'link @gah/cli'
+    projectDirectory: 'test'
+  displayName: "\U0001F503 use linked cli in test"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'run test'
+    projectDirectory: 'test'
+  displayName: "\U0001F52C Run tests"
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFiles: 'test/test-results.xml'
+    testResultsFormat: 'xunit'
+  displayName: "\U0001F680 Publish test resolts"
+
 - task: PublishPipelineArtifact@1
   inputs:
     targetPath: '$(Build.SourcesDirectory)/cli'

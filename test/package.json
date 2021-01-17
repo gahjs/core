@@ -11,6 +11,9 @@
   "author": "LoaderB0T",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "test": "yarn mocha -p tsconfig.json ./src/tests/*.spec.ts"
+  },
   "dependencies": {
     "@gah/cli": "^0.5.15",
     "@gah/shared": "^0.5.7",
