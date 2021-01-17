@@ -18,7 +18,7 @@ steps:
 - task: YarnInstaller@3
   inputs:
     versionSpec: '1.x'
-  displayName: "\U0001F4E5 Install Node.js"
+  displayName: "\U0001F4E5 Install Yarn"
 
 - task: Yarn@3
   inputs:
@@ -63,6 +63,44 @@ steps:
     arguments: 'run build'
     projectDirectory: 'cli'
   displayName: "\U0001F6E0 Build cli"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'link'
+    projectDirectory: 'cli'
+  displayName: "\U0001F503 link cli"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'install'
+    projectDirectory: 'test'
+  displayName: "\U0001F4E6 Install packages for tests"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'link @gah/shared'
+    projectDirectory: 'test'
+  displayName: "\U0001F503 use linked shared in test"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'link @gah/cli'
+    projectDirectory: 'test'
+  displayName: "\U0001F503 use linked cli in test"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'run test'
+    projectDirectory: 'test'
+  displayName: "\U0001F52C Run tests"
+
+- task: PublishTestResults@2
+  inputs:
+    testResultsFormat: 'XUnit'
+    testResultsFiles: '*.xml'
+    searchFolder: '$(Build.SourcesDirectory)/test/results'
+    testRunTitle: 'Gah tests'
+  displayName: "\U0001F680 Publish test results"
 
 - task: PublishPipelineArtifact@1
   inputs:

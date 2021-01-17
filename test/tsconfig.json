@@ -1,4 +1,8 @@
 {
+  "exclude": [
+    "**/resources/**",
+    "**/working-dir/**"
+  ],
   "compilerOptions": {
     "target": "ES2019",
     "module": "CommonJS",

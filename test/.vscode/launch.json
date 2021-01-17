@@ -10,11 +10,6 @@
       "name": "Mocha All",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
       "args": [
-        "-r",
-        "ts-node/register",
-        "--timeout",
-        "999999",
-        "--colors",
         "-p",
         "tsconfig.json",
         "${workspaceFolder}/src/**/*.spec.ts",
