@@ -7,6 +7,6 @@
   ],
   "reporter": "xunit",
   "reporter-option": [
-    "output=test-results.xml"
+    "output=results/test-result.xml"
   ]
 }
