@@ -22,7 +22,7 @@ beforeEach(async function () {
   await gah.clean();
 });
 
-it('1_install-works', async () => {
+xit('1_install-works', async () => {
   await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
   await gah.runInstall('host', true);
 
@@ -42,7 +42,7 @@ it('3_check-plugin-updates-no-updates', async () => {
   asserter.assertLog('No plugins can be updated.');
 });
 
-it('4_check-plugin-updates-found-updates', async () => {
+xit('4_check-plugin-updates-found-updates', async () => {
   await gah.copyModules(['core', 'shared', 'led']);
   await gah.modifyModuleConfig('led', 'modules.0.config.plugins.0.version', '0.0.1');
   PromptMock.addMock(0);
