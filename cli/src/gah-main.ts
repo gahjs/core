@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { DIContainer } from './di-container';
 
 import { MainController } from './controller/main.controller';
@@ -11,10 +10,9 @@ export const gahMain = async () => {
   console.log(chalk.bold(chalk.whiteBright(`gah v${pjson.version}`)));
   let mainController: MainController;
   await (async () => {
-    DIContainer.load();
-    mainController = DIContainer.resolve<MainController>(MainController);
+    mainController = DIContainer.resolve<MainController>('mainController');
 
-    DIContainer.get(ContextService).setContext({ calledFromCli: true });
+    DIContainer.resolve<ContextService>('contextService').setContext({ calledFromCli: true });
 
     // Call main method
     await mainController.main();

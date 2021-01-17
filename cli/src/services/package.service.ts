@@ -1,16 +1,12 @@
-import { inject, injectable } from 'inversify';
-import { LoggerService } from './logger.service';
-import { IExecutionService, ILoggerService, IPackageService } from '@gah/shared';
+import { IExecutionService, IPackageService } from '@gah/shared';
 import { ExecutionService } from './execution.service';
-
-
-@injectable()
 export class PackageService implements IPackageService {
 
-  @inject(LoggerService)
-  private readonly _loggerService: ILoggerService;
-  @inject(ExecutionService)
   private readonly _executionService: IExecutionService;
+
+  constructor(executionService: ExecutionService) {
+    this._executionService = executionService;
+  }
 
   public async findLatestPackageVersion(packageName: string): Promise<string> {
     const success = await this._executionService.execute(`yarn info --json ${packageName} version`, false);

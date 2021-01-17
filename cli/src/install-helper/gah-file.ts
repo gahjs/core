@@ -31,10 +31,10 @@ export class GahFile {
 
   constructor(filePath: string) {
 
-    this._fileSystemService = DIContainer.get(FileSystemService);
-    this._workspaceService = DIContainer.get(WorkspaceService);
-    this._loggerService = DIContainer.get(LoggerService);
-    this._pluginService = DIContainer.get(PluginService);
+    this._fileSystemService = DIContainer.resolve<FileSystemService>('fileSystemService');
+    this._workspaceService = DIContainer.resolve<WorkspaceService>('workspaceService');
+    this._loggerService = DIContainer.resolve<LoggerService>('loggerService');
+    this._pluginService = DIContainer.resolve<PluginService>('pluginService');
     this.isInstalled = false;
     this._modules = new Array<GahModuleBase>();
     this._configs = new Array<{ moduleName: string, cfg: GahConfig }>();

@@ -1,11 +1,8 @@
-import { injectable } from 'inversify';
-
 import { ModuleReference, GahModuleType } from '@gah/shared';
 
 import { Controller } from './controller';
 import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 
-@injectable()
 export class DependencyController extends Controller {
 
   public async remove(): Promise<void> {

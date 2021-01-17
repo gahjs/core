@@ -1,6 +1,5 @@
-import { inject, injectable } from 'inversify';
 import { ChildProcess, exec, spawn } from 'child_process';
-import { IExecutionService, ILoggerService } from '@gah/shared';
+import { IExecutionService } from '@gah/shared';
 import { LoggerService } from './logger.service';
 import chalk from 'chalk';
 import path from 'path';
@@ -8,12 +7,15 @@ import fs from 'fs-extra';
 /**
  * TODO: Use loggerservice to ensure that this works with loading animations, but without any square before the msg
  */
-@injectable()
+
 export class ExecutionService implements IExecutionService {
   public executionResult: string = '';
   public executionErrorResult: string = '';
-  @inject(LoggerService)
-  private readonly _loggerService: ILoggerService;
+  private readonly _loggerService: LoggerService;
+
+  constructor(loggerService: LoggerService) {
+    this._loggerService = loggerService;
+  }
 
 
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string, cwd?: string): Promise<boolean> {

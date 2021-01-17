@@ -1,4 +1,3 @@
-import { injectable, inject } from 'inversify';
 import { ILoggerService, IContextService } from '@gah/shared';
 import { ContextService } from './context-service';
 import { AwesomeLogger } from 'awesome-logging';
@@ -10,13 +9,15 @@ import { AwesomeLoggerSpinnerControl } from 'awesome-logging/lib/logger/models/c
  * Either flag or property in GahConfig!
  */
 
-@injectable()
 export class LoggerService implements ILoggerService {
   private _isSpinning: boolean;
   private _spinnerControl: AwesomeLoggerSpinnerControl;
 
-  @inject(ContextService)
   private readonly _contextService: IContextService;
+
+  constructor(contextService: ContextService) {
+    this._contextService = contextService;
+  }
 
   private get debugLoggingEnabled(): boolean {
     return this._contextService.getContext().debug ?? false;

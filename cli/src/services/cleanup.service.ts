@@ -1,7 +1,5 @@
-import { injectable } from 'inversify';
 import deepEqual from 'deep-equal';
 import chalk from 'chalk';
-import { DIContainer } from '../di-container';
 
 import { IFileSystemService, ICleanupService, ILoggerService, IGitService } from '@gah/shared';
 
@@ -9,18 +7,16 @@ import { FileSystemService } from './file-system.service';
 import { LoggerService } from './logger.service';
 import { GitService } from './git.service';
 
-
-@injectable()
 export class CleanupSevice implements ICleanupService {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _loggerService: ILoggerService;
   private readonly _gitService: IGitService;
   private _temporaryJsonFileChanges: { filePath: string, propertyPath: string, previousValue: any }[] = [];
 
-  constructor() {
-    this._fileSystemService = DIContainer.get(FileSystemService);
-    this._loggerService = DIContainer.get(LoggerService);
-    this._gitService = DIContainer.get(GitService);
+  constructor(fileSystemService: FileSystemService, loggerService: LoggerService, gitService: GitService) {
+    this._fileSystemService = fileSystemService;
+    this._loggerService = loggerService;
+    this._gitService = gitService;
   }
 
 

@@ -1,7 +1,4 @@
-import { injectable } from 'inversify';
-
 import { GahConfig, GahHost, GahModule, GahModuleType, IConfigurationService, IContextService, IFileSystemService, ILoggerService, TsConfig } from '@gah/shared';
-import { DIContainer } from '../di-container';
 import { LoggerService } from './logger.service';
 import { FileSystemService } from './file-system.service';
 import { ContextService } from './context-service';
@@ -12,7 +9,6 @@ const gahModuleConfigFileName = 'gah-module.json';
 const gahHostConfigFileName = 'gah-host.json';
 const tsConfigPath = 'tsconfig.json';
 
-@injectable()
 export class ConfigService implements IConfigurationService {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _contextService: IContextService;
@@ -27,10 +23,10 @@ export class ConfigService implements IConfigurationService {
   private _configs: { moduleName: string; cfg: GahConfig; }[];
   private _globalCfg: GahConfig;
 
-  constructor() {
-    this._fileSystemService = DIContainer.get(FileSystemService);
-    this._loggerService = DIContainer.get(LoggerService);
-    this._contextService = DIContainer.get(ContextService);
+  constructor(fileSystemService: FileSystemService, loggerService: LoggerService, contextService: ContextService) {
+    this._fileSystemService = fileSystemService;
+    this._loggerService = loggerService;
+    this._contextService = contextService;
   }
 
   private get gahConfigFileName() {

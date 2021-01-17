@@ -15,7 +15,6 @@ before(() => {
 });
 
 beforeEach(async function () {
-  await import('reflect-metadata');
   const title = this.currentTest?.title;
   gah = new GahHelper(title!);
   writeSpy.resetHistory();

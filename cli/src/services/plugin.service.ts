@@ -1,5 +1,3 @@
-import { injectable } from 'inversify';
-
 import {
   GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig, GahCommandHandler,
   IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
@@ -13,10 +11,8 @@ import { TemplateService } from './template.service';
 import { PromptService } from './prompt.service';
 import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
-import { DIContainer } from '../di-container';
 import chalk from 'chalk';
 
-@injectable()
 export class PluginService implements IPluginService {
 
   private readonly _plugins = new Array<GahPlugin>();
@@ -36,14 +32,22 @@ export class PluginService implements IPluginService {
   private readonly _executionService: IExecutionService;
   private readonly _pluginData: { [pluginName: string]: { [key: string]: any } } = {};
 
-  constructor() {
-    this._fileSystemService = DIContainer.get(FileSystemService);
-    this._loggerService = DIContainer.get(LoggerService);
-    this._configService = DIContainer.get(ConfigService);
-    this._templateService = DIContainer.get(TemplateService);
-    this._promptService = DIContainer.get(PromptService);
-    this._workspaceService = DIContainer.get(WorkspaceService);
-    this._executionService = DIContainer.get(ExecutionService);
+  constructor(
+    fileSystemService: FileSystemService,
+    loggerService: LoggerService,
+    configService: ConfigService,
+    templateService: TemplateService,
+    promptService: PromptService,
+    workspaceService: WorkspaceService,
+    executionService: ExecutionService
+  ) {
+    this._fileSystemService = fileSystemService;
+    this._loggerService = loggerService;
+    this._configService = configService;
+    this._templateService = templateService;
+    this._promptService = promptService;
+    this._workspaceService = workspaceService;
+    this._executionService = executionService;
   }
 
   public async init(): Promise<void> {

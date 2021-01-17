@@ -1,9 +1,6 @@
-import { injectable } from 'inversify';
-
 import { GahPluginDependencyConfig, PlguinUpdate } from '@gah/shared';
 import { Controller } from './controller';
 
-@injectable()
 export class PluginController extends Controller {
   public async add(pluginName?: string) {
 

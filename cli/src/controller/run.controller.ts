@@ -1,11 +1,7 @@
-import { injectable } from 'inversify';
-
 import { GahModuleType } from '@gah/shared';
 
 import { Controller } from './controller';
 
-
-@injectable()
 export class RunController extends Controller {
 
   public async exec(command: string[], configurationName?: string) {

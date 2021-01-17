@@ -14,8 +14,8 @@ export class GahFolder {
   private readonly _modulesTemplateData: ModulesTemplateData;
 
   constructor(moduleBaseFolder: string, srcBasePath: string, gahCfgFolder?: string) {
-    this._fileSystemService = DIContainer.get(FileSystemService);
-    this._templateService = DIContainer.get(TemplateService);
+    this._fileSystemService = DIContainer.resolve<FileSystemService>('fileSystemService');
+    this._templateService = DIContainer.resolve<TemplateService>('templateService');
     this._modulesTemplateData = new ModulesTemplateData();
 
     this._gahCfgFolder = gahCfgFolder ?? moduleBaseFolder;

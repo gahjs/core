@@ -1,4 +1,4 @@
-import { Container } from 'inversify';
+import { asClass, createContainer, InjectionMode, Lifetime } from 'awilix';
 
 import { DependencyController } from './controller/dependency.controller';
 import { HostModuleController } from './controller/hostModule.controller';
@@ -24,26 +24,30 @@ import { TemplateService } from './services/template.service';
 import { WorkspaceService } from './services/workspace.service';
 
 
-export const DIContainer = new Container();
-DIContainer.bind<DependencyController>(DependencyController).toSelf().inSingletonScope();
-DIContainer.bind<HostModuleController>(HostModuleController).toSelf().inSingletonScope();
-DIContainer.bind<InitController>(InitController).toSelf().inSingletonScope();
-DIContainer.bind<InstallController>(InstallController).toSelf().inSingletonScope();
-DIContainer.bind<MainController>(MainController).toSelf().inSingletonScope();
-DIContainer.bind<PluginController>(PluginController).toSelf().inSingletonScope();
-DIContainer.bind<RunController>(RunController).toSelf().inSingletonScope();
-DIContainer.bind<TidyController>(TidyController).toSelf().inSingletonScope();
-DIContainer.bind<WhyController>(WhyController).toSelf().inSingletonScope();
+export const DIContainer = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
-DIContainer.bind<CleanupSevice>(CleanupSevice).toSelf().inSingletonScope();
-DIContainer.bind<ConfigService>(ConfigService).toSelf().inSingletonScope();
-DIContainer.bind<ContextService>(ContextService).toSelf().inSingletonScope();
-DIContainer.bind<ExecutionService>(ExecutionService).toSelf().inSingletonScope();
-DIContainer.bind<FileSystemService>(FileSystemService).toSelf().inSingletonScope();
-DIContainer.bind<GitService>(GitService).toSelf().inSingletonScope();
-DIContainer.bind<LoggerService>(LoggerService).toSelf().inSingletonScope();
-DIContainer.bind<PackageService>(PackageService).toSelf().inSingletonScope();
-DIContainer.bind<PluginService>(PluginService).toSelf().inSingletonScope();
-DIContainer.bind<PromptService>(PromptService).toSelf().inSingletonScope();
-DIContainer.bind<TemplateService>(TemplateService).toSelf().inSingletonScope();
-DIContainer.bind<WorkspaceService>(WorkspaceService).toSelf().inSingletonScope();
+DIContainer.register(
+  {
+    dependencyController: asClass(DependencyController, { lifetime: Lifetime.SINGLETON }),
+    hostModuleController: asClass(HostModuleController, { lifetime: Lifetime.SINGLETON }),
+    initController: asClass(InitController, { lifetime: Lifetime.SINGLETON }),
+    installController: asClass(InstallController, { lifetime: Lifetime.SINGLETON }),
+    mainController: asClass(MainController, { lifetime: Lifetime.SINGLETON }),
+    pluginController: asClass(PluginController, { lifetime: Lifetime.SINGLETON }),
+    runController: asClass(RunController, { lifetime: Lifetime.SINGLETON }),
+    tidyController: asClass(TidyController, { lifetime: Lifetime.SINGLETON }),
+    whyController: asClass(WhyController, { lifetime: Lifetime.SINGLETON }),
+    cleanupSevice: asClass(CleanupSevice, { lifetime: Lifetime.SINGLETON }),
+    configService: asClass(ConfigService, { lifetime: Lifetime.SINGLETON }),
+    contextService: asClass(ContextService, { lifetime: Lifetime.SINGLETON }),
+    executionService: asClass(ExecutionService, { lifetime: Lifetime.SINGLETON }),
+    fileSystemService: asClass(FileSystemService, { lifetime: Lifetime.SINGLETON }),
+    gitService: asClass(GitService, { lifetime: Lifetime.SINGLETON }),
+    loggerService: asClass(LoggerService, { lifetime: Lifetime.SINGLETON }),
+    packageService: asClass(PackageService, { lifetime: Lifetime.SINGLETON }),
+    pluginService: asClass(PluginService, { lifetime: Lifetime.SINGLETON }),
+    promptService: asClass(PromptService, { lifetime: Lifetime.SINGLETON }),
+    templateService: asClass(TemplateService, { lifetime: Lifetime.SINGLETON }),
+    workspaceService: asClass(WorkspaceService, { lifetime: Lifetime.SINGLETON })
+  }
+);

@@ -31,7 +31,9 @@
   "private": false,
   "dependencies": {
     "@gah/shared": "^0.5.7",
+    "add": "^2.0.6",
     "awesome-logging": "0.0.1-pre1",
+    "awilix": "^4.3.1",
     "chalk": "^4.1.0",
     "change-case": "^4.1.2",
     "commander": "^7.0.0",
@@ -46,10 +48,9 @@
     "fs-extra": "^9.0.1",
     "fswin": "^3.21.107",
     "globby": "^11.0.2",
-    "inversify": "^5.0.5",
     "ora": "^5.2.0",
-    "reflect-metadata": "~0.1.13",
-    "simple-git": "^2.31.0"
+    "simple-git": "^2.31.0",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@awdware/eslint-config-nodejs": "^0.0.6",

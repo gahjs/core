@@ -1,18 +1,17 @@
-import { inject, injectable } from 'inversify';
 import { LoggerService } from './logger.service';
-import { IExecutionService, ILoggerService, IGitService } from '@gah/shared';
-import { ExecutionService } from './execution.service';
+import { ILoggerService, IGitService } from '@gah/shared';
 import simpleGit, { SimpleGit } from 'simple-git';
 import chalk from 'chalk';
 const git: SimpleGit = simpleGit();
 
 
-@injectable()
 export class GitService implements IGitService {
-  @inject(LoggerService)
   private readonly _loggerService: ILoggerService;
-  @inject(ExecutionService)
-  private readonly _executionService: IExecutionService;
+
+  constructor(loggerService: LoggerService) {
+    this._loggerService = loggerService;
+  }
+
 
   public async init(): Promise<void> {
     const rootDir = await this.getRootDir();

@@ -27,8 +27,8 @@ export class GahHelper {
   }
 
   async clean() {
-    gahDiContainer.unbind(PromptService);
-    gahDiContainer.bind(PromptService).to(MockPromptService);
+    // gahDiContainer.unbind(PromptService);
+    // gahDiContainer.bind(PromptService).to(MockPromptService);
 
     await fs.promises.rmdir(workingDir, { recursive: true });
     await fs.ensureDir(workingDir);

@@ -1,19 +1,16 @@
-import { injectable } from 'inversify';
 import { FileSystemService } from './file-system.service';
 import { IWorkspaceService, IFileSystemService, GlobalGahData, IContextService } from '@gah/shared';
 import { platform, homedir } from 'os';
 import { createHash } from 'crypto';
-import { DIContainer } from '../di-container';
 import { ContextService } from './context-service';
 
-@injectable()
 export class WorkspaceService implements IWorkspaceService {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _contextService: IContextService;
 
-  constructor() {
-    this._fileSystemService = DIContainer.get(FileSystemService);
-    this._contextService = DIContainer.get(ContextService);
+  constructor(fileSystemService: FileSystemService, contextService: ContextService) {
+    this._fileSystemService = fileSystemService;
+    this._contextService = contextService;
   }
 
   public async ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string): Promise<void> {

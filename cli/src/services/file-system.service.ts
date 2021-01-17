@@ -1,4 +1,3 @@
-import { injectable, inject } from 'inversify';
 import fs from 'fs-extra';
 import path_ from 'path';
 import { IFileSystemService, ILoggerService, IExecutionService, FileSystemType } from '@gah/shared';
@@ -11,14 +10,14 @@ import decompress from 'decompress';
 import chalk from 'chalk';
 const decompressTargz = require('decompress-targz');
 
-@injectable()
 export class FileSystemService implements IFileSystemService {
-  @inject(ExecutionService)
   private readonly _executionService: IExecutionService;
-  @inject(LoggerService)
   private readonly _loggerService: ILoggerService;
 
-  constructor() { }
+  constructor(executionService: ExecutionService, loggerService: LoggerService) {
+    this._executionService = executionService;
+    this._loggerService = loggerService;
+  }
 
   async fileExists(path: string): Promise<boolean> {
     return new Promise(r => fs.access(path, fs.constants.F_OK, e => r(!e)));

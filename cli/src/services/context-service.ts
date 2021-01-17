@@ -1,7 +1,4 @@
-import { injectable } from 'inversify';
 import { IContextService, GahContext } from '@gah/shared';
-
-@injectable()
 export class ContextService implements IContextService {
   private readonly _ctx: GahContext;
 

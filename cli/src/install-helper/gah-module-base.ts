@@ -70,16 +70,16 @@ export abstract class GahModuleBase {
 
 
   constructor(moduleName?: string, gahCfgPath?: string) {
-    this.cleanupService = DIContainer.get(CleanupSevice);
-    this.fileSystemService = DIContainer.get(FileSystemService);
-    this.workspaceService = DIContainer.get(WorkspaceService);
-    this.templateService = DIContainer.get(TemplateService);
-    this.executionService = DIContainer.get(ExecutionService);
-    this.loggerService = DIContainer.get(LoggerService);
-    this.packageService = DIContainer.get(PackageService);
-    this.pluginService = DIContainer.get(PluginService);
-    this.contextService = DIContainer.get(ContextService);
-    this.cfgService = DIContainer.get(ConfigService);
+    this.cleanupService = DIContainer.resolve<CleanupSevice>('cleanupSevice');
+    this.fileSystemService = DIContainer.resolve<FileSystemService>('fileSystemService');
+    this.workspaceService = DIContainer.resolve<WorkspaceService>('workspaceService');
+    this.templateService = DIContainer.resolve<TemplateService>('templateService');
+    this.executionService = DIContainer.resolve<ExecutionService>('executionService');
+    this.loggerService = DIContainer.resolve<LoggerService>('loggerService');
+    this.packageService = DIContainer.resolve<PackageService>('packageService');
+    this.pluginService = DIContainer.resolve<PluginService>('pluginService');
+    this.contextService = DIContainer.resolve<ContextService>('contextService');
+    this.cfgService = DIContainer.resolve<ConfigService>('configService');
 
     this.installed = false;
     this.moduleName = moduleName;

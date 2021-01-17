@@ -1,17 +1,14 @@
-import { injectable, inject } from 'inversify';
 import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig, IFileSystemService } from '@gah/shared';
 
 
 import { prompt } from 'enquirer';
 import { FileSystemService } from './file-system.service';
 
-@injectable()
 export class PromptService implements IPromptService {
-  @inject(FileSystemService)
   private readonly _fileSystemService: IFileSystemService;
 
-  constructor() {
-
+  constructor(fileSystemService: FileSystemService) {
+    this._fileSystemService = fileSystemService;
   }
 
   public async input(cfg: PromptConfig): Promise<string> {

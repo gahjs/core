@@ -1,4 +1,3 @@
-import { injectable, inject } from 'inversify';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import { Option, Command } from 'commander';
@@ -16,31 +15,42 @@ import { WhyController } from './why.controller';
 import { TidyController } from './tidy.controler';
 import { GitService } from '../services/git.service';
 
-@injectable()
 export class MainController extends Controller {
-  @inject(InitController)
   private readonly _initController: InitController;
-  @inject(DependencyController)
   private readonly _dependencyController: DependencyController;
-  @inject(HostModuleController)
   private readonly _hostModuleController: HostModuleController;
-  @inject(InstallController)
   private readonly _installController: InstallController;
-  @inject(PluginController)
   private readonly _pluginController: PluginController;
-  @inject(RunController)
   private readonly _runController: RunController;
-  @inject(TidyController)
   private readonly _tidyController: TidyController;
-  @inject(WhyController)
   private readonly _whyController: WhyController;
-  @inject(GitService)
   private readonly _gitService: GitService;
 
   private readonly _version: string;
 
-  constructor() {
+  constructor(
+    initController: InitController,
+    dependencyController: DependencyController,
+    hostModuleController: HostModuleController,
+    installController: InstallController,
+    pluginController: PluginController,
+    runController: RunController,
+    tidyController: TidyController,
+    whyController: WhyController,
+    gitService: GitService
+  ) {
     super();
+
+    this._initController = initController;
+    this._dependencyController = dependencyController;
+    this._hostModuleController = hostModuleController;
+    this._installController = installController;
+    this._pluginController = pluginController;
+    this._runController = runController;
+    this._tidyController = tidyController;
+    this._whyController = whyController;
+    this._gitService = gitService;
+
     const pjson = require(this._fileSystemService.join(__dirname, '../../package.json'));
     this._version = pjson.version;
   }

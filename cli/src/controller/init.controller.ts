@@ -1,9 +1,6 @@
-import { injectable } from 'inversify';
-
 import { ModuleDefinition, GahModule, PackageJson } from '@gah/shared';
 import { Controller } from './controller';
 
-@injectable()
 export class InitController extends Controller {
   private nameExists: boolean;
   public async init(isHost?: boolean, isEntry?: boolean) {

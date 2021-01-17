@@ -1,12 +1,8 @@
-import { injectable } from 'inversify';
-
 import { GahModuleType } from '@gah/shared';
 
 import { Controller } from './controller';
 import { GahFile } from '../install-helper/gah-file';
 
-
-@injectable()
 export class WhyController extends Controller {
 
   public async whyModule(moduleName: string) {
