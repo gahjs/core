@@ -18,7 +18,7 @@ steps:
 - task: YarnInstaller@3
   inputs:
     versionSpec: '1.x'
-  displayName: "\U0001F4E5 Install Node.js"
+  displayName: "\U0001F4E5 Install Yarn"
 
 - task: Yarn@3
   inputs:
@@ -63,6 +63,12 @@ steps:
     arguments: 'run build'
     projectDirectory: 'cli'
   displayName: "\U0001F6E0 Build cli"
+
+- task: Yarn@3
+  inputs:
+    arguments: 'link'
+    projectDirectory: 'cli'
+  displayName: "\U0001F503 link cli"
 
 - task: Yarn@3
   inputs:
