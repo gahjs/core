@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import DIContainer from '../di-container';
+import { DIContainer } from '../di-container';
 import { AwesomeChecklistLoggerControl, AwesomeChecklistLoggerItem, AwesomeChecklistLoggerState, AwesomeLogger } from 'awesome-logging';
 import {
   IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, GahEventType,

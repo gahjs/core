@@ -13,7 +13,7 @@ import { TemplateService } from './template.service';
 import { PromptService } from './prompt.service';
 import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
-import DIContainer from '../di-container';
+import { DIContainer } from '../di-container';
 import chalk from 'chalk';
 
 @injectable()

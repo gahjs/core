@@ -1,4 +1,4 @@
-import DIContainer from '../di-container';
+import { DIContainer } from '../di-container';
 import { ConfigService } from '../services/config.service';
 import { ExecutionService } from '../services/execution.service';
 import { FileSystemService } from '../services/file-system.service';

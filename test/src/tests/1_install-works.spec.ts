@@ -1,4 +1,3 @@
-import "reflect-metadata";
 require('should');
 import { PromptMock } from '../helper/prompt';
 
@@ -6,9 +5,9 @@ import { SinonSpy, spy } from "sinon";
 import { Asserter } from "../helper/asserter";
 import { GahHelper } from "../helper/gah-helper";
 
-export let gah: GahHelper;
-export let asserter: Asserter;
-export let writeSpy: SinonSpy;
+let gah: GahHelper;
+let asserter: Asserter;
+let writeSpy: SinonSpy;
 
 before(() => {
   writeSpy = spy(process.stdout, 'write') as SinonSpy<[string], boolean>;
@@ -16,13 +15,14 @@ before(() => {
 });
 
 beforeEach(async function () {
+  await import('reflect-metadata');
   const title = this.currentTest?.title;
   gah = new GahHelper(title!);
   writeSpy.resetHistory();
   await gah.clean();
 });
 
-xit('1_install-works', async () => {
+it('1_install-works', async () => {
   await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
   await gah.runInstall('host', true);
 
@@ -42,7 +42,7 @@ it('3_check-plugin-updates-no-updates', async () => {
   asserter.assertLog('No plugins can be updated.');
 });
 
-xit('4_check-plugin-updates-found-updates', async () => {
+it('4_check-plugin-updates-found-updates', async () => {
   await gah.copyModules(['core', 'shared', 'led']);
   await gah.modifyModuleConfig('led', 'modules.0.config.plugins.0.version', '0.0.1');
   PromptMock.addMock(0);

@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 
 import { GahConfig, GahHost, GahModule, GahModuleType, IConfigurationService, IContextService, IFileSystemService, ILoggerService, TsConfig } from '@gah/shared';
-import DIContainer from '../di-container';
+import { DIContainer } from '../di-container';
 import { LoggerService } from './logger.service';
 import { FileSystemService } from './file-system.service';
 import { ContextService } from './context-service';

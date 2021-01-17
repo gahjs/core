@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import deepEqual from 'deep-equal';
 import chalk from 'chalk';
-import DIContainer from '../di-container';
+import { DIContainer } from '../di-container';
 
 import { IFileSystemService, ICleanupService, ILoggerService, IGitService } from '@gah/shared';
 

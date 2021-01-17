@@ -3,7 +3,7 @@ import { FileSystemService } from './file-system.service';
 import { IWorkspaceService, IFileSystemService, GlobalGahData, IContextService } from '@gah/shared';
 import { platform, homedir } from 'os';
 import { createHash } from 'crypto';
-import DIContainer from '../di-container';
+import { DIContainer } from '../di-container';
 import { ContextService } from './context-service';
 
 @injectable()

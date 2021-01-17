@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import DIContainer from '../di-container';
+import { DIContainer } from '../di-container';
 import {
   IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig
 } from '@gah/shared';

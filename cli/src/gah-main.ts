@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import DIContainer from './di-container';
+import { DIContainer } from './di-container';
 
 import { MainController } from './controller/main.controller';
 import chalk from 'chalk';

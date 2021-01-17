@@ -47,6 +47,3 @@ DIContainer.bind<PluginService>(PluginService).toSelf().inSingletonScope();
 DIContainer.bind<PromptService>(PromptService).toSelf().inSingletonScope();
 DIContainer.bind<TemplateService>(TemplateService).toSelf().inSingletonScope();
 DIContainer.bind<WorkspaceService>(WorkspaceService).toSelf().inSingletonScope();
-
-
-export default DIContainer;

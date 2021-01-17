@@ -1,4 +1,4 @@
-import DIContainer from './di-container';
+import { DIContainer } from './di-container';
 
 import { ContextService } from './services/context-service';
 import { InstallController } from './controller/install.controller';

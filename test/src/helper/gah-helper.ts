@@ -1,3 +1,4 @@
+import * as gahMain from '@gah/cli/lib/gah-main';
 import { DIContainer as gahDiContainer } from '@gah/cli/lib/di-container';
 import { PromptService } from '@gah/cli/lib/services/prompt.service';
 import { MockPromptService } from '../mocks/prompt.service';
@@ -13,7 +14,6 @@ require('should');
 const workingDir = path.join(__dirname, '../../working-dir');
 const resourcesDir = path.join(__dirname, '../resources');
 const resultsDir = path.join(__dirname, '../results');
-let gahMain: any;
 export class GahHelper {
   testTitle: string;
   testId: number;
@@ -27,9 +27,6 @@ export class GahHelper {
   }
 
   async clean() {
-    delete require.cache[require.resolve('@gah/cli/lib/gah-main')];
-    gahMain = require('@gah/cli/lib/gah-main');
-
     gahDiContainer.unbind(PromptService);
     gahDiContainer.bind(PromptService).to(MockPromptService);
 
