@@ -109,7 +109,9 @@ export class ConfigService implements IConfigurationService {
   }
 
   public async getGahConfig(): Promise<GahConfig> {
-    await this.loadGahConfig();
+    if (!this._fullCfg) {
+      await this.loadGahConfig();
+    }
     return this._fullCfg;
   }
 

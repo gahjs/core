@@ -255,7 +255,8 @@ export class PluginService implements IPluginService {
           await handler.handler(payload);
         } catch (error) {
           this._loggerService.error(`Error in plugin ${handler.pluginName}.\nCallstack from plugin:`);
-          this._loggerService.error(error);
+          this._loggerService.error(error.message);
+          this._loggerService.error(error.stack);
           this._loggerService.log('--------------------------------------------------------------------------------');
           this._loggerService.log('Trying to continue with execution...\n');
           return;
