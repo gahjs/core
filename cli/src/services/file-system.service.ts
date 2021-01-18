@@ -15,6 +15,8 @@ export class FileSystemService implements IFileSystemService {
   private readonly _loggerService: ILoggerService;
   private readonly _cwd: string;
 
+  private readonly _objectStore: { [path: string]: any } = {};
+
   constructor(executionService: ExecutionService, loggerService: LoggerService) {
     this._executionService = executionService;
     this._loggerService = loggerService;
@@ -25,7 +27,7 @@ export class FileSystemService implements IFileSystemService {
     if (path_.isAbsolute(string)) {
       return string;
     }
-    return path_.join(this._cwd, string);
+    return this.join(this._cwd, string);
   }
 
   async fileExists(path: string): Promise<boolean> {
@@ -48,7 +50,8 @@ export class FileSystemService implements IFileSystemService {
     if (!await this.fileExists(path)) {
       return null;
     }
-    return fs.promises.readFile(this.cwd(path)).then(b => b.toString());
+    return fs.promises.readFile(this.cwd(path))
+      .then(b => b.toString());
   }
 
   async tryParseFile<T>(path: string): Promise<T | null> {
@@ -59,11 +62,23 @@ export class FileSystemService implements IFileSystemService {
   }
 
   async parseFile<T>(path: string): Promise<T> {
-    const str = await this.readFile(path);
+    const absolutePath = this.cwd(path);
+
+    const str = await this.readFile(absolutePath);
     try {
-      return parse(str) as T;
+      const res = parse(str) as T;
+      if (!this._objectStore[absolutePath]) {
+        this._objectStore[absolutePath] = res;
+      } else {
+        const prevObj = this._objectStore[absolutePath];
+        Object.keys(prevObj).forEach(key => {
+          delete prevObj[key];
+        });
+        Object.assign(prevObj, res);
+      }
+      return this._objectStore[absolutePath];
     } catch (error) {
-      this._loggerService.error(`Failed to parse file: '${chalk.gray(path)}'`);
+      this._loggerService.error(`Failed to parse file: '${chalk.gray(absolutePath)}'`);
       throw error;
     }
   }
@@ -73,8 +88,21 @@ export class FileSystemService implements IFileSystemService {
   }
 
   async saveObjectToFile<T>(path: string, obj: T, beautify = true): Promise<void> {
+    const absolutePath = this.cwd(path);
+
+    if (!this._objectStore[absolutePath]) {
+      this._objectStore[absolutePath] = obj;
+    } else {
+      const prevObj = this._objectStore[absolutePath];
+      const objCopy = { ...obj };
+      Object.keys(prevObj).forEach(key => {
+        delete prevObj[key];
+      });
+      Object.assign(prevObj, objCopy);
+    }
+
     const objStr = stringify(obj, null, beautify ? 2 : 0);
-    return this.saveFile(path, objStr);
+    return this.saveFile(absolutePath, objStr);
   }
 
   async ensureRelativePath(path: string, relativeFrom?: string, dontCheck = false): Promise<string> {

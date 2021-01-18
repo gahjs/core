@@ -414,7 +414,7 @@ export class GahHostDef extends GahModuleBase {
   }
 
   private setAngularCompilerOptionsInTsConfig() {
-    this.tsConfigFile.setAngularCompilerOptions(this._ngCompilerOptions);
+    return this.tsConfigFile.setAngularCompilerOptions(this._ngCompilerOptions);
   }
 
 }

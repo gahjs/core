@@ -196,7 +196,13 @@ export abstract class GahModuleBase {
   }
 
   private async listenForFinishedUnit(unit: InstallUnit<any>, result: Promise<InstallUnitReturn>) {
-    const res = await result;
+    let res: InstallUnitReturn;
+    try {
+      res = await result;
+    } catch (error) {
+      this.loggerService.error(`Install failed during step: ${unit.id}`);
+      throw error;
+    }
     const index = this._installUnits.findIndex(x => x.id === unit.id);
     unit.finished = true;
     this.pluginService.triggerEvent((`AFTER_${unit.id}` as GahEventType), unit.eventPayload);
@@ -245,6 +251,7 @@ export abstract class GahModuleBase {
     if (await this.preCompiled()) {
       return;
     }
+    const linkPromises: Promise<void>[] = [];
     for (const dep of this.allRecursiveDependencies) {
       if (await dep.preCompiled()) {
         if (dep.installed) {
@@ -298,12 +305,15 @@ export abstract class GahModuleBase {
         }
       } else {
         const mockPath = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
-        await this.fileSystemService.ensureDirectory(mockPath);
-
         const from = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath, dep.moduleName!);
         const to = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
-        await this.fileSystemService.createDirLink(from, to);
+        const linkPromise = this.fileSystemService.ensureDirectory(mockPath)
+          .then(() => this.fileSystemService.createDirLink(from, to));
+        linkPromises.push(linkPromise);
       }
+    }
+    if (linkPromises.length) {
+      await Promise.all(linkPromises);
     }
   }
 

@@ -28,20 +28,20 @@ describe('Basic Tests', () => {
     process.cwd = originalCwdMethod;
   })
 
-  xit('1_install-works', async () => {
+  it('1_install-works', async () => {
     await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
     await gah.runInstall('host', true);
 
     await gah.compareHost();
   });
 
-  xit('2_check-plugin-updates-none-installed', async () => {
+  it('2_check-plugin-updates-none-installed', async () => {
     await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
     await gah.runPluginUpdate('host');
     asserter.assertLog('No plugins installed!');
   });
 
-  xit('3_check-plugin-updates-no-updates', async () => {
+  it('3_check-plugin-updates-no-updates', async () => {
     await gah.copyModules(['core', 'shared', 'led']);
     await gah.runPluginUpdate('led');
     asserter.assertNoLog('No plugins installed!');
