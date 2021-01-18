@@ -425,7 +425,7 @@ export abstract class GahModuleBase {
   }
 
   private async executeScripts(preinstall: boolean): Promise<void> {
-    if (this.preCompiled || this.contextService.getContext().skipScripts) {
+    if (await this.preCompiled() || this.contextService.getContext().skipScripts) {
       return;
     }
     const scriptName = preinstall ? 'gah-preinstall' : 'gah-postinstall';
