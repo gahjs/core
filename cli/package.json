@@ -21,7 +21,8 @@
     "start": "yarn run build && yarn run global",
     "global": "yarn global add file:D:/git/@gahjs/core/cli",
     "lint": "yarn eslint ./src/**",
-    "build": "yarn run prebuild && tsc -p . && yarn run postbuild"
+    "build": "yarn run prebuild && tsc -p . && yarn run postbuild",
+    "format": "prettier -w . --ignore-path .gitignore"
   },
   "engines": {
     "node": ">=12.0"

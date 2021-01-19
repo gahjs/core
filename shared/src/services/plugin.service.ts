@@ -5,7 +5,11 @@ export interface IPluginService {
   init(): Promise<void>;
   loadInstalledPlugins(): Promise<void>;
   triggerEvent<T extends GahEventType>(type: T, payload: ExtractEventPayload<GahEvent, T>): Promise<void>;
-  registerEventHandler<T extends GahEventType>(pluginName: string, type: T, handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void): void;
+  registerEventHandler<T extends GahEventType>(
+    pluginName: string,
+    type: T,
+    handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void
+  ): void;
   installPlugin(pluginName: string): Promise<boolean>;
   removePlugin(pluginName: string): Promise<boolean>;
   getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null>;

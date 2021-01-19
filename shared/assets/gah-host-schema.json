@@ -1,100 +1,100 @@
 {
-    "type": "object",
-    "properties": {
-        "$schema": {
-            "type": "string",
-            "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-host-schema.json"
-        },
-        "modules": {
-            "description": "The array of the modules that should be loaded for this host.",
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/ModuleReference"
-            }
-        },
-        "aot": {
-            "description": "Use aot compilation for the host? (Enabled by default)",
-            "type": "boolean",
-            "default": true
-        },
-        "htmlHeadContent": {
-            "description": "Additional lines in the head section of the index.html file (eg. <link rel=\"icon\" href=\"assets/[module-name]/favicon.ico\" type=\"image/x-icon\"/> )",
-            "anyOf": [
-                {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                {
-                    "type": "string"
-                }
-            ]
-        },
-        "title": {
-            "description": "The <title> tag of the website",
-            "type": "string"
-        },
-        "baseHref": {
-            "description": "The baseHref that is put into the web.config for redirect rules (defaults to '/')",
-            "type": "string"
-        },
-        "angularCompilerOptions": {
-            "description": "Some of the Angular compiler options",
-            "$ref": "#/definitions/GahAngularCompilerOptions"
-        },
-        "isHost": {
-            "type": "boolean"
-        }
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-host-schema.json"
     },
-    "definitions": {
-        "ModuleReference": {
-            "description": "Contains information about a external referenced module",
-            "type": "object",
-            "properties": {
-                "path": {
-                    "description": "The path to the gah-config.json of the external module. Relative to the folder containing this config file.",
-                    "type": "string"
-                },
-                "names": {
-                    "description": "The names of the referenced modules within the project",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "aliasName": {
-                    "description": "The module will be imported with an alias name instead of the real module name",
-                    "type": "string"
-                }
-            }
-        },
-        "GahAngularCompilerOptions": {
-            "type": "object",
-            "properties": {
-                "strictPropertyInitialization": {
-                    "type": "boolean"
-                },
-                "strictNullChecks": {
-                    "type": "boolean"
-                },
-                "noImplicitAny": {
-                    "type": "boolean"
-                },
-                "strictBindCallApply": {
-                    "type": "boolean"
-                },
-                "strictFunctionTypes": {
-                    "type": "boolean"
-                },
-                "noImplicitReturns": {
-                    "type": "boolean"
-                },
-                "forceConsistentCasingInFileNames": {
-                    "type": "boolean"
-                }
-            }
-        }
+    "modules": {
+      "description": "The array of the modules that should be loaded for this host.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ModuleReference"
+      }
     },
-    "$schema": "http://json-schema.org/draft-07/schema#"
+    "aot": {
+      "description": "Use aot compilation for the host? (Enabled by default)",
+      "type": "boolean",
+      "default": true
+    },
+    "htmlHeadContent": {
+      "description": "Additional lines in the head section of the index.html file (eg. <link rel=\"icon\" href=\"assets/[module-name]/favicon.ico\" type=\"image/x-icon\"/> )",
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
+    "title": {
+      "description": "The <title> tag of the website",
+      "type": "string"
+    },
+    "baseHref": {
+      "description": "The baseHref that is put into the web.config for redirect rules (defaults to '/')",
+      "type": "string"
+    },
+    "angularCompilerOptions": {
+      "description": "Some of the Angular compiler options",
+      "$ref": "#/definitions/GahAngularCompilerOptions"
+    },
+    "isHost": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "ModuleReference": {
+      "description": "Contains information about a external referenced module",
+      "type": "object",
+      "properties": {
+        "path": {
+          "description": "The path to the gah-config.json of the external module. Relative to the folder containing this config file.",
+          "type": "string"
+        },
+        "names": {
+          "description": "The names of the referenced modules within the project",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliasName": {
+          "description": "The module will be imported with an alias name instead of the real module name",
+          "type": "string"
+        }
+      }
+    },
+    "GahAngularCompilerOptions": {
+      "type": "object",
+      "properties": {
+        "strictPropertyInitialization": {
+          "type": "boolean"
+        },
+        "strictNullChecks": {
+          "type": "boolean"
+        },
+        "noImplicitAny": {
+          "type": "boolean"
+        },
+        "strictBindCallApply": {
+          "type": "boolean"
+        },
+        "strictFunctionTypes": {
+          "type": "boolean"
+        },
+        "noImplicitReturns": {
+          "type": "boolean"
+        },
+        "forceConsistentCasingInFileNames": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
 }

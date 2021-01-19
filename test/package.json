@@ -12,7 +12,8 @@
   "license": "MIT",
   "private": false,
   "scripts": {
-    "test": "yarn mocha -p tsconfig.json ./src/tests/*.spec.ts"
+    "test": "yarn mocha -p tsconfig.json ./src/tests/*.spec.ts",
+    "format": "prettier -w . --ignore-path .gitignore"
   },
   "prettier": "@awdware/prettier-config",
   "dependencies": {

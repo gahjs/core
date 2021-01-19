@@ -1,9 +1,9 @@
 export interface ILoggerService {
-  log(text: string): void
-  warn(text: string): void
+  log(text: string): void;
+  warn(text: string): void;
   error(text: string | Error): void;
   debug(text: string): void;
   success(text: string): void;
   startLoadingAnimation(text: string): void;
-  stopLoadingAnimation(removeLine?: boolean, succeeded?: boolean, text?: string): void
+  stopLoadingAnimation(removeLine?: boolean, succeeded?: boolean, text?: string): void;
 }

@@ -10,8 +10,8 @@ Credits: https://github.com/ffflorian/schemastore-updater/tree/master/schemas/pa
  */
 export type Person =
   | {
-    [k: string]: any;
-  }
+      [k: string]: any;
+    }
   | string;
 /**
  * Run AFTER the package is published
@@ -71,18 +71,18 @@ export interface PackageJson {
    * The url to the project homepage.
    */
   homepage?:
-  | {
-    [k: string]: any;
-  }
-  | '.';
+    | {
+        [k: string]: any;
+      }
+    | '.';
   /**
    * The url to your project's issue tracker and / or the email address to which issues should be reported. These are helpful for people who encounter issues with your package.
    */
   bugs?:
-  | {
-    [k: string]: any;
-  }
-  | string;
+    | {
+        [k: string]: any;
+      }
+    | string;
   /**
    * You should specify a license for your package so that people know how they are permitted to use it, and any restrictions you're placing on it.
    */
@@ -113,10 +113,10 @@ export interface PackageJson {
    */
   main?: string;
   bin?:
-  | string
-  | {
-    [k: string]: any;
-  };
+    | string
+    | {
+        [k: string]: any;
+      };
   /**
    * Set the types property to point to your bundled declaration file
    */
@@ -157,10 +157,10 @@ export interface PackageJson {
    * Specify the place where your code lives. This is helpful for people who want to contribute.
    */
   repository?:
-  | {
-    [k: string]: any;
-  }
-  | string;
+    | {
+        [k: string]: any;
+      }
+    | string;
   /**
    * The 'scripts' member is an object hash of script commands that are run at various times in the lifecycle of your package.
    * The key is the lifecycle event, and the value is the command to run at that point.
@@ -269,10 +269,10 @@ export interface PackageJson {
    * A module ID with untranspiled code that is the primary entry point to your program.
    */
   esnext?:
-  | string
-  | {
-    [k: string]: any;
-  };
+    | string
+    | {
+        [k: string]: any;
+      };
   workspaces?: string[];
   /**
    * Any property starting with _ is valid.

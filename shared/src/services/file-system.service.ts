@@ -1,6 +1,4 @@
-
-export type FileSystemType = ('any' | 'file' | 'directory');
-
+export type FileSystemType = 'any' | 'file' | 'directory';
 
 export interface IFileSystemService {
   /**
@@ -11,13 +9,13 @@ export interface IFileSystemService {
   /**
    * Synchronously reads the entire contents of a file.
    * @param path  A path to a file.
-   * @returns The entire content of the file as a string 
+   * @returns The entire content of the file as a string
    */
   readFile(path: string): Promise<string>;
   /**
    * Synchronously reads the entire contents of a file and returns an array of string lines.
    * @param path  A path to a file.
-   * @returns The entire content of the file line by line in a string array 
+   * @returns The entire content of the file line by line in a string array
    */
   readFileLineByLine(path: string): Promise<string[]>;
   /**

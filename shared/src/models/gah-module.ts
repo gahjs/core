@@ -7,7 +7,9 @@ export class GahModule {
    */
   public modules: ModuleDefinition[];
 
-  public get isHost() { return false; }
+  public get isHost() {
+    return false;
+  }
 
   constructor() {
     this.modules = new Array<ModuleDefinition>();

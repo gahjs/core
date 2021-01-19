@@ -1,3 +1,3 @@
 export interface IPackageService {
-  findLatestPackageVersion(packageName: string): Promise<string>
+  findLatestPackageVersion(packageName: string): Promise<string>;
 }

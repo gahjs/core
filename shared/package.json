@@ -13,7 +13,8 @@
     "lint": "eslint src/** --fix",
     "build": "yarn run prebuild && tsc -p . && node ts-version-support.js",
     "drop": "yarn run build && yarn publish --access public --no-git-tag-version",
-    "schema": "node generate-schema.js"
+    "schema": "node generate-schema.js",
+    "format": "prettier -w . --ignore-path .gitignore"
   },
   "engines": {
     "node": ">=12.0"

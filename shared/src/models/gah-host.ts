@@ -33,7 +33,9 @@ export class GahHost {
    */
   public angularCompilerOptions?: GahAngularCompilerOptions;
 
-  public get isHost() { return true; }
+  public get isHost() {
+    return true;
+  }
 
   constructor() {
     this.modules = new Array<ModuleReference>();

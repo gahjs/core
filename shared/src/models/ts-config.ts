@@ -1,7 +1,7 @@
 import { GahAngularCompilerOptions } from './gah-angular-compiler-options';
 
 export class TsConfig {
-  compilerOptions: TsConfigCompilerOptions
+  compilerOptions: TsConfigCompilerOptions;
   angularCompilerOptions?: GahAngularCompilerOptions;
 }
 

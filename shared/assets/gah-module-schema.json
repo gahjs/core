@@ -1,170 +1,170 @@
 {
-    "type": "object",
-    "properties": {
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-module-schema.json"
+    },
+    "modules": {
+      "description": "The array of the modules defined in this project.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/ModuleDefinition"
+      }
+    },
+    "isHost": {
+      "type": "boolean"
+    }
+  },
+  "definitions": {
+    "ModuleDefinition": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the module. This has to be unique withing the scope of all modules that are used within the same host.",
+          "type": "string"
+        },
+        "packageName": {
+          "description": "The package name of the module. This determins the prefix of the import statement to this module. \"import {...} from '@packageName/moduleName'\"",
+          "type": "string"
+        },
+        "assetsPath": {
+          "description": "The path(s) to the assets folder(s) that should get served by the host. This is optional and relative to this config's directory.",
+          "anyOf": [
+            {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            {
+              "type": "string"
+            }
+          ]
+        },
+        "stylesPath": {
+          "description": "The path to the file containing global styles. This is optional and relative to this config's directory.",
+          "type": "string"
+        },
+        "publicApiPath": {
+          "description": "The path to the public-api.ts file. The path is relative to the folder this config file is in.",
+          "type": "string"
+        },
+        "dependencies": {
+          "description": "The array of modules that are the dependencies for this module. This is optional.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ModuleReference"
+          }
+        },
+        "baseNgModuleName": {
+          "description": "The typescript class name of the base NgModule for this module. This is optional for modules that just act as a library without providing page-like functionality or routing.",
+          "type": "string"
+        },
+        "isEntry": {
+          "description": "Describes whether a module is the entry module for the host. This has to be set to true for exactly one module that is referenced by a host.",
+          "type": "boolean"
+        },
+        "parentGahModule": {
+          "description": "Configures the parent of this module. Must be the name of a gah module which has a router outlet containing a route with the path 'gah-outlet'.",
+          "type": "string"
+        },
+        "excludedPackages": {
+          "description": "Exclude certain packages from the package.json to be added to the host's package.json. Has to be set for all modules that import which package to be effective.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "config": {
+          "description": "Configure plugins and other settings for this module.",
+          "$ref": "#/definitions/GahConfig"
+        }
+      }
+    },
+    "ModuleReference": {
+      "description": "Contains information about a external referenced module",
+      "type": "object",
+      "properties": {
+        "path": {
+          "description": "The path to the gah-config.json of the external module. Relative to the folder containing this config file.",
+          "type": "string"
+        },
+        "names": {
+          "description": "The names of the referenced modules within the project",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "aliasName": {
+          "description": "The module will be imported with an alias name instead of the real module name",
+          "type": "string"
+        }
+      }
+    },
+    "GahConfig": {
+      "type": "object",
+      "properties": {
         "$schema": {
-            "type": "string",
-            "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-module-schema.json"
+          "type": "string",
+          "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-config-schema.json"
         },
-        "modules": {
-            "description": "The array of the modules defined in this project.",
-            "type": "array",
-            "items": {
-                "$ref": "#/definitions/ModuleDefinition"
+        "extends": {
+          "description": "The path to the config file which this config file extends",
+          "type": "string"
+        },
+        "plugins": {
+          "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GahPluginDependencyConfig"
+          }
+        },
+        "precompiled": {
+          "description": "List of precompiled modules with a path to the tgz file (output from yarn pack command)",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "path": {
+                "type": "string"
+              }
             }
-        },
-        "isHost": {
-            "type": "boolean"
+          }
         }
+      }
     },
-    "definitions": {
-        "ModuleDefinition": {
-            "type": "object",
-            "properties": {
-                "name": {
-                    "description": "The name of the module. This has to be unique withing the scope of all modules that are used within the same host.",
-                    "type": "string"
-                },
-                "packageName": {
-                    "description": "The package name of the module. This determins the prefix of the import statement to this module. \"import {...} from '@packageName/moduleName'\"",
-                    "type": "string"
-                },
-                "assetsPath": {
-                    "description": "The path(s) to the assets folder(s) that should get served by the host. This is optional and relative to this config's directory.",
-                    "anyOf": [
-                        {
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                        {
-                            "type": "string"
-                        }
-                    ]
-                },
-                "stylesPath": {
-                    "description": "The path to the file containing global styles. This is optional and relative to this config's directory.",
-                    "type": "string"
-                },
-                "publicApiPath": {
-                    "description": "The path to the public-api.ts file. The path is relative to the folder this config file is in.",
-                    "type": "string"
-                },
-                "dependencies": {
-                    "description": "The array of modules that are the dependencies for this module. This is optional.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/ModuleReference"
-                    }
-                },
-                "baseNgModuleName": {
-                    "description": "The typescript class name of the base NgModule for this module. This is optional for modules that just act as a library without providing page-like functionality or routing.",
-                    "type": "string"
-                },
-                "isEntry": {
-                    "description": "Describes whether a module is the entry module for the host. This has to be set to true for exactly one module that is referenced by a host.",
-                    "type": "boolean"
-                },
-                "parentGahModule": {
-                    "description": "Configures the parent of this module. Must be the name of a gah module which has a router outlet containing a route with the path 'gah-outlet'.",
-                    "type": "string"
-                },
-                "excludedPackages": {
-                    "description": "Exclude certain packages from the package.json to be added to the host's package.json. Has to be set for all modules that import which package to be effective.",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "config": {
-                    "description": "Configure plugins and other settings for this module.",
-                    "$ref": "#/definitions/GahConfig"
-                }
-            }
+    "GahPluginDependencyConfig": {
+      "description": "Describes a plugin dependency",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The name of the plugin that should be used. This has to be the name of a npm package.",
+          "type": "string"
         },
-        "ModuleReference": {
-            "description": "Contains information about a external referenced module",
-            "type": "object",
-            "properties": {
-                "path": {
-                    "description": "The path to the gah-config.json of the external module. Relative to the folder containing this config file.",
-                    "type": "string"
-                },
-                "names": {
-                    "description": "The names of the referenced modules within the project",
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "aliasName": {
-                    "description": "The module will be imported with an alias name instead of the real module name",
-                    "type": "string"
-                }
-            }
+        "settings": {
+          "$ref": "#/definitions/GahPluginConfig",
+          "description": "The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available."
         },
-        "GahConfig": {
-            "type": "object",
-            "properties": {
-                "$schema": {
-                    "type": "string",
-                    "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-config-schema.json"
-                },
-                "extends": {
-                    "description": "The path to the config file which this config file extends",
-                    "type": "string"
-                },
-                "plugins": {
-                    "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/GahPluginDependencyConfig"
-                    }
-                },
-                "precompiled": {
-                    "description": "List of precompiled modules with a path to the tgz file (output from yarn pack command)",
-                    "type": "array",
-                    "items": {
-                        "type": "object",
-                        "properties": {
-                            "name": {
-                                "type": "string"
-                            },
-                            "path": {
-                                "type": "string"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "GahPluginDependencyConfig": {
-            "description": "Describes a plugin dependency",
-            "type": "object",
-            "properties": {
-                "name": {
-                    "description": "The name of the plugin that should be used. This has to be the name of a npm package.",
-                    "type": "string"
-                },
-                "settings": {
-                    "$ref": "#/definitions/GahPluginConfig",
-                    "description": "The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available."
-                },
-                "version": {
-                    "description": "The version of the plugin that should be used.",
-                    "type": "string"
-                }
-            }
-        },
-        "GahPluginConfig": {
-            "additionalProperties": true,
-            "type": "object",
-            "properties": {
-                "enabled": {
-                    "type": "boolean"
-                }
-            }
+        "version": {
+          "description": "The version of the plugin that should be used.",
+          "type": "string"
         }
+      }
     },
-    "$schema": "http://json-schema.org/draft-07/schema#"
+    "GahPluginConfig": {
+      "additionalProperties": true,
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema#"
 }

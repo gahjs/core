@@ -16,12 +16,10 @@ export class GahConfig {
   /**
    * List of precompiled modules with a path to the tgz file (output from yarn pack command)
    */
-  public precompiled?:
-    {
-      name: string,
-      path?: string
-    }[];
+  public precompiled?: {
+    name: string;
+    path?: string;
+  }[];
 
-  constructor() {
-  }
+  constructor() {}
 }
