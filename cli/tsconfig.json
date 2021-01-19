@@ -3,17 +3,12 @@
     "target": "ES2019",
     "module": "CommonJS",
     "baseUrl": "./",
-    "lib": [
-      "ES2019",
-      "ESNext"
-    ],
+    "lib": ["ES2019", "ESNext"],
     "declaration": true,
     "outDir": "lib",
     "rootDir": "./src",
     "strict": true,
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "sourceMap": true,
     "esModuleInterop": true,
     "strictPropertyInitialization": false,
@@ -23,8 +18,5 @@
     "preserveSymlinks": true,
     "newLine": "lf"
   },
-  "exclude": [
-    "assets",
-    "lib"
-  ]
+  "exclude": ["assets", "lib"]
 }

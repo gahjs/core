@@ -1,9 +1,27 @@
 import chalk from 'chalk';
 import { DIContainer } from '../di-container';
-import { AwesomeChecklistLoggerControl, AwesomeChecklistLoggerItem, AwesomeChecklistLoggerState, AwesomeLogger } from 'awesome-logging';
 import {
-  IFileSystemService, ITemplateService, IWorkspaceService, IExecutionService, ILoggerService, GahEventType,
-  IPluginService, GahModuleData, PackageJson, IContextService, IPackageService, ICleanupService, IConfigurationService, GahConfig, GahEventName, GahFolderData
+  AwesomeChecklistLoggerControl,
+  AwesomeChecklistLoggerItem,
+  AwesomeChecklistLoggerState,
+  AwesomeLogger
+} from 'awesome-logging';
+import {
+  IFileSystemService,
+  ITemplateService,
+  IWorkspaceService,
+  IExecutionService,
+  ILoggerService,
+  GahEventType,
+  IPluginService,
+  GahModuleData,
+  PackageJson,
+  IContextService,
+  IPackageService,
+  ICleanupService,
+  IConfigurationService,
+  GahConfig,
+  GahEventName
 } from '@gah/shared';
 
 import { FileSystemService } from '../services/file-system.service';
@@ -43,13 +61,13 @@ export abstract class GahModuleBase {
   public isHost: boolean;
   protected installed: boolean;
   protected gahCfgPath?: string;
-  protected gahConfigs: { moduleName: string; cfg: GahConfig; }[];
+  protected gahConfigs: { moduleName: string; cfg: GahConfig }[];
   protected initializedModules: GahModuleBase[];
 
   public isEntry: boolean;
   public parentGahModule?: string;
   public excludedPackages: string[];
-  public aliasNames: { forModule: string, alias: string }[];
+  public aliasNames: { forModule: string; alias: string }[];
 
   public tsConfigFile: TsConfigFile;
   public gahFolder: GahFolder;
@@ -67,7 +85,6 @@ export abstract class GahModuleBase {
   private readonly _installUnits: InstallUnit<any>[] = [];
   private _progressLogger: AwesomeChecklistLoggerControl;
   private _installDone: (_: void) => void;
-
 
   constructor(moduleName?: string, gahCfgPath?: string) {
     this.cleanupService = DIContainer.resolve<CleanupSevice>('cleanupSevice');
@@ -101,8 +118,15 @@ export abstract class GahModuleBase {
       await this.fileSystemService.ensureDirectory(this._globalPackageStorePath);
       await this.fileSystemService.ensureDirectory(this._globalPackageStoreArchivePath);
 
-      if (!await this.fileSystemService.fileExists(this._globalPackageStoreJsonPath)) {
-        const packageJsonTemplatePath = this.fileSystemService.join(__dirname, '..', '..', 'assets', 'package-store', 'package.json');
+      if (!(await this.fileSystemService.fileExists(this._globalPackageStoreJsonPath))) {
+        const packageJsonTemplatePath = this.fileSystemService.join(
+          __dirname,
+          '..',
+          '..',
+          'assets',
+          'package-store',
+          'package.json'
+        );
         await this.fileSystemService.copyFile(packageJsonTemplatePath, this._globalPackageStorePath);
       }
     }
@@ -121,7 +145,6 @@ export abstract class GahModuleBase {
   public abstract specificData(): Partial<GahModuleData>;
 
   public async data(): Promise<GahModuleData> {
-
     const currentPluginCfg = await this.cfgService.getPluginConfig(this.moduleName);
     const pluginCfg: { [key: string]: any[] } = {};
 
@@ -181,17 +204,27 @@ export abstract class GahModuleBase {
   public abstract install(skipPackageInstall: boolean): Promise<void>;
 
   protected async doInstall() {
-    this._progressLogger = AwesomeLogger.log('checklist', { items: this._installUnits.map(x => { return { text: x.text, state: 'pending' } as AwesomeChecklistLoggerItem; }) });
+    this._progressLogger = AwesomeLogger.log('checklist', {
+      items: this._installUnits.map(x => {
+        return { text: x.text, state: 'pending' } as AwesomeChecklistLoggerItem;
+      })
+    });
     this.checkUnitDependencies();
-    return new Promise((resolve) => { this._installDone = resolve; });
+    return new Promise(resolve => {
+      this._installDone = resolve;
+    });
   }
 
   private loggerStateFromRes(res: InstallUnitReturn): AwesomeChecklistLoggerState {
     switch (res) {
-      case InstallUnitResult.failed: return 'failed';
-      case InstallUnitResult.skipped: return 'skipped';
-      case InstallUnitResult.warnings: return 'partiallySucceeded';
-      default: return 'succeeded';
+      case InstallUnitResult.failed:
+        return 'failed';
+      case InstallUnitResult.skipped:
+        return 'skipped';
+      case InstallUnitResult.warnings:
+        return 'partiallySucceeded';
+      default:
+        return 'succeeded';
     }
   }
 
@@ -205,7 +238,7 @@ export abstract class GahModuleBase {
     }
     const index = this._installUnits.findIndex(x => x.id === unit.id);
     unit.finished = true;
-    this.pluginService.triggerEvent((`AFTER_${unit.id}` as GahEventType), unit.eventPayload);
+    this.pluginService.triggerEvent(`AFTER_${unit.id}` as GahEventType, unit.eventPayload);
     await this.checkUnitDependencies();
     this._progressLogger.changeState(index, this.loggerStateFromRes(res));
     if (!this._installUnits.some(x_1 => !x_1.finished)) {
@@ -293,7 +326,11 @@ export abstract class GahModuleBase {
               const packageName = destDep.match(getNameRegex)![1];
               const adjustedPath = `file:${this.fileSystemService.join(this._globalPackageStoreArchivePath, packageName)}`;
               destPkgJson.dependencies![destDepKey] = adjustedPath;
-              this.loggerService.debug(`Adjusted precompiled dependency path: '${chalk.red(prevPath)}' --> '${chalk.green(adjustedPath)}' in '${chalk.gray(destPathPackageJson)}'`);
+              this.loggerService.debug(
+                `Adjusted precompiled dependency path: '${chalk.red(prevPath)}' --> '${chalk.green(
+                  adjustedPath
+                )}' in '${chalk.gray(destPathPackageJson)}'`
+              );
               didAdjustPath = true;
             }
           });
@@ -307,7 +344,8 @@ export abstract class GahModuleBase {
         const mockPath = this.fileSystemService.join(this.gahFolder.precompiledPath, dep.fullName);
         const from = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath, dep.moduleName!);
         const to = this.fileSystemService.join(dep.basePath, dep.srcBasePath);
-        const linkPromise = this.fileSystemService.ensureDirectory(mockPath)
+        const linkPromise = this.fileSystemService
+          .ensureDirectory(mockPath)
           .then(() => this.fileSystemService.createDirLink(from, to));
         linkPromises.push(linkPromise);
       }
@@ -324,18 +362,23 @@ export abstract class GahModuleBase {
     }
 
     for (const dep of this.allRecursiveDependencies) {
-
       if (await dep.preCompiled()) {
         const precompiledModulePath = this.fileSystemService.join(this._globalPackageStoreArchivePath, dep.fullName);
-        this.cleanupService.registerJsonFileTemporaryChange(this.packageJsonPath, `dependencies.${dep.fullName}`, packageJson.dependencies![dep.fullName]);
+        this.cleanupService.registerJsonFileTemporaryChange(
+          this.packageJsonPath,
+          `dependencies.${dep.fullName}`,
+          packageJson.dependencies![dep.fullName]
+        );
         packageJson.dependencies![dep.fullName] = `file:${precompiledModulePath}`;
 
         if (dep.aliasNames) {
           const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
           if (aliasForThisModule) {
-            this.cleanupService.registerJsonFileTemporaryChange(this.packageJsonPath,
+            this.cleanupService.registerJsonFileTemporaryChange(
+              this.packageJsonPath,
               `dependencies.${aliasForThisModule.alias}`,
-              packageJson.dependencies![aliasForThisModule.alias]);
+              packageJson.dependencies![aliasForThisModule.alias]
+            );
 
             packageJson.dependencies![aliasForThisModule.alias] = `file:${precompiledModulePath}`;
           }
@@ -344,10 +387,21 @@ export abstract class GahModuleBase {
         await this.fileSystemService.saveObjectToFile(this.packageJsonPath, packageJson);
       } else {
         // /public-api.ts or / Index.ts or similar. Usually without sub-folders
-        const publicApiPathRelativeToBaseSrcPath = await this.fileSystemService.ensureRelativePath(dep.publicApiPathRelativeToBasePath, dep.srcBasePath, true);
-        const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(0, publicApiPathRelativeToBaseSrcPath.length - 3);
+        const publicApiPathRelativeToBaseSrcPath = await this.fileSystemService.ensureRelativePath(
+          dep.publicApiPathRelativeToBasePath,
+          dep.srcBasePath,
+          true
+        );
+        const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(
+          0,
+          publicApiPathRelativeToBaseSrcPath.length - 3
+        );
 
-        const path = this.fileSystemService.join(this.gahFolder.dependencyPath, dep.moduleName!, publicApiRelativePathWithoutExtention);
+        const path = this.fileSystemService.join(
+          this.gahFolder.dependencyPath,
+          dep.moduleName!,
+          publicApiRelativePathWithoutExtention
+        );
         const pathName = `@${dep.packageName}/${dep.moduleName!}`;
 
         this.tsConfigFile.addPathAlias(pathName, path);
@@ -371,11 +425,11 @@ export abstract class GahModuleBase {
     for (const dep of this.allRecursiveDependencies) {
       // Reference scss style files
 
-      const node_modulesPath = this.fileSystemService.join(
-        this.contextService.getContext().currentBaseFolder!, 'node_modules'
-      );
+      const node_modulesPath = this.fileSystemService.join(this.contextService.getContext().currentBaseFolder!, 'node_modules');
       const node_modulePackagePath = this.fileSystemService.join(
-        node_modulesPath, dep.packageName ? `@${dep.packageName}` : '', dep.moduleName!
+        node_modulesPath,
+        dep.packageName ? `@${dep.packageName}` : '',
+        dep.moduleName!
       );
 
       // In case the module is not precompiled a fake node_module with the styles will be created
@@ -384,17 +438,21 @@ export abstract class GahModuleBase {
         const sourceStyles = await this.fileSystemService.getFilesFromGlob(`${dep.basePath}/**/styles/**/*.scss`, ['**/dist/**']);
 
         // Getting the parent directory of the source path, because we want the name of the source path to be included later in the relative paths
-        const absoluteSrcParentPath = this.fileSystemService.getDirectoryPathFromFilePath(this.fileSystemService.join(dep.basePath, dep.srcBasePath));
+        const absoluteSrcParentPath = this.fileSystemService.getDirectoryPathFromFilePath(
+          this.fileSystemService.join(dep.basePath, dep.srcBasePath)
+        );
         // getting the relative paths to the style files including the source directoy itself
-        const relativeSourcePaths = await Promise.all(sourceStyles.map(x => this.fileSystemService.ensureRelativePath(
-          x, absoluteSrcParentPath, true
-        )));
+        const relativeSourcePaths = await Promise.all(
+          sourceStyles.map(x => this.fileSystemService.ensureRelativePath(x, absoluteSrcParentPath, true))
+        );
         // Getting the path in the node_modules folder where the files are linked to later
-        const targetPaths = await Promise.all(relativeSourcePaths.map(async p => {
-          const moduleStylePath = this.fileSystemService.join(node_modulePackagePath, p);
-          await this.fileSystemService.ensureDirectory(this.fileSystemService.getDirectoryPathFromFilePath(moduleStylePath));
-          return moduleStylePath;
-        }));
+        const targetPaths = await Promise.all(
+          relativeSourcePaths.map(async p => {
+            const moduleStylePath = this.fileSystemService.join(node_modulePackagePath, p);
+            await this.fileSystemService.ensureDirectory(this.fileSystemService.getDirectoryPathFromFilePath(moduleStylePath));
+            return moduleStylePath;
+          })
+        );
         for (let i = 0; i < relativeSourcePaths.length; i++) {
           const src = relativeSourcePaths[i];
           const target = targetPaths[i];
@@ -407,15 +465,23 @@ export abstract class GahModuleBase {
       }
 
       // Find all scss files in a folder called styles in the precompiled node_modules module folder
-      const styles = await this.fileSystemService.getFilesFromGlob(`${node_modulePackagePath}/**/styles/**/*.scss`, ['**/dist/**'], true);
+      const styles = await this.fileSystemService.getFilesFromGlob(
+        `${node_modulePackagePath}/**/styles/**/*.scss`,
+        ['**/dist/**'],
+        true
+      );
       // Get the path without the path to the module itself (starting at the same point as .gah-dependencies links)
-      const relativePaths = await Promise.all(styles.map((x) => this.fileSystemService.ensureRelativePath(x, node_modulesPath, true)));
+      const relativePaths = await Promise.all(
+        styles.map(x => this.fileSystemService.ensureRelativePath(x, node_modulesPath, true))
+      );
 
       if (relativePaths.length > 0) {
-
         // Generate all the imports to the found style files (pointing to .gah/dependencies)
-        const fileContent = relativePaths.map((s) => `@import "${s}";`).join('\n');
-        await this.fileSystemService.saveFile(this.fileSystemService.join(this.basePath, this.gahFolder.stylesPath, `${dep.moduleName!}.scss`), fileContent);
+        const fileContent = relativePaths.map(s => `@import "${s}";`).join('\n');
+        await this.fileSystemService.saveFile(
+          this.fileSystemService.join(this.basePath, this.gahFolder.stylesPath, `${dep.moduleName!}.scss`),
+          fileContent
+        );
       }
     }
   }
@@ -426,7 +492,7 @@ export abstract class GahModuleBase {
   }
 
   public async getPackageJson(): Promise<PackageJson> {
-    this._packageJson ??= await this.fileSystemService.tryParseFile<PackageJson>(this.packageJsonPath) ?? undefined;
+    this._packageJson ??= (await this.fileSystemService.tryParseFile<PackageJson>(this.packageJsonPath)) ?? undefined;
     return this._packageJson ?? {};
   }
 
@@ -435,12 +501,11 @@ export abstract class GahModuleBase {
   }
 
   private async executeScripts(preinstall: boolean): Promise<void> {
-    if (await this.preCompiled() || this.contextService.getContext().skipScripts) {
+    if ((await this.preCompiled()) || this.contextService.getContext().skipScripts) {
       return;
     }
     const scriptName = preinstall ? 'gah-preinstall' : 'gah-postinstall';
     if ((await this.getPackageJson()).scripts?.[scriptName]) {
-
       this.loggerService.log(`Executing ${preinstall ? 'pre' : 'post'}-install script.`);
 
       const success = await this.executionService.execute(`yarn run ${scriptName}`, false, undefined, this.basePath);
@@ -463,11 +528,14 @@ export abstract class GahModuleBase {
 
     const yarnTimeout = this.contextService.getContext().yarnTimeout;
     const networkTimeout = yarnTimeout ? ` --network-timeout ${yarnTimeout}` : '';
-    const success = await this.executionService.execute(`yarn${networkTimeout}`, true, () => {
-
-      return '';
-
-    }, '.gah');
+    const success = await this.executionService.execute(
+      `yarn${networkTimeout}`,
+      true,
+      () => {
+        return '';
+      },
+      '.gah'
+    );
 
     if (success) {
       this.loggerService.success('Packages installed successfully');

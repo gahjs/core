@@ -5,7 +5,12 @@ import chalk from 'chalk';
 import { InstallUnit } from './install-unit';
 
 export class GahModuleDef extends GahModuleBase {
-  constructor(gahCfgPath: string, moduleName: string, initializedModules: GahModuleBase[], gahConfigs: { moduleName: string, cfg: GahConfig }[]) {
+  constructor(
+    gahCfgPath: string,
+    moduleName: string,
+    initializedModules: GahModuleBase[],
+    gahConfigs: { moduleName: string; cfg: GahConfig }[]
+  ) {
     super(moduleName, gahCfgPath);
     this.isHost = false;
     initializedModules.push(this);
@@ -30,7 +35,9 @@ export class GahModuleDef extends GahModuleBase {
     if (!moduleCfg) {
       throw new Error(`Cannot find module with name "${this.moduleName}" in file "${this.gahCfgPath}"`);
     }
-    this.basePath = this.fileSystemService.ensureAbsolutePath(this.fileSystemService.getDirectoryPathFromFilePath(this.gahCfgPath!));
+    this.basePath = this.fileSystemService.ensureAbsolutePath(
+      this.fileSystemService.getDirectoryPathFromFilePath(this.gahCfgPath!)
+    );
     this.srcBasePath = this.fileSystemService.getDirectoryPathFromFilePath(moduleCfg.publicApiPath);
     await this.initTsConfigObject();
     this.dependencies = new Array<GahModuleBase>();
@@ -45,7 +52,10 @@ export class GahModuleDef extends GahModuleBase {
     this.aliasNames = [];
 
     if (moduleCfg.config) {
-      this.gahConfigs.push({ cfg: moduleCfg.config, moduleName: this.moduleName! });
+      this.gahConfigs.push({
+        cfg: moduleCfg.config,
+        moduleName: this.moduleName!
+      });
     }
 
     if (moduleCfg.dependencies) {
@@ -67,7 +77,10 @@ export class GahModuleDef extends GahModuleBase {
               }
               this.dependencies.push(newModuleDef);
             } else {
-              throw new Error(`Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this.moduleName!}' in '${this.basePath}'`);
+              throw new Error(
+                `Module '${depModuleName}' could not be found at '${depAbsoluteBasepath}' referenced by '${this
+                  .moduleName!}' in '${this.basePath}'`
+              );
             }
           }
         }
@@ -90,56 +103,104 @@ export class GahModuleDef extends GahModuleBase {
 
     this.installed = true;
 
-    this.addInstallUnit(new InstallUnit('CLEAN_TS_CONFIG', { module: await this.data() }, undefined, 'Cleanup', () => {
-      return this.tsConfigFile.clean();
-    }));
+    this.addInstallUnit(
+      new InstallUnit('CLEAN_TS_CONFIG', { module: await this.data() }, undefined, 'Cleanup', () => {
+        return this.tsConfigFile.clean();
+      })
+    );
 
-    this.addInstallUnit(new InstallUnit('CLEAN_GAH_FOLDER', { module: await this.data() }, undefined, 'Cleanup', () => {
-      return Promise.all(
-        [
+    this.addInstallUnit(
+      new InstallUnit('CLEAN_GAH_FOLDER', { module: await this.data() }, undefined, 'Cleanup', () => {
+        return Promise.all([
           this.gahFolder.cleanDependencyDirectory(),
           this.gahFolder.cleanStylesDirectory(),
           this.gahFolder.cleanPrecompiledFolder(),
           this.gahFolder.tryHideGahFolder()
-        ]
-      );
-    }));
+        ]);
+      })
+    );
 
-    this.addInstallUnit(new InstallUnit('GENERATE_SYMLINKS', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Cleaning and generating styles file', () => {
-      return this.createSymlinksToDependencies();
-    }));
+    this.addInstallUnit(
+      new InstallUnit(
+        'GENERATE_SYMLINKS',
+        { module: await this.data() },
+        ['CLEAN_GAH_FOLDER'],
+        'Cleaning and generating styles file',
+        () => {
+          return this.createSymlinksToDependencies();
+        }
+      )
+    );
 
-    this.addInstallUnit(new InstallUnit('ADJUST_TS_CONFIG',
-      { module: await this.data(), tsConfig: this.tsConfigFile.getFileContents() },
-      ['CLEAN_TS_CONFIG'], 'Adjusting tsconfig.json', () => {
-        return this.addDependenciesToTsConfigFile();
-      }));
+    this.addInstallUnit(
+      new InstallUnit(
+        'ADJUST_TS_CONFIG',
+        {
+          module: await this.data(),
+          tsConfig: this.tsConfigFile.getFileContents()
+        },
+        ['CLEAN_TS_CONFIG'],
+        'Adjusting tsconfig.json',
+        () => {
+          return this.addDependenciesToTsConfigFile();
+        }
+      )
+    );
 
-    this.addInstallUnit(new InstallUnit('ADJUST_GITIGNORE', { module: await this.data() }, undefined, 'Adjusting .gitignore', () => {
-      return this.adjustGitignore();
-    }));
+    this.addInstallUnit(
+      new InstallUnit('ADJUST_GITIGNORE', { module: await this.data() }, undefined, 'Adjusting .gitignore', () => {
+        return this.adjustGitignore();
+      })
+    );
 
-    this.addInstallUnit(new InstallUnit('PRE_INSTALL_SCRIPTS', { module: await this.data() }, undefined, 'Executing preinstall scripts', () => {
-      return this.executePreinstallScripts();
-    }));
+    this.addInstallUnit(
+      new InstallUnit('PRE_INSTALL_SCRIPTS', { module: await this.data() }, undefined, 'Executing preinstall scripts', () => {
+        return this.executePreinstallScripts();
+      })
+    );
 
-    this.addInstallUnit(new InstallUnit('INSTALL_PACKAGES', { module: await this.data() }, undefined, 'Installing packages', async () => {
-      return this.installPackages(skipPackageInstall);
-    }));
+    this.addInstallUnit(
+      new InstallUnit('INSTALL_PACKAGES', { module: await this.data() }, undefined, 'Installing packages', async () => {
+        return this.installPackages(skipPackageInstall);
+      })
+    );
 
-    this.addInstallUnit(new InstallUnit('GENERATE_STYLE_IMPORTS', { module: await this.data() }, ['INSTALL_PACKAGES'], 'Importing styles', async () => {
-      return this.generateStyleImports();
-    }));
+    this.addInstallUnit(
+      new InstallUnit(
+        'GENERATE_STYLE_IMPORTS',
+        { module: await this.data() },
+        ['INSTALL_PACKAGES'],
+        'Importing styles',
+        async () => {
+          return this.generateStyleImports();
+        }
+      )
+    );
 
-    this.addInstallUnit(new InstallUnit('POST_INSTALL_SCRIPTS', { module: await this.data() }, ['GENERATE_STYLE_IMPORTS'], 'Executing postinstall scripts', async () => {
-      return this.executePostinstallScripts();
-    }));
+    this.addInstallUnit(
+      new InstallUnit(
+        'POST_INSTALL_SCRIPTS',
+        { module: await this.data() },
+        ['GENERATE_STYLE_IMPORTS'],
+        'Executing postinstall scripts',
+        async () => {
+          return this.executePostinstallScripts();
+        }
+      )
+    );
 
-    this.addInstallUnit(new InstallUnit('CLEAN_TEMPORARY_CHANGES', { module: await this.data() }, ['POST_INSTALL_SCRIPTS'], 'Cleaning temporary changes', async () => {
-      return this.cleanupService.cleanJsonFileTemporaryChanges();
-    }));
+    this.addInstallUnit(
+      new InstallUnit(
+        'CLEAN_TEMPORARY_CHANGES',
+        { module: await this.data() },
+        ['POST_INSTALL_SCRIPTS'],
+        'Cleaning temporary changes',
+        async () => {
+          return this.cleanupService.cleanJsonFileTemporaryChanges();
+        }
+      )
+    );
 
     await this.doInstall();
   }
-
 }

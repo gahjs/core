@@ -1,4 +1,11 @@
-import { IFileSystemService, TsConfigCompilerOptionsPaths, TsConfig, TsConfigFileData, GahAngularCompilerOptions, ICleanupService } from '@gah/shared';
+import {
+  IFileSystemService,
+  TsConfigCompilerOptionsPaths,
+  TsConfig,
+  TsConfigFileData,
+  GahAngularCompilerOptions,
+  ICleanupService
+} from '@gah/shared';
 
 export class TsConfigFile {
   private readonly _fileSystemService: IFileSystemService;
@@ -24,7 +31,7 @@ export class TsConfigFile {
     }
 
     const allPaths = Object.keys(this._tsConfig.compilerOptions.paths);
-    allPaths.forEach((x) => {
+    allPaths.forEach(x => {
       const pathCfg = this._tsConfig.compilerOptions.paths[x];
       if (pathCfg?.some(pathCfgEntry => pathCfgEntry.startsWith('[gah]'))) {
         delete this._tsConfig.compilerOptions.paths[x];

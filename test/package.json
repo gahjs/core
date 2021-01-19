@@ -14,6 +14,7 @@
   "scripts": {
     "test": "yarn mocha -p tsconfig.json ./src/tests/*.spec.ts"
   },
+  "prettier": "@awdware/prettier-config",
   "dependencies": {
     "@gah/cli": "^0.5.15",
     "@gah/shared": "^0.5.7",
@@ -21,7 +22,9 @@
   },
   "devDependencies": {
     "@angular/cli": "^11.0.7",
-    "@awdware/eslint-config-nodejs": "^0.0.6",
+    "@awdware/eslint-config-nodejs": "^0.0.8",
+    "@awdware/eslint-config-base": "^0.0.5",
+    "@awdware/prettier-config": "^0.0.2",
     "@types/fs-extra": "^9.0.6",
     "@types/mocha": "^8.2.0",
     "@types/node": "^12.0.0",
@@ -33,6 +36,7 @@
     "fs-extra": "^9.0.1",
     "mocha": "^7.0.0",
     "mocha-junit-reporter": "^2.0.0",
+    "prettier": "^2.2.1",
     "should": "^13.2.3",
     "sinon": "^9.2.3",
     "ts-mocha": "^8.0.0",

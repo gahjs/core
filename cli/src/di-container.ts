@@ -23,31 +23,28 @@ import { PromptService } from './services/prompt.service';
 import { TemplateService } from './services/template.service';
 import { WorkspaceService } from './services/workspace.service';
 
-
 export const DIContainer = createContainer({ injectionMode: InjectionMode.CLASSIC });
 
-DIContainer.register(
-  {
-    dependencyController: asClass(DependencyController, { lifetime: Lifetime.SINGLETON }),
-    hostModuleController: asClass(HostModuleController, { lifetime: Lifetime.SINGLETON }),
-    initController: asClass(InitController, { lifetime: Lifetime.SINGLETON }),
-    installController: asClass(InstallController, { lifetime: Lifetime.SINGLETON }),
-    mainController: asClass(MainController, { lifetime: Lifetime.SINGLETON }),
-    pluginController: asClass(PluginController, { lifetime: Lifetime.SINGLETON }),
-    runController: asClass(RunController, { lifetime: Lifetime.SINGLETON }),
-    tidyController: asClass(TidyController, { lifetime: Lifetime.SINGLETON }),
-    whyController: asClass(WhyController, { lifetime: Lifetime.SINGLETON }),
-    cleanupSevice: asClass(CleanupSevice, { lifetime: Lifetime.SINGLETON }),
-    configService: asClass(ConfigService, { lifetime: Lifetime.SINGLETON }),
-    contextService: asClass(ContextService, { lifetime: Lifetime.SINGLETON }),
-    executionService: asClass(ExecutionService, { lifetime: Lifetime.SINGLETON }),
-    fileSystemService: asClass(FileSystemService, { lifetime: Lifetime.SINGLETON }),
-    gitService: asClass(GitService, { lifetime: Lifetime.SINGLETON }),
-    loggerService: asClass(LoggerService, { lifetime: Lifetime.SINGLETON }),
-    packageService: asClass(PackageService, { lifetime: Lifetime.SINGLETON }),
-    pluginService: asClass(PluginService, { lifetime: Lifetime.SINGLETON }),
-    promptService: asClass(PromptService, { lifetime: Lifetime.SINGLETON }),
-    templateService: asClass(TemplateService, { lifetime: Lifetime.SINGLETON }),
-    workspaceService: asClass(WorkspaceService, { lifetime: Lifetime.SINGLETON })
-  }
-);
+DIContainer.register({
+  dependencyController: asClass(DependencyController, { lifetime: Lifetime.SINGLETON }),
+  hostModuleController: asClass(HostModuleController, { lifetime: Lifetime.SINGLETON }),
+  initController: asClass(InitController, { lifetime: Lifetime.SINGLETON }),
+  installController: asClass(InstallController, { lifetime: Lifetime.SINGLETON }),
+  mainController: asClass(MainController, { lifetime: Lifetime.SINGLETON }),
+  pluginController: asClass(PluginController, { lifetime: Lifetime.SINGLETON }),
+  runController: asClass(RunController, { lifetime: Lifetime.SINGLETON }),
+  tidyController: asClass(TidyController, { lifetime: Lifetime.SINGLETON }),
+  whyController: asClass(WhyController, { lifetime: Lifetime.SINGLETON }),
+  cleanupSevice: asClass(CleanupSevice, { lifetime: Lifetime.SINGLETON }),
+  configService: asClass(ConfigService, { lifetime: Lifetime.SINGLETON }),
+  contextService: asClass(ContextService, { lifetime: Lifetime.SINGLETON }),
+  executionService: asClass(ExecutionService, { lifetime: Lifetime.SINGLETON }),
+  fileSystemService: asClass(FileSystemService, { lifetime: Lifetime.SINGLETON }),
+  gitService: asClass(GitService, { lifetime: Lifetime.SINGLETON }),
+  loggerService: asClass(LoggerService, { lifetime: Lifetime.SINGLETON }),
+  packageService: asClass(PackageService, { lifetime: Lifetime.SINGLETON }),
+  pluginService: asClass(PluginService, { lifetime: Lifetime.SINGLETON }),
+  promptService: asClass(PromptService, { lifetime: Lifetime.SINGLETON }),
+  templateService: asClass(TemplateService, { lifetime: Lifetime.SINGLETON }),
+  workspaceService: asClass(WorkspaceService, { lifetime: Lifetime.SINGLETON })
+});

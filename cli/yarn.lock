@@ -2,17 +2,20 @@
 # yarn lockfile v1
 
 
-"@awdware/eslint-config-base@^0.0.4":
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-base/-/eslint-config-base-0.0.4.tgz#248d4175444dc05f1a92d61cb21779e1ee991c63"
-  integrity sha512-bkICaxMDBY8nUnAObIKKAaTNqqPpSepsGWWgSLv7Z8bfniM2hIHQJBvvo+rzpPa9LfWyB7lmroVPYoGFwsUKSQ==
+"@awdware/eslint-config-base@^0.0.5":
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-base/-/eslint-config-base-0.0.5.tgz#877db4a20b2258fca91a120a041df95a100799a3"
+  integrity sha512-kPmP83mfbRz5B9cRgWQ4aPZhdxjPgA1pPT1CC8w/VtM29bPzkrFXp2vn7DtxXpdlaUn7GqPu57gszwN3VJdhGQ==
 
-"@awdware/eslint-config-nodejs@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-nodejs/-/eslint-config-nodejs-0.0.6.tgz#f112eb5c9779659f9db166c1b21681e2eaa9dafb"
-  integrity sha512-ugp219UQJd6crL+AGQ1D3+8i6vR8vNLCRx2yG1t5/faZF7SDtQ4mGG7i3QuXHFheEmbtraTsSqBTsP1h+qob/A==
-  dependencies:
-    "@awdware/eslint-config-base" "^0.0.4"
+"@awdware/eslint-config-nodejs@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@awdware/eslint-config-nodejs/-/eslint-config-nodejs-0.0.8.tgz#a906ca58b09caa133d5a16d0609f84bc7dd59255"
+  integrity sha512-Kof80VqATCAC6l468FtCxC9O0fLDrMXP/J6Rq4b13U8fIgd2aVZi8XpLJKLudI8T0SpVCMJMvetNXhOVHhfAfQ==
+
+"@awdware/prettier-config@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@awdware/prettier-config/-/prettier-config-0.0.2.tgz#8fd6d59a2b78006cd93a4ae435ca1338382735e6"
+  integrity sha512-VK6SiTmFgiN27sMCOQesu70LgjBCW79FnIQrDzOF+8iZ6p6E/cJs7RPicUpSw+YnzBeRQvHIeC4pBJ//iYKnlA==
 
 "@babel/code-frame@^7.0.0":
   version "7.12.11"
@@ -2580,6 +2583,11 @@ prelude-ls@^1.2.1:
   version "1.2.1"
   resolved "https://registry.yarnpkg.com/prelude-ls/-/prelude-ls-1.2.1.tgz#debc6489d7a6e6b0e7611888cec880337d316396"
   integrity sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==
+
+prettier@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.2.1.tgz#795a1a78dd52f073da0cd42b21f9c91381923ff5"
+  integrity sha512-PqyhM2yCjg/oKkFPtTGUojv7gnZAoG80ttl45O6x2Ug/rMJw4wcc9k6aaf2hibP7BGVCCM33gZoGjyvt9mm16Q==
 
 process-nextick-args@~2.0.0:
   version "2.0.1"

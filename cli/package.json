@@ -29,6 +29,7 @@
   "author": "LoaderB0T",
   "license": "MIT",
   "private": false,
+  "prettier": "@awdware/prettier-config",
   "dependencies": {
     "@gah/shared": "^0.5.7",
     "add": "^2.0.6",
@@ -53,7 +54,9 @@
     "yarn": "^1.22.10"
   },
   "devDependencies": {
-    "@awdware/eslint-config-nodejs": "^0.0.6",
+    "@awdware/eslint-config-nodejs": "^0.0.8",
+    "@awdware/eslint-config-base": "^0.0.5",
+    "@awdware/prettier-config": "^0.0.2",
     "@types/clear": "^0.1.1",
     "@types/decompress": "^4.2.3",
     "@types/deep-equal": "^1.0.1",
@@ -68,6 +71,7 @@
     "del-cli": "^3.0.1",
     "eslint": "^7.17.0",
     "legally": "^3.5.9",
+    "prettier": "^2.2.1",
     "ts-node": "^9.1.1",
     "typescript": "^4.1.3"
   }
