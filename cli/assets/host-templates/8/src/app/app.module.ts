@@ -7,21 +7,14 @@ import { RouterModule, Router } from '@angular/router';
 import { gahModules } from './.gah/generated/gah-modules';
 
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    RouterModule.forRoot([]),
-    gahModules
-  ],
+  declarations: [AppComponent],
+  imports: [BrowserModule, HttpClientModule, RouterModule.forRoot([]), gahModules],
   exports: [HttpClientModule],
-  bootstrap: [AppComponent],
+  bootstrap: [AppComponent]
 })
 export class AppModule {
   constructor(router: Router) {
-    console.log('constructor: AppModule')
+    console.log('constructor: AppModule');
 
     if (!(window as any).__gah__routes) {
       throw new Error('Routes could not be builded');

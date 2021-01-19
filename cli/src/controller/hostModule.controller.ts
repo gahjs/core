@@ -4,15 +4,19 @@ import { Controller } from './controller';
 import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 
 export class HostModuleController extends Controller {
-
   public async remove(): Promise<void> {
-    if (await this._configService.getGahModuleType() === GahModuleType.MODULE) {
+    if ((await this._configService.getGahModuleType()) === GahModuleType.MODULE) {
       this._loggerService.error('This command is only available for hosts');
       this._loggerService.error('Please use the "dependency" command instead');
       return;
     }
 
-    const moduleNames = await ModuleReferenceHelper.askForModuleDependencies(this._configService, this._promptService, this._loggerService, true);
+    const moduleNames = await ModuleReferenceHelper.askForModuleDependencies(
+      this._configService,
+      this._promptService,
+      this._loggerService,
+      true
+    );
 
     if (!moduleNames || moduleNames.length === 0) {
       return;
@@ -21,7 +25,6 @@ export class HostModuleController extends Controller {
     const host = await this._configService.getGahHost();
 
     for (const modName of moduleNames) {
-
       const idx = host.modules.findIndex(x => x.names.some(y => y === modName))!;
       const dep = host.modules[idx];
       if (dep!.names.length! > 1) {
@@ -34,11 +37,13 @@ export class HostModuleController extends Controller {
 
     await this._configService.saveGahModuleConfig();
 
-    this._loggerService.success(`${moduleNames.length === 1 ? 'Module' : 'Modules'} ${moduleNames.join(', ')} removed successfully`);
+    this._loggerService.success(
+      `${moduleNames.length === 1 ? 'Module' : 'Modules'} ${moduleNames.join(', ')} removed successfully`
+    );
   }
 
   public async add(): Promise<void> {
-    if (await this._configService.getGahModuleType() === GahModuleType.MODULE) {
+    if ((await this._configService.getGahModuleType()) === GahModuleType.MODULE) {
       this._loggerService.error('This command is only available for hosts');
       this._loggerService.error('Please use the "dependency" command instead');
       return;
@@ -49,7 +54,12 @@ export class HostModuleController extends Controller {
     this._loggerService.log('Adding new module to host');
 
     const msgFilePath = 'Path to the gah-module.json of the module that should be added to the host';
-    const dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath);
+    const dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(
+      this._promptService,
+      this._fileSystemService,
+      this._loggerService,
+      msgFilePath
+    );
 
     if (!dependencyConfigPath) {
       return;

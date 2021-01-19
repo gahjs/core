@@ -2,7 +2,13 @@ import { GahInfo, IFileSystemService, ILoggerService, IWorkspaceService } from '
 import { platform } from 'os';
 
 export class CopyHost {
-  public static async copy(fileSystemService: IFileSystemService, workspaceService: IWorkspaceService, loggerService: ILoggerService, ngVersion: string, force: boolean = false) {
+  public static async copy(
+    fileSystemService: IFileSystemService,
+    workspaceService: IWorkspaceService,
+    loggerService: ILoggerService,
+    ngVersion: string,
+    force: boolean = false
+  ) {
     const destinationFolder = './.gah';
 
     await workspaceService.ensureGitIgnoreLine('.gah', 'Ignoring the automatically generated .gah folder');

@@ -7,17 +7,10 @@ import { RouterModule, Router } from '@angular/router';
 import { gahModules } from './.gah/generated/gah-modules';
 
 @NgModule({
-  declarations: [
-    GahMainComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    RouterModule.forRoot([]),
-    gahModules
-  ],
+  declarations: [GahMainComponent],
+  imports: [BrowserModule, HttpClientModule, RouterModule.forRoot([]), gahModules],
   exports: [HttpClientModule],
-  bootstrap: [GahMainComponent],
+  bootstrap: [GahMainComponent]
 })
 export class GahMainModule {
   constructor(router: Router) {

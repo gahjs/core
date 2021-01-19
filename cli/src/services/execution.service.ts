@@ -17,17 +17,11 @@ export class ExecutionService implements IExecutionService {
     this._loggerService = loggerService;
   }
 
-
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string, cwd?: string): Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.executionResult = '';
       this.executionErrorResult = '';
-      const usedCwd =
-        cwd
-          ? path.isAbsolute(cwd)
-            ? cwd
-            : path.join(process.cwd(), cwd)
-          : process.cwd();
+      const usedCwd = cwd ? (path.isAbsolute(cwd) ? cwd : path.join(process.cwd(), cwd)) : process.cwd();
       this._loggerService.debug(`Spawning process '${chalk.gray(cmd)}' in '${chalk.blue(usedCwd)}'`);
       let childProcess: ChildProcess;
       if (!fs.pathExistsSync(usedCwd)) {
@@ -46,7 +40,9 @@ export class ExecutionService implements IExecutionService {
         if (outPut) {
           if (outPutCallback) {
             const newOut = outPutCallback(buffer);
-            if (newOut) { console.log(newOut); }
+            if (newOut) {
+              console.log(newOut);
+            }
           } else {
             console.log(buffer);
           }
@@ -58,7 +54,9 @@ export class ExecutionService implements IExecutionService {
         if (outPut) {
           if (outPutCallback) {
             const newOut = outPutCallback(buffer);
-            if (newOut) { console.log(newOut); }
+            if (newOut) {
+              console.log(newOut);
+            }
           } else {
             console.error(buffer);
           }
@@ -73,8 +71,7 @@ export class ExecutionService implements IExecutionService {
           setTimeout(() => {
             resolve(false);
           }, 100);
-        }
-        else {
+        } else {
           setTimeout(() => {
             resolve(true);
           }, 100);
@@ -83,17 +80,15 @@ export class ExecutionService implements IExecutionService {
     });
   }
 
-
   public executeAndForget(executeable: string, options: string[], outPut: boolean, cwd?: string): Promise<boolean> {
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const childProcess = spawn(executeable, options, { cwd, shell: true, stdio: outPut ? 'inherit' : 'ignore' });
       childProcess.on('exit', code => {
         if (code !== 0) {
           setTimeout(() => {
             resolve(false);
           }, 10);
-        }
-        else {
+        } else {
           setTimeout(() => {
             resolve(true);
           }, 10);

@@ -4,5 +4,4 @@ import { Component } from '@angular/core';
   selector: 'gah-root',
   template: '<router-outlet></router-outlet>'
 })
-export class GahMainComponent {
-}
+export class GahMainComponent {}

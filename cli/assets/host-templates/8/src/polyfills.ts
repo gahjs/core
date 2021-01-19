@@ -56,18 +56,15 @@
  * APPLICATION IMPORTS
  */
 
-
-
-
 /*
-  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-  *   Please do not edit the following content of this file. Changes after this areas might be overwriten by gah.   *
-  *    If you really need to edit a section that is not marked for editing, please open an issue on github:         *
-  *                                  https://github.com/gahjs/core/issues/new                                       *
-  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-*/
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *   Please do not edit the following content of this file. Changes after this areas might be overwriten by gah.   *
+ *    If you really need to edit a section that is not marked for editing, please open an issue on github:         *
+ *                                  https://github.com/gahjs/core/issues/new                                       *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ */
 
 /***************************************************************************************************
  * Zone JS is required by default for Angular itself.
  */
-import 'zone.js/dist/zone';  // Included with Angular CLI.
+import 'zone.js/dist/zone'; // Included with Angular CLI.

@@ -12,7 +12,6 @@ if (environment.production) {
 fetch('environment.json')
   .then(res => res.json())
   .then(async (env: GahEnvironment) => {
-
     if (!environment.production) {
       console.log(env);
     }
@@ -21,9 +20,9 @@ fetch('environment.json')
 
     init(env);
 
-    platformBrowserDynamic().bootstrapModule((await import('./app/app.module')).AppModule)
+    platformBrowserDynamic()
+      .bootstrapModule((await import('./app/app.module')).AppModule)
       .catch(err => console.error(err));
-
   })
   .catch(err => {
     console.error('environment.json not found or not readable\nTrace:');

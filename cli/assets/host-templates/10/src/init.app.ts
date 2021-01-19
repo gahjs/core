@@ -100,15 +100,18 @@ const addToGahOutlet = (parentRoutes: Routes, child: GahRouteConfig) => {
     return true;
   } else {
     for (const parentRoute of parentRoutes) {
-      if (addToGahOutlet(parentRoute.children?.filter(x => !addedRoutes.includes(x)), child)) {
+      if (
+        addToGahOutlet(
+          parentRoute.children?.filter(x => !addedRoutes.includes(x)),
+          child
+        )
+      ) {
         return true;
       }
     }
     return false;
   }
 };
-
-
 
 const addToChildren = (route: Route, routes: Routes) => {
   if (!route.children) {

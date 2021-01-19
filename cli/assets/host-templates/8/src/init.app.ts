@@ -10,7 +10,7 @@ export const init = (env: any) => {
 
 const setEnvironmentValues = (moduleEnv: any, env: any) => {
   if (moduleEnv) {
-    Object.keys(moduleEnv).forEach((k) => {
+    Object.keys(moduleEnv).forEach(k => {
       if (env[k] === undefined) {
         console.error(`Missing value in host environment: ${k}`);
       }
@@ -23,7 +23,7 @@ const _routes: Routes = [];
 let facadeRoutes: Routes = [];
 
 const initRoutes = () => {
-  modulePackages.forEach((m) => {
+  modulePackages.forEach(m => {
     const mod = m.module;
     const isEntry = m.isEntry;
     readModuleRoutes(mod, isEntry);

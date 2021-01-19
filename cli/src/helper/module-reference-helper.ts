@@ -1,7 +1,6 @@
 import { IPromptService, IFileSystemService, IConfigurationService, ILoggerService } from '@gah/shared';
 
 export class ModuleReferenceHelper {
-
   public static async askForGahModuleJson(
     promptService: IPromptService,
     fileSystemService: IFileSystemService,
@@ -29,7 +28,11 @@ export class ModuleReferenceHelper {
     return dependencyConfigPath;
   }
 
-  public static async askForModulesToAdd(configService: IConfigurationService, promptService: IPromptService, dependencyModuleNames?: string[]) {
+  public static async askForModulesToAdd(
+    configService: IConfigurationService,
+    promptService: IPromptService,
+    dependencyModuleNames?: string[]
+  ) {
     const availableExternalModules = configService.externalConfig.modules.map(x => x.name);
     if (dependencyModuleNames && dependencyModuleNames.length > 0) {
       const invalidModule = dependencyModuleNames.find(x => !availableExternalModules.includes(x));
@@ -46,7 +49,7 @@ export class ModuleReferenceHelper {
     const dependencyModuleNames_ = await promptService.checkbox({
       msg: 'Which of the modules do you want to add?',
       choices: () => [...availableExternalModules],
-      enabled: () => enabled,
+      enabled: () => enabled
     });
 
     if (!dependencyModuleNames || dependencyModuleNames.length === 0) {
@@ -62,26 +65,25 @@ export class ModuleReferenceHelper {
     loggerService: ILoggerService,
     isHost: boolean,
     msg: string,
-    moduleName?: string) {
-    const availableModules = isHost ?
-      (await configService.getGahHost()).modules.map(x => x.names).reduce((a, b) => a.concat(b)) :
-      (await configService.getGahModule()).modules.map(x => x.name);
+    moduleName?: string
+  ) {
+    const availableModules = isHost
+      ? (await configService.getGahHost()).modules.map(x => x.names).reduce((a, b) => a.concat(b))
+      : (await configService.getGahModule()).modules.map(x => x.name);
 
     if (moduleName && !availableModules.includes(moduleName)) {
       throw new Error(`Cannot find module ${moduleName}`);
     }
 
-    const moduleName_ = await promptService
-      .list({
-        msg,
-        enabled: () => !moduleName && availableModules.length > 1,
-        choices: () => [...availableModules]
-      });
+    const moduleName_ = await promptService.list({
+      msg,
+      enabled: () => !moduleName && availableModules.length > 1,
+      choices: () => [...availableModules]
+    });
 
     if (availableModules.length === 1) {
       moduleName = availableModules[0];
     }
-
 
     moduleName = moduleName ?? moduleName_;
 
@@ -98,27 +100,25 @@ export class ModuleReferenceHelper {
     loggerService: ILoggerService,
     isHost: boolean,
     moduleName?: string,
-    dependencyNames?: string[]) {
-
-
-    const existingDependencies =
-      (isHost ?
-        (await configService.getGahHost()).modules
-        :
-        (await configService.getGahModule()).modules.find(x => x.name === moduleName)?.dependencies)
-        ?.map(x => x.names).reduce((a, b) => a.concat(b));
+    dependencyNames?: string[]
+  ) {
+    const existingDependencies = (isHost
+      ? (await configService.getGahHost()).modules
+      : (await configService.getGahModule()).modules.find(x => x.name === moduleName)?.dependencies
+    )
+      ?.map(x => x.names)
+      .reduce((a, b) => a.concat(b));
 
     if (!existingDependencies || existingDependencies.length === 0) {
       loggerService.warn(`The module "${moduleName}" has no references to other modules`);
       return undefined;
     }
 
-    const dependencyNames_ = await promptService
-      .checkbox({
-        msg: 'Select one or multiple dependencies to remove',
-        enabled: () => !dependencyNames || dependencyNames.length === 0,
-        choices: () => [...existingDependencies]
-      });
+    const dependencyNames_ = await promptService.checkbox({
+      msg: 'Select one or multiple dependencies to remove',
+      enabled: () => !dependencyNames || dependencyNames.length === 0,
+      choices: () => [...existingDependencies]
+    });
 
     dependencyNames = (dependencyNames?.length === 0 ? dependencyNames_ : dependencyNames) ?? dependencyNames_;
 
@@ -128,5 +128,4 @@ export class ModuleReferenceHelper {
 
     return dependencyNames;
   }
-
 }

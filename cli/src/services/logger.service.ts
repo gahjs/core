@@ -61,7 +61,12 @@ export class LoggerService implements ILoggerService {
   public startLoadingAnimation(text: string) {
     const textObj = new TextObject(' ■ ', 'BLUE');
     textObj.append(text);
-    this._spinnerControl = AwesomeLogger.log('spinner', { spinnerFrames: [' ▄', ' ■', ' ▀', ' ▀', ' ■'], spinnerColor: 'BLUE', spinnerDelay: 80, text });
+    this._spinnerControl = AwesomeLogger.log('spinner', {
+      spinnerFrames: [' ▄', ' ■', ' ▀', ' ▀', ' ■'],
+      spinnerColor: 'BLUE',
+      spinnerDelay: 80,
+      text
+    });
     this._isSpinning = true;
   }
 

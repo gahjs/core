@@ -16,7 +16,6 @@ export const gahMain = async () => {
 
     // Call main method
     await mainController.main();
-
   })().catch(err => {
     console.log();
     console.error(chalk.red(' ■ ') + err.message);

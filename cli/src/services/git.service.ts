@@ -4,7 +4,6 @@ import simpleGit, { SimpleGit } from 'simple-git';
 import chalk from 'chalk';
 const git: SimpleGit = simpleGit();
 
-
 export class GitService implements IGitService {
   private readonly _loggerService: ILoggerService;
 
@@ -12,10 +11,9 @@ export class GitService implements IGitService {
     this._loggerService = loggerService;
   }
 
-
   public async init(): Promise<void> {
     const rootDir = await this.getRootDir();
-    await git.cwd(rootDir).catch((err) => {
+    await git.cwd(rootDir).catch(err => {
       this._loggerService.debug('Git Service could not be initialized.');
     });
   }
@@ -29,7 +27,7 @@ export class GitService implements IGitService {
   }
 
   public async getCurrentBranchName(): Promise<string> {
-    return git.revparse({ '--abbrev-ref': null, 'HEAD': null });
+    return git.revparse({ '--abbrev-ref': null, HEAD: null });
   }
 
   public async getModifiedLines(): Promise<string[]> {

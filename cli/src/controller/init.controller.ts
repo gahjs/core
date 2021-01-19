@@ -16,8 +16,6 @@ export class InitController extends Controller {
     }
 
     if (!isHost) {
-
-
       const packageJson = await this.getPackageJson();
 
       const newModuleName = await this.askModuleName(isHost, packageJson);
@@ -37,10 +35,8 @@ export class InitController extends Controller {
         return;
       }
 
-
       const assetsFolderPath = await this.askForAssetsFolderPath(isHost);
       const stylesFolderPath = await this.askForGlobalStylesPath(isHost);
-
 
       const publicApiPath = await this.askForPublicApiPath(isHost);
 
@@ -51,11 +47,19 @@ export class InitController extends Controller {
 
       const baseModuleName = await this.askBaseModuleName();
 
-      this.doInitModule(newModuleName, assetsFolderPath, stylesFolderPath, packageName, publicApiPath, baseModuleName, isEntry ?? false, overwrite);
+      this.doInitModule(
+        newModuleName,
+        assetsFolderPath,
+        stylesFolderPath,
+        packageName,
+        publicApiPath,
+        baseModuleName,
+        isEntry ?? false,
+        overwrite
+      );
     } else {
       this.doInitHost();
     }
-
   }
 
   private async doInitModule(
@@ -68,7 +72,6 @@ export class InitController extends Controller {
     isEntry: boolean,
     overwrite: boolean
   ) {
-
     const newModule = new ModuleDefinition();
 
     newModule.name = newModuleName;
@@ -105,12 +108,11 @@ export class InitController extends Controller {
 
   private async askBaseModuleName() {
     const guessedName = await this.tryGuessbaseModuleName();
-    return await this._promptService
-      .input({
-        msg: 'Enter the class name of the base NgModule for this GahModule (empty if there is none)',
-        enabled: () => true,
-        default: guessedName
-      });
+    return await this._promptService.input({
+      msg: 'Enter the class name of the base NgModule for this GahModule (empty if there is none)',
+      enabled: () => true,
+      default: guessedName
+    });
   }
 
   private async getPackageJson() {
@@ -122,38 +124,36 @@ export class InitController extends Controller {
   }
 
   private async askForPublicApiPath(isHost: boolean | undefined) {
-    let defaultPublicApiPath = (await this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist']))?.[0]
-      ?? (await this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist']))?.[0];
-
+    let defaultPublicApiPath =
+      (await this._fileSystemService.getFilesFromGlob('**/public-api.ts', ['.gah', 'dist']))?.[0] ??
+      (await this._fileSystemService.getFilesFromGlob('**/index.ts', ['.gah', 'dist']))?.[0];
 
     if (process.platform === 'win32' && defaultPublicApiPath) {
       defaultPublicApiPath = defaultPublicApiPath.replace(/\//g, '\\');
     }
 
-    const publicApiPath = await this._promptService
-      .fuzzyPath({
-        msg: 'Enter the path to the public-api file (public-api.ts / index.ts / ...)',
-        enabled: () => !isHost,
-        itemType: 'file',
-        exclude: (val) => !val.endsWith('.ts') || val.endsWith('.d.ts'),
-        excludePattern: ['.gah'],
-        default: defaultPublicApiPath
-      });
+    const publicApiPath = await this._promptService.fuzzyPath({
+      msg: 'Enter the path to the public-api file (public-api.ts / index.ts / ...)',
+      enabled: () => !isHost,
+      itemType: 'file',
+      exclude: val => !val.endsWith('.ts') || val.endsWith('.d.ts'),
+      excludePattern: ['.gah'],
+      default: defaultPublicApiPath
+    });
     return publicApiPath;
   }
 
   private async askForAssetsFolderPath(isHost: boolean | undefined) {
     const defaultAssetsFolder = (await this._fileSystemService.getFilesFromGlob('**/assets', ['.gah', 'dist']))?.[0];
 
-    const assetsFolderPath = await this._promptService
-      .fuzzyPath({
-        msg: 'Enter the path to the assets folder. Leave empty for none',
-        itemType: 'directory',
-        excludePattern: ['.gah', 'dist'],
-        default: defaultAssetsFolder,
-        enabled: () => !isHost,
-        optional: true
-      });
+    const assetsFolderPath = await this._promptService.fuzzyPath({
+      msg: 'Enter the path to the assets folder. Leave empty for none',
+      itemType: 'directory',
+      excludePattern: ['.gah', 'dist'],
+      default: defaultAssetsFolder,
+      enabled: () => !isHost,
+      optional: true
+    });
     return assetsFolderPath;
   }
 
@@ -166,29 +166,27 @@ export class InitController extends Controller {
       defaultStylesPath = defaultStylesPath?.replace(/\//g, '\\');
     }
 
-    const stylesFilePath = await this._promptService
-      .fuzzyPath({
-        msg: 'Enter the path to the global styles file. Leave empty for none',
-        enabled: () => !isHost,
-        itemType: 'file',
-        excludePattern: ['.gah', 'dist'],
-        exclude: (val) => !val.endsWith('.scss'),
-        default: defaultStylesPath,
-        optional: true
-      });
+    const stylesFilePath = await this._promptService.fuzzyPath({
+      msg: 'Enter the path to the global styles file. Leave empty for none',
+      enabled: () => !isHost,
+      itemType: 'file',
+      excludePattern: ['.gah', 'dist'],
+      exclude: val => !val.endsWith('.scss'),
+      default: defaultStylesPath,
+      optional: true
+    });
     return stylesFilePath;
   }
 
   private async askForModuleOverwrite(newModuleName: string, packageName: string) {
     const module = await this._configService.getGahModule();
-    return await this._promptService
-      .confirm({
-        msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
-        enabled: () => {
-          this.doesNameAndPackageExist(module, newModuleName, packageName);
-          return this.nameExists;
-        }
-      });
+    return await this._promptService.confirm({
+      msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
+      enabled: () => {
+        this.doesNameAndPackageExist(module, newModuleName, packageName);
+        return this.nameExists;
+      }
+    });
   }
 
   private async askPackageName(packageJson?: PackageJson, isHost?: boolean) {
@@ -200,43 +198,44 @@ export class InitController extends Controller {
       }
     }
 
-    const packageName = await this._promptService
-      .input({
-        msg: 'Enter the name of the package prefix of this module',
-        enabled: () => !isHost,
-        default: guessedPackageName || null
-      });
+    const packageName = await this._promptService.input({
+      msg: 'Enter the name of the package prefix of this module',
+      enabled: () => !isHost,
+      default: guessedPackageName || null
+    });
     return packageName;
   }
 
   private async askModuleName(isHost?: boolean, packageJson?: PackageJson) {
     let guessedModuleName: string = '';
     if (packageJson?.name) {
-      const pkgName = packageJson.name.match(/(@[\w-]+\/)?([\w/\-.]+)/)?.[2]?.replace(/\//, '-').toLocaleLowerCase();
+      const pkgName = packageJson.name
+        .match(/(@[\w-]+\/)?([\w/\-.]+)/)?.[2]
+        ?.replace(/\//, '-')
+        .toLocaleLowerCase();
       if (pkgName) {
         guessedModuleName = pkgName;
       }
     }
 
-    const newModuleName = await this._promptService
-      .input({
-        msg: `Enter a unique name for this ${isHost ? 'host' : 'module'}`,
-        enabled: () => !isHost,
-        default: guessedModuleName
-      });
+    const newModuleName = await this._promptService.input({
+      msg: `Enter a unique name for this ${isHost ? 'host' : 'module'}`,
+      enabled: () => !isHost,
+      default: guessedModuleName
+    });
     return newModuleName;
   }
 
   private async askForOverwrite(isHost: boolean | undefined) {
     const alreadyInitialized = await this._configService.gahConfigExists();
 
-    const overwriteHost = await this._promptService
-      .confirm({
-        msg: 'This folder already contains a GAH configuration. A host has to be in its own workspace. Do you want to overwrite the existing configuration for this workspace?',
-        enabled: () => {
-          return (isHost ?? false) && alreadyInitialized;
-        }
-      });
+    const overwriteHost = await this._promptService.confirm({
+      msg:
+        'This folder already contains a GAH configuration. A host has to be in its own workspace. Do you want to overwrite the existing configuration for this workspace?',
+      enabled: () => {
+        return (isHost ?? false) && alreadyInitialized;
+      }
+    });
     return { alreadyInitialized, overwriteHost };
   }
 

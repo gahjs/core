@@ -16,7 +16,7 @@ export class WorkspaceService implements IWorkspaceService {
   public async ensureGitIgnoreLine(gitIgnorePattern: string, description?: string, baseDir?: string): Promise<void> {
     const gitIgnorePath = baseDir ? this._fileSystemService.join(baseDir, '.gitignore') : '.gitignore';
 
-    if (!await this._fileSystemService.fileExists(gitIgnorePath)) {
+    if (!(await this._fileSystemService.fileExists(gitIgnorePath))) {
       await this._fileSystemService.saveFile(gitIgnorePath, '## Added by gah\n\n');
     }
 
@@ -44,7 +44,7 @@ export class WorkspaceService implements IWorkspaceService {
 
   public async getGlobalData(): Promise<GlobalGahData> {
     const globalDataPath = this._fileSystemService.join(this.getGlobalGahFolder(), 'data.json');
-    if (!await this._fileSystemService.fileExists(globalDataPath)) {
+    if (!(await this._fileSystemService.fileExists(globalDataPath))) {
       return {} as GlobalGahData;
     }
     return await this._fileSystemService.parseFile<GlobalGahData>(globalDataPath);

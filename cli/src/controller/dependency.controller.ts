@@ -4,23 +4,33 @@ import { Controller } from './controller';
 import { ModuleReferenceHelper } from '../helper/module-reference-helper';
 
 export class DependencyController extends Controller {
-
   public async remove(): Promise<void> {
-
-    if (await this._configService.getGahModuleType() === GahModuleType.HOST) {
+    if ((await this._configService.getGahModuleType()) === GahModuleType.HOST) {
       this._loggerService.error('This command is unavailable for hosts');
       this._loggerService.error('Please use the "reference" command instead');
       return;
     }
 
     const msgModule = 'Select a module you want to remove a dependency from';
-    const moduleName = await ModuleReferenceHelper.askForModule(this._configService, this._promptService, this._loggerService, false, msgModule);
+    const moduleName = await ModuleReferenceHelper.askForModule(
+      this._configService,
+      this._promptService,
+      this._loggerService,
+      false,
+      msgModule
+    );
     if (!moduleName) {
       this._loggerService.warn('No module selected.');
       return;
     }
 
-    const dependencyNames = await ModuleReferenceHelper.askForModuleDependencies(this._configService, this._promptService, this._loggerService, false, moduleName);
+    const dependencyNames = await ModuleReferenceHelper.askForModuleDependencies(
+      this._configService,
+      this._promptService,
+      this._loggerService,
+      false,
+      moduleName
+    );
 
     if (!dependencyNames || dependencyNames.length === 0) {
       this._loggerService.warn('No dependency selected.');
@@ -41,11 +51,13 @@ export class DependencyController extends Controller {
 
     await this._configService.saveGahModuleConfig();
 
-    this._loggerService.success(`${dependencyNames.length === 1 ? 'Depdendency' : 'Dependencies'} ${dependencyNames.join(', ')} removed successfully`);
+    this._loggerService.success(
+      `${dependencyNames.length === 1 ? 'Depdendency' : 'Dependencies'} ${dependencyNames.join(', ')} removed successfully`
+    );
   }
 
   public async add(): Promise<void> {
-    if (await this._configService.getGahModuleType() === GahModuleType.HOST) {
+    if ((await this._configService.getGahModuleType()) === GahModuleType.HOST) {
       this._loggerService.error('This command is unavailable for hosts');
       this._loggerService.error('Please use the "reference" command instead');
       return;
@@ -53,14 +65,25 @@ export class DependencyController extends Controller {
     this._loggerService.log('Adding new dependency to module');
 
     const msgModule = 'Select a module you want to add a dependency to';
-    const moduleName = await ModuleReferenceHelper.askForModule(this._configService, this._promptService, this._loggerService, false, msgModule);
+    const moduleName = await ModuleReferenceHelper.askForModule(
+      this._configService,
+      this._promptService,
+      this._loggerService,
+      false,
+      msgModule
+    );
     if (!moduleName) {
       this._loggerService.error('No module selected.');
       return;
     }
 
     const msgFilePath = 'Path to the gah-module.json of the new dependency';
-    const dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(this._promptService, this._fileSystemService, this._loggerService, msgFilePath);
+    const dependencyConfigPath = await ModuleReferenceHelper.askForGahModuleJson(
+      this._promptService,
+      this._fileSystemService,
+      this._loggerService,
+      msgFilePath
+    );
     if (!dependencyConfigPath) {
       this._loggerService.warn('No dependency selected.');
       return;
@@ -70,7 +93,9 @@ export class DependencyController extends Controller {
     const dependencyModuleNames = await ModuleReferenceHelper.askForModulesToAdd(this._configService, this._promptService);
 
     const module = (await this._configService.getGahModule()).modules.find(x => x.name === moduleName);
-    if (!module) { throw new Error(`Module '${moduleName}' could not be found`); }
+    if (!module) {
+      throw new Error(`Module '${moduleName}' could not be found`);
+    }
 
     const newDep = new ModuleReference();
 

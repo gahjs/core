@@ -47,15 +47,14 @@ export class FileSystemService implements IFileSystemService {
   }
 
   async tryReadFile(path: string): Promise<string | null> {
-    if (!await this.fileExists(path)) {
+    if (!(await this.fileExists(path))) {
       return null;
     }
-    return fs.promises.readFile(this.cwd(path))
-      .then(b => b.toString());
+    return fs.promises.readFile(this.cwd(path)).then(b => b.toString());
   }
 
   async tryParseFile<T>(path: string): Promise<T | null> {
-    if (!await this.fileExists(path)) {
+    if (!(await this.fileExists(path))) {
       return null;
     }
     return this.parseFile<T>(path);
@@ -106,14 +105,17 @@ export class FileSystemService implements IFileSystemService {
   }
 
   async ensureRelativePath(path: string, relativeFrom?: string, dontCheck = false): Promise<string> {
-    if (!dontCheck && !await this.directoryExists(path)) { throw new Error(`Could not find path ${path}`); }
+    if (!dontCheck && !(await this.directoryExists(path))) {
+      throw new Error(`Could not find path ${path}`);
+    }
     relativeFrom = relativeFrom ?? this._cwd;
-    if (!dontCheck && !await this.directoryExists(relativeFrom)) { throw new Error(`Could not find path ${relativeFrom}`); }
+    if (!dontCheck && !(await this.directoryExists(relativeFrom))) {
+      throw new Error(`Could not find path ${relativeFrom}`);
+    }
 
     path = path_.relative(relativeFrom, path).replace(/\\/g, '/');
     return path;
   }
-
 
   async directoryExists(path: string): Promise<boolean> {
     return fs.pathExists(this.cwd(path));
@@ -142,22 +144,31 @@ export class FileSystemService implements IFileSystemService {
   }
 
   async copyFilesInDirectory(fromDirectory: string, toDirectory: string): Promise<void> {
-    if (!await this.directoryExists(fromDirectory)) {
+    if (!(await this.directoryExists(fromDirectory))) {
       throw new Error('Directory to copy from not found');
     }
     await this.ensureDirectory(toDirectory);
     return fs.copy(this.cwd(fromDirectory), this.cwd(toDirectory), { recursive: true });
   }
 
-  async getFilesFromGlob(glob_: string, ignore?: string | string[], noDefaultIgnore?: boolean, type: FileSystemType = 'any'): Promise<string[]> {
+  async getFilesFromGlob(
+    glob_: string,
+    ignore?: string | string[],
+    noDefaultIgnore?: boolean,
+    type: FileSystemType = 'any'
+  ): Promise<string[]> {
     const ignore_ = new Array<string>();
     if (!noDefaultIgnore) {
       ignore_.push('**/node_modules/**');
       ignore_.push('/node_modules/**');
       ignore_.push('**/.gah/**');
     }
-    if (ignore && typeof (ignore) === 'string') { ignore_.push(ignore); }
-    if (ignore && Array.isArray(ignore)) { ignore.forEach(x => ignore_.push(x)); }
+    if (ignore && typeof ignore === 'string') {
+      ignore_.push(ignore);
+    }
+    if (ignore && Array.isArray(ignore)) {
+      ignore.forEach(x => ignore_.push(x));
+    }
 
     const onlyFiles = type && type === 'file';
     const onlyDirectories = type && type === 'directory';
@@ -173,7 +184,9 @@ export class FileSystemService implements IFileSystemService {
     if (platform() === 'win32') {
       const cmd = `mklink /j "${this.cwd(linkPath)}" "${this.cwd(realPath)}"`;
       await this._executionService.execute(cmd, false).then(success => {
-        if (!success) { throw new Error(this._executionService.executionErrorResult); }
+        if (!success) {
+          throw new Error(this._executionService.executionErrorResult);
+        }
       });
     } else {
       fs.ensureSymlink(this.cwd(realPath), this.cwd(linkPath), 'dir');
@@ -184,7 +197,9 @@ export class FileSystemService implements IFileSystemService {
     if (platform() === 'win32') {
       const cmd = `mklink /h "${this.cwd(linkPath)}" "${this.cwd(realPath)}"`;
       await this._executionService.execute(cmd, false).then(success => {
-        if (!success) { throw new Error(this._executionService.executionErrorResult); }
+        if (!success) {
+          throw new Error(this._executionService.executionErrorResult);
+        }
       });
     } else {
       await fs.ensureSymlink(this.cwd(realPath), this.cwd(linkPath), 'file');
@@ -213,18 +228,18 @@ export class FileSystemService implements IFileSystemService {
   }
 
   ensureAbsolutePath(path: string) {
-    if (path_.isAbsolute(path)) { return path.replace(/\\/g, '/'); }
+    if (path_.isAbsolute(path)) {
+      return path.replace(/\\/g, '/');
+    }
     return path_.resolve(this.cwd(path)).replace(/\\/g, '/');
   }
 
   async decompressTargz(filePath: string, destinationPath: string) {
     return decompress(filePath, destinationPath, {
-      plugins: [
-        decompressTargz()
-      ]
+      plugins: [decompressTargz()]
     })
       .then(() => true)
-      .catch((reason) => {
+      .catch(reason => {
         this._loggerService.error(reason);
         return false;
       });

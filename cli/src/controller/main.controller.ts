@@ -56,7 +56,7 @@ export class MainController extends Controller {
   }
 
   public async main() {
-    if (await this._configService.getGahModuleType() === GahModuleType.HOST) {
+    if ((await this._configService.getGahModuleType()) === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
       this._contextService.setContext({ currentBaseFolder: this._fileSystemService.join(process.cwd(), '.gah') });
     } else {
@@ -85,7 +85,9 @@ export class MainController extends Controller {
       this._contextService.setContext({ configName: paramValue });
     }
 
-    this._loggerService.debug(`Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}\n`);
+    this._loggerService.debug(
+      `Environment Vars: \n${chalk.greenBright(Object.keys(process.env).map(x => `\n${x}:${process.env[x]}`))}\n`
+    );
 
     await this.checkForUpdates();
 
@@ -102,9 +104,7 @@ export class MainController extends Controller {
 
     const program = new Command();
 
-    program
-      .storeOptionsAsProperties()
-      .version(this._version);
+    program.storeOptionsAsProperties().version(this._version);
 
     program.on('--help', () => {
       console.log(
@@ -115,24 +115,21 @@ export class MainController extends Controller {
     });
     console.log();
 
-
     program
       .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
       .option('--debug', 'Enables verbose debug logging')
       .option('--config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)')
-      .addOption(new Option('--useTestContext', 'enables the test context. Used in automated tests, never in production!').hideHelp());
+      .addOption(
+        new Option('--useTestContext', 'enables the test context. Used in automated tests, never in production!').hideHelp()
+      );
 
-    const cmdModule = program
-      .command('module')
-      .description('Several commands for working with a module');
+    const cmdModule = program.command('module').description('Several commands for working with a module');
     cmdModule
       .command('init')
       .description('Initiates a new module')
       .option('-e, --entry', 'Initiates a module as the entry module')
-      .action(async (cmdObj) => this._initController.init(false, cmdObj.entry));
-    const cmdModuleDependency = cmdModule
-      .command('dependency')
-      .description('A command for managing dependencies of a module');
+      .action(async cmdObj => this._initController.init(false, cmdObj.entry));
+    const cmdModuleDependency = cmdModule.command('dependency').description('A command for managing dependencies of a module');
     cmdModuleDependency
       .command('add')
       .description('Adds new dependencies to a module')
@@ -142,16 +139,12 @@ export class MainController extends Controller {
       .description('Removes dependencies from a module')
       .action(async () => this._dependencyController.remove());
 
-    const cmdHost = program
-      .command('host')
-      .description('Several commands for working with a host');
+    const cmdHost = program.command('host').description('Several commands for working with a host');
     cmdHost
       .command('init')
       .description('Initiates a new host')
       .action(async () => this._initController.init(true));
-    const cmdHostModule = cmdHost
-      .command('module')
-      .description('A command for managing modules of a host');
+    const cmdHostModule = cmdHost.command('module').description('A command for managing modules of a host');
     cmdHostModule
       .command('add')
       .description('Adds module to a host')
@@ -161,20 +154,19 @@ export class MainController extends Controller {
       .description('Removes a module from a host')
       .action(async () => this._hostModuleController.remove());
 
-    const cmdPlugin = program
-      .command('plugin <add|remove|update|run> [options]');
+    const cmdPlugin = program.command('plugin <add|remove|update|run> [options]');
     cmdPlugin
       .command('add [pluginName]')
       .description('Adds and installs a new plugin.')
-      .action(async (pluginName) => this._pluginController.add(pluginName));
+      .action(async pluginName => this._pluginController.add(pluginName));
     cmdPlugin
       .command('remove [pluginName]')
       .description('Removes and uninstalls a plugin.')
-      .action(async (pluginName) => this._pluginController.remove(pluginName));
+      .action(async pluginName => this._pluginController.remove(pluginName));
     cmdPlugin
       .command('update [pluginName]')
       .description('Updates plugin to its newest version.')
-      .action(async (pluginName) => this._pluginController.update(pluginName));
+      .action(async pluginName => this._pluginController.update(pluginName));
     cmdPlugin
       .command('run <command...>')
       .description('Runs a custom command from a plugin.')
@@ -193,23 +185,19 @@ export class MainController extends Controller {
       .option('--skipPackageInstall', 'Skips the yarn install step')
       .option('--skipScripts', 'Skips pre and post install scripts')
       .alias('i')
-      .action(async (cmdObj) => this._installController.install(cmdObj.skipPackageInstall));
+      .action(async cmdObj => this._installController.install(cmdObj.skipPackageInstall));
 
-    const cmdWhy = program
-      .command('why <module|package>')
-      .description('Why is something there?');
+    const cmdWhy = program.command('why <module|package>').description('Why is something there?');
     cmdWhy
       .command('module <name>')
       .description('Why is this module referenced?')
-      .action(async (name) => this._whyController.whyModule(name));
+      .action(async name => this._whyController.whyModule(name));
     cmdWhy
       .command('package <name>')
       .description('Why is this package there?')
-      .action(async (name) => this._whyController.whyPackage(name));
+      .action(async name => this._whyController.whyPackage(name));
 
-    const cmdTidy = program
-      .command('tidy <packages>')
-      .description('Tidy up your modules.');
+    const cmdTidy = program.command('tidy <packages>').description('Tidy up your modules.');
     cmdTidy
       .command('packages')
       .description('Tidies up the packages of your modules.')
@@ -217,7 +205,6 @@ export class MainController extends Controller {
 
     await program.parseAsync(process.argv);
   }
-
 
   private async checkForUpdates() {
     const gahData = await this._workspaceService.getGlobalData();
@@ -254,5 +241,4 @@ export class MainController extends Controller {
 
     await this._workspaceService.saveGlobalGahData(gahData);
   }
-
 }

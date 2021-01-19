@@ -3,18 +3,16 @@ import { GahModuleType } from '@gah/shared';
 import { Controller } from './controller';
 
 export class RunController extends Controller {
-
   public async exec(command: string[], configurationName?: string) {
-    const isHost = await this._configService.getGahModuleType() === GahModuleType.HOST;
+    const isHost = (await this._configService.getGahModuleType()) === GahModuleType.HOST;
 
     const likedEnvFile = '.gah/src/environment.json';
 
     if (isHost) {
-
       const envFileSimpleName = configurationName ? `environment.${configurationName}.json` : 'environment.json';
       const envFileName = `env/${envFileSimpleName}`;
 
-      if (!await this._fileSystemService.fileExists(envFileName)) {
+      if (!(await this._fileSystemService.fileExists(envFileName))) {
         throw new Error(`Cannot find configuration file "${envFileSimpleName}"`);
       }
 

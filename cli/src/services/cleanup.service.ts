@@ -11,14 +11,13 @@ export class CleanupSevice implements ICleanupService {
   private readonly _fileSystemService: IFileSystemService;
   private readonly _loggerService: ILoggerService;
   private readonly _gitService: IGitService;
-  private _temporaryJsonFileChanges: { filePath: string, propertyPath: string, previousValue: any }[] = [];
+  private _temporaryJsonFileChanges: { filePath: string; propertyPath: string; previousValue: any }[] = [];
 
   constructor(fileSystemService: FileSystemService, loggerService: LoggerService, gitService: GitService) {
     this._fileSystemService = fileSystemService;
     this._loggerService = loggerService;
     this._gitService = gitService;
   }
-
 
   public async cleanPendingChanges() {
     const isRepo = await this._gitService.isGitRepo();
@@ -41,7 +40,9 @@ export class CleanupSevice implements ICleanupService {
         try {
           branchState = JSON.parse(branchStateText);
         } catch (error) {
-          this._loggerService.error(`Cannot compare '${chalk.gray(fullPath)}' because the branch state is not a valid JSON file.`);
+          this._loggerService.error(
+            `Cannot compare '${chalk.gray(fullPath)}' because the branch state is not a valid JSON file.`
+          );
           continue;
         }
         if (deepEqual(currentState, branchState)) {

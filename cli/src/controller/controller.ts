@@ -9,8 +9,17 @@ import { TemplateService } from '../services/template.service';
 import { WorkspaceService } from '../services/workspace.service';
 import { ContextService } from '../services/context-service';
 import {
-  IWorkspaceService, ITemplateService, IPromptService, IPluginService, ILoggerService,
-  IFileSystemService, IExecutionService, IConfigurationService, IContextService, IPackageService, ICleanupService
+  IWorkspaceService,
+  ITemplateService,
+  IPromptService,
+  IPluginService,
+  ILoggerService,
+  IFileSystemService,
+  IExecutionService,
+  IConfigurationService,
+  IContextService,
+  IPackageService,
+  ICleanupService
 } from '@gah/shared';
 import { PackageService } from '../services/package.service';
 import { CleanupSevice } from '../services/cleanup.service';

@@ -3,12 +3,10 @@ import { Controller } from './controller';
 
 export class PluginController extends Controller {
   public async add(pluginName?: string) {
-
-    const pluginName_ = await this._promptService
-      .input({
-        msg: 'Please enter the name of the plugin you want to add',
-        enabled: () => !pluginName
-      });
+    const pluginName_ = await this._promptService.input({
+      msg: 'Please enter the name of the plugin you want to add',
+      enabled: () => !pluginName
+    });
 
     pluginName = pluginName ?? pluginName_;
     if (!pluginName) {
@@ -25,13 +23,13 @@ export class PluginController extends Controller {
     }
 
     await this._pluginService.installPlugin(pluginName.toLowerCase());
-
   }
 
   public async remove(pluginName?: string) {
-
     const pluginName_ = await this.askForInstalledPlugin('Please select the plugin you want to remove', pluginName);
-    if (!pluginName_) { return; }
+    if (!pluginName_) {
+      return;
+    }
     pluginName = pluginName || pluginName_;
 
     await this._pluginService.removePlugin(pluginName);
@@ -86,15 +84,12 @@ export class PluginController extends Controller {
       return null;
     }
 
-    const pluginName_ = await this._promptService
-      .list({
-        msg: msg,
-        enabled: () => !pluginName,
-        choices: () => cfg.plugins!.map(x => x.name)
-      });
+    const pluginName_ = await this._promptService.list({
+      msg: msg,
+      enabled: () => !pluginName,
+      choices: () => cfg.plugins!.map(x => x.name)
+    });
 
     return pluginName ?? pluginName_;
   }
-
-
 }

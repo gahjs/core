@@ -55,7 +55,9 @@ export class GahFolder {
   }
 
   public async cleanDependencyDirectory() {
-    await this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
+    await this._fileSystemService.deleteFilesInDirectory(
+      this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath)
+    );
     await this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.dependencyPath));
   }
 
@@ -74,7 +76,9 @@ export class GahFolder {
   }
 
   public async cleanGeneratedDirectory() {
-    await this._fileSystemService.deleteFilesInDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
+    await this._fileSystemService.deleteFilesInDirectory(
+      this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath)
+    );
     await this._fileSystemService.ensureDirectory(this._fileSystemService.join(this._moduleBaseFolder, this.generatedPath));
   }
 
@@ -85,12 +89,19 @@ export class GahFolder {
         fswin.setAttributes(
           this._fileSystemService.join(this._moduleBaseFolder, this._pathRelativeToModuleBaseFolder),
           { IS_HIDDEN: true },
-          (succeeded: boolean) => succeeded ? resolve(null) : reject(null));
+          (succeeded: boolean) => (succeeded ? resolve(null) : reject(null))
+        );
       });
     }
   }
 
-  public addGeneratedFileTemplateData(moduleName: string, packageName: string, isEntry: boolean, baseNgModuleName?: string, parentGahModule?: string) {
+  public addGeneratedFileTemplateData(
+    moduleName: string,
+    packageName: string,
+    isEntry: boolean,
+    baseNgModuleName?: string,
+    parentGahModule?: string
+  ) {
     // Get a save name of a module removing some special chars. Mainly dots are probably used in names and have to be replaced.
     const saveModuleName = moduleName.replace(/[.*:$-]/g, '_');
     // Generationg data for the ejs template generation generating the gah-modules.ts

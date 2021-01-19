@@ -1,6 +1,5 @@
 import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig, IFileSystemService } from '@gah/shared';
 
-
 import { prompt } from 'enquirer';
 import { FileSystemService } from './file-system.service';
 
@@ -38,13 +37,14 @@ export class PromptService implements IPromptService {
       cfg.startingDirectory ? `${cfg.startingDirectory}/**` : '**',
       ['node_modules', ...excludes],
       undefined,
-      cfg.itemType);
+      cfg.itemType
+    );
 
     const filteredFiles = (cfg.exclude ? allFiles.filter(x => !cfg.exclude!(x)) : allFiles).map(x => x.replace(/\\/g, '/'));
 
     const defaultIndex = filteredFiles.findIndex(x => x === cfg.default?.replace(/\\/g, '/'));
 
-    const def = cfg.optional ? 0 : cfg.default && defaultIndex || undefined;
+    const def = cfg.optional ? 0 : (cfg.default && defaultIndex) || undefined;
 
     if (filteredFiles.length === 0) {
       return '';
@@ -66,7 +66,6 @@ export class PromptService implements IPromptService {
     } as any).then((_: any) => _._);
   }
 
-
   public async list(cfg: SelectionPromptConfig): Promise<string> {
     return prompt({
       type: 'select',
@@ -80,7 +79,7 @@ export class PromptService implements IPromptService {
   public async checkbox(cfg: SelectionPromptConfig): Promise<string[]> {
     // Workaround for https://github.com/enquirer/enquirer/issues/298
     if (!cfg.enabled()) {
-      return undefined as any as string[];
+      return (undefined as any) as string[];
     }
 
     return prompt({

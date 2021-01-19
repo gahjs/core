@@ -1,7 +1,14 @@
 import chalk from 'chalk';
 import { DIContainer } from '../di-container';
 import {
-  IFileSystemService, GahHost, GahModule, IWorkspaceService, ILoggerService, GahFileData, IPluginService, GahConfig
+  IFileSystemService,
+  GahHost,
+  GahModule,
+  IWorkspaceService,
+  ILoggerService,
+  GahFileData,
+  IPluginService,
+  GahConfig
 } from '@gah/shared';
 import { GahModuleBase } from './gah-module-base';
 import { GahModuleDef } from './gah-module-def';
@@ -18,7 +25,7 @@ export class GahFile {
   private readonly _workspaceService: IWorkspaceService;
   private readonly _loggerService: ILoggerService;
   private readonly _pluginService: IPluginService;
-  private readonly _configs: { moduleName: string, cfg: GahConfig }[];
+  private readonly _configs: { moduleName: string; cfg: GahConfig }[];
 
   private readonly _gahFileName: string;
 
@@ -30,14 +37,13 @@ export class GahFile {
   private readonly _filePath: string;
 
   constructor(filePath: string) {
-
     this._fileSystemService = DIContainer.resolve<FileSystemService>('fileSystemService');
     this._workspaceService = DIContainer.resolve<WorkspaceService>('workspaceService');
     this._loggerService = DIContainer.resolve<LoggerService>('loggerService');
     this._pluginService = DIContainer.resolve<PluginService>('pluginService');
     this.isInstalled = false;
     this._modules = new Array<GahModuleBase>();
-    this._configs = new Array<{ moduleName: string, cfg: GahConfig }>();
+    this._configs = new Array<{ moduleName: string; cfg: GahConfig }>();
 
     this._gahFileName = this._fileSystemService.getFilenameFromFilePath(filePath);
 
@@ -122,7 +128,11 @@ export class GahFile {
       await m.executePostinstallScripts();
     }
 
-    this._loggerService.stopLoadingAnimation(false, true, `gah install done ${this._rootModule.installStepCount}/${this._rootModule.installStepCount}!`);
+    this._loggerService.stopLoadingAnimation(
+      false,
+      true,
+      `gah install done ${this._rootModule.installStepCount}/${this._rootModule.installStepCount}!`
+    );
   }
 
   public whyModule(moduleName: string) {
@@ -149,13 +159,21 @@ export class GahFile {
     }
   }
 
-  private findRecursiveDependencieChains(searchedName: string, module: GahModuleBase, chains: string[][], chain: string[], pathStart: string): string[][] {
+  private findRecursiveDependencieChains(
+    searchedName: string,
+    module: GahModuleBase,
+    chains: string[][],
+    chain: string[],
+    pathStart: string
+  ): string[][] {
     if (!chain || chain.length === 0) {
       chain = [pathStart];
     }
     for (const dep of module.dependencies) {
       if (chain.indexOf(dep.moduleName!) !== -1) {
-        this._loggerService.warn(`ERROR: circular dependdency detected: ${[...chain, dep.moduleName!].map(x => `'${chalk.red(x)}'`).join(' -> ')}`);
+        this._loggerService.warn(
+          `ERROR: circular dependdency detected: ${[...chain, dep.moduleName!].map(x => `'${chalk.red(x)}'`).join(' -> ')}`
+        );
         continue;
       }
       if (dep.moduleName === searchedName) {
@@ -189,16 +207,22 @@ export class GahFile {
     if (becauseOfUs.length <= 1) {
       this._loggerService.log(`'${chalk.yellow(packageName)}' is not referenced`);
     } else {
-      this._loggerService.log(`'${chalk.yellow(packageName)}' is referenced by the following configurations: (red means it is excluded)`);
+      this._loggerService.log(
+        `'${chalk.yellow(packageName)}' is referenced by the following configurations: (red means it is excluded)`
+      );
 
       for (const module of becauseOfUs) {
         const modulePackageJson = await module.getPackageJson();
         const packageVersion = (modulePackageJson.dependencies ?? modulePackageJson.devDependencies)?.[packageName];
 
         if (module.excludedPackages.indexOf(packageName) !== -1) {
-          this._loggerService.log(`'${chalk.red(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);
+          this._loggerService.log(
+            `'${chalk.red(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`
+          );
         } else {
-          this._loggerService.log(`'${chalk.green(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`);
+          this._loggerService.log(
+            `'${chalk.green(module.moduleName ?? '#N/A#')}' references version '${chalk.gray(packageVersion ?? 'unknown')}'`
+          );
         }
       }
     }
@@ -216,10 +240,13 @@ export class GahFile {
       const modules = this._modules.filter(x => !x.isHost);
       for (const mod of modules) {
         const modPackageJson = await mod.getPackageJson();
-        if (modPackageJson.dependencies?.[dep] && compareVersions(
-          modPackageJson.dependencies[dep].replace('~', '').replace('^', ''),
-          hostPackageJson.dependencies![dep].replace('~', '').replace('^', '')
-        )) {
+        if (
+          modPackageJson.dependencies?.[dep] &&
+          compareVersions(
+            modPackageJson.dependencies[dep].replace('~', '').replace('^', ''),
+            hostPackageJson.dependencies![dep].replace('~', '').replace('^', '')
+          )
+        ) {
           modPackageJson.dependencies[dep] = hostPackageJson.dependencies![dep];
           if (!modulesThatChanged.includes(mod)) {
             modulesThatChanged.push(mod);
@@ -231,10 +258,13 @@ export class GahFile {
       const modules = this._modules.filter(x => !x.isHost);
       for (const mod of modules) {
         const modPackageJson = await mod.getPackageJson();
-        if (modPackageJson.devDependencies?.[dep] && compareVersions(
-          modPackageJson.devDependencies[dep].replace('~', '').replace('^', ''),
-          hostPackageJson.devDependencies![dep].replace('~', '').replace('^', '')
-        )) {
+        if (
+          modPackageJson.devDependencies?.[dep] &&
+          compareVersions(
+            modPackageJson.devDependencies[dep].replace('~', '').replace('^', ''),
+            hostPackageJson.devDependencies![dep].replace('~', '').replace('^', '')
+          )
+        ) {
           modPackageJson.devDependencies[dep] = hostPackageJson.devDependencies![dep];
           if (!modulesThatChanged.includes(mod)) {
             modulesThatChanged.push(mod);
@@ -243,7 +273,10 @@ export class GahFile {
       }
     }
     for (const mod of modulesThatChanged) {
-      await this._fileSystemService.saveObjectToFile(this._fileSystemService.join(mod.basePath, 'package.json'), await mod.getPackageJson());
+      await this._fileSystemService.saveObjectToFile(
+        this._fileSystemService.join(mod.basePath, 'package.json'),
+        await mod.getPackageJson()
+      );
     }
   }
 
@@ -274,11 +307,9 @@ export class GahFile {
   private setModuleType(filePath: string) {
     if (this._gahFileName === 'gah-host.json') {
       this.isHost = true;
-    }
-    else if (this._gahFileName === 'gah-module.json') {
+    } else if (this._gahFileName === 'gah-module.json') {
       this.isHost = false;
-    }
-    else {
+    } else {
       throw new Error(`The provided file is not a gah module or gah host file!\npath: "${filePath}"`);
     }
   }
@@ -301,7 +332,6 @@ export class GahFile {
         break;
     }
 
-
     await CopyHost.copy(this._fileSystemService, this._workspaceService, this._loggerService, angularCoreVersion, true);
   }
 
@@ -315,8 +345,12 @@ export class GahFile {
     if (entryModuleNames.length === 0) {
       throw new Error('You do not have any entry modules defined! You need exactly one entry module for the system to work!');
     } else if (entryModuleNames.length > 1) {
-      throw new Error(`${'You have too many entry modules defined! You need exactly one entry module for the system to work!'
-        + ' The following modules are configured as entry modules: '}${entryModuleNames.join(', ')}`);
+      throw new Error(
+        `${
+          'You have too many entry modules defined! You need exactly one entry module for the system to work!' +
+          ' The following modules are configured as entry modules: '
+        }${entryModuleNames.join(', ')}`
+      );
     }
   }
 }

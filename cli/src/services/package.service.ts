@@ -1,7 +1,6 @@
 import { IExecutionService, IPackageService } from '@gah/shared';
 import { ExecutionService } from './execution.service';
 export class PackageService implements IPackageService {
-
   private readonly _executionService: IExecutionService;
 
   constructor(executionService: ExecutionService) {

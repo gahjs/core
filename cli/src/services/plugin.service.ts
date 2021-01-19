@@ -1,7 +1,21 @@
 import {
-  GahEventHandler, GahPlugin, GahEvent, IPluginService, GahPluginDependencyConfig, GahCommandHandler,
-  IExecutionService, IWorkspaceService, IPromptService, ITemplateService, IConfigurationService,
-  ILoggerService, IFileSystemService, PlguinUpdate, GahEventType, ExtractEventPayload, PackageJson
+  GahEventHandler,
+  GahPlugin,
+  GahEvent,
+  IPluginService,
+  GahPluginDependencyConfig,
+  GahCommandHandler,
+  IExecutionService,
+  IWorkspaceService,
+  IPromptService,
+  ITemplateService,
+  IConfigurationService,
+  ILoggerService,
+  IFileSystemService,
+  PlguinUpdate,
+  GahEventType,
+  ExtractEventPayload,
+  PackageJson
 } from '@gah/shared';
 
 import { FileSystemService } from './file-system.service';
@@ -14,14 +28,13 @@ import { ExecutionService } from './execution.service';
 import chalk from 'chalk';
 
 export class PluginService implements IPluginService {
-
   private readonly _plugins = new Array<GahPlugin>();
   private readonly _eventHandlers = new Array<GahEventHandler<any>>();
   private readonly _commandHandlers = new Array<GahCommandHandler>();
   private _pluginFolder: string;
   private _pluginPackageJson: string;
 
-  public pluginNames: { name: string, version: string }[] = [];
+  public pluginNames: { name: string; version: string }[] = [];
 
   private readonly _fileSystemService: IFileSystemService;
   private readonly _loggerService: ILoggerService;
@@ -55,7 +68,7 @@ export class PluginService implements IPluginService {
     this._pluginPackageJson = this._fileSystemService.join(this._pluginFolder, 'package.json');
 
     await this._fileSystemService.ensureDirectory(this._pluginFolder);
-    if (!await this._fileSystemService.fileExists(this._pluginPackageJson)) {
+    if (!(await this._fileSystemService.fileExists(this._pluginPackageJson))) {
       const packageJsonTemplatePath = this._fileSystemService.join(__dirname, '..', '..', 'assets', 'plugins', 'package.json');
       await this._fileSystemService.copyFile(packageJsonTemplatePath, this._pluginFolder);
     }
@@ -79,7 +92,6 @@ export class PluginService implements IPluginService {
     plugin['executionService'] = this._executionService;
     plugin['pluginService'] = this;
   }
-
 
   public async loadInstalledPlugins(): Promise<void> {
     const cfg = await this._configService.getGahConfig();
@@ -105,7 +117,7 @@ export class PluginService implements IPluginService {
   }
 
   private async ensurePluginIsInstalled(pluginDepCfg: GahPluginDependencyConfig): Promise<GahPlugin> {
-    let { plugin } = await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version) ?? { plugin: undefined };
+    let { plugin } = (await this.tryLoadInstalledPlugin(pluginDepCfg.name, pluginDepCfg.version)) ?? { plugin: undefined };
     if (plugin) {
       return plugin;
     }
@@ -122,7 +134,10 @@ export class PluginService implements IPluginService {
     throw new Error('Failed');
   }
 
-  private async tryLoadInstalledPlugin(pluginName: string, pluginVersion?: string): Promise<{ plugin: GahPlugin, version: string } | undefined> {
+  private async tryLoadInstalledPlugin(
+    pluginName: string,
+    pluginVersion?: string
+  ): Promise<{ plugin: GahPlugin; version: string } | undefined> {
     const cfg = await this._configService.getGahConfig();
     if (!cfg?.plugins?.some(x => x.name === pluginName)) {
       this._loggerService.debug(`Plugin ${pluginName} not yet specified in gah config`);
@@ -143,13 +158,13 @@ export class PluginService implements IPluginService {
 
     const pluginFolderPath = this._fileSystemService.join(this._pluginFolder, 'node_modules', pluginName);
 
-    if (!await this._fileSystemService.fileExists(pluginFolderPath)) {
+    if (!(await this._fileSystemService.fileExists(pluginFolderPath))) {
       this._loggerService.debug(`Cannot find plugin folder at ${pluginFolderPath}`);
       return undefined;
     }
 
     const importFileName = this.calculatePluginImportFileName(pluginName);
-    if (!await this._fileSystemService.fileExists(importFileName)) {
+    if (!(await this._fileSystemService.fileExists(importFileName))) {
       const importFileContent = `exports.PluginType = require("${pluginName}").default;`;
       await this._fileSystemService.saveFile(importFileName, importFileContent);
     }
@@ -171,10 +186,18 @@ export class PluginService implements IPluginService {
 
   private async checkPlugin(plugin: GahPlugin, pluginName: string) {
     if (!plugin.onInit || !plugin['registerEventListener'] || !plugin.onInstall || !plugin['name']) {
-      if (!plugin.onInit) { this._loggerService.debug('Plugin doesn\'t implement onInit method'); }
-      if (!plugin['registerEventListener']) { this._loggerService.debug('Plugin doesn\'t implement registerEventListener method'); }
-      if (!plugin.onInstall) { this._loggerService.debug('Plugin doesn\'t implement onInstall method'); }
-      if (!plugin['name']) { this._loggerService.debug('Plugin doesn\'t call super constructor with the plugin name'); }
+      if (!plugin.onInit) {
+        this._loggerService.debug("Plugin doesn't implement onInit method");
+      }
+      if (!plugin['registerEventListener']) {
+        this._loggerService.debug("Plugin doesn't implement registerEventListener method");
+      }
+      if (!plugin.onInstall) {
+        this._loggerService.debug("Plugin doesn't implement onInstall method");
+      }
+      if (!plugin['name']) {
+        this._loggerService.debug("Plugin doesn't call super constructor with the plugin name");
+      }
       return false;
     }
     this.initPluginServices(plugin);
@@ -200,7 +223,12 @@ export class PluginService implements IPluginService {
     if (!skipDownload) {
       this._loggerService.startLoadingAnimation('Downloading Plugin');
       const pluginVersionOrEmpty = pluginVersion ? `@${pluginVersion}` : '';
-      const success = await this._executionService.execute(`yarn add ${pluginName}${pluginVersionOrEmpty} -D -E`, false, undefined, this._pluginFolder);
+      const success = await this._executionService.execute(
+        `yarn add ${pluginName}${pluginVersionOrEmpty} -D -E`,
+        false,
+        undefined,
+        this._pluginFolder
+      );
       if (!success) {
         this._loggerService.stopLoadingAnimation(false, false, 'Downloading Plugin failed (check the package name again)');
         return false;
@@ -265,7 +293,11 @@ export class PluginService implements IPluginService {
     }
   }
 
-  registerEventHandler<T extends GahEventType>(pluginName: string, type: T, handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void): void {
+  registerEventHandler<T extends GahEventType>(
+    pluginName: string,
+    type: T,
+    handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void
+  ): void {
     const newHandler = new GahEventHandler<T>();
     newHandler.pluginName = pluginName;
     newHandler.eventType = type;
@@ -292,7 +324,9 @@ export class PluginService implements IPluginService {
 
     const cfg = await this._configService.getCurrentConfig();
     const idx = cfg.plugins?.findIndex(x => x.name === pluginName) ?? -1;
-    if (idx === -1) { throw new Error(`Error uninstalling plugin ${pluginName}`); }
+    if (idx === -1) {
+      throw new Error(`Error uninstalling plugin ${pluginName}`);
+    }
 
     cfg.plugins?.splice(idx, 1);
     await this._configService.saveCurrentConfig();
@@ -313,7 +347,6 @@ export class PluginService implements IPluginService {
     }
   }
 
-
   public async getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null> {
     const cfg = await this._configService.getCurrentConfig();
     if (!cfg.plugins) {
@@ -329,7 +362,9 @@ export class PluginService implements IPluginService {
     const updates = new Array<PlguinUpdate>();
     yarnOutput.split('\n').forEach(yarnOutputLine => {
       const updateMatches = yarnOutputLine.match(/^(\S+)\s(\d+.\d+.\d+)\s+(\d+.\d+.\d+)\s+(\d+.\d+.\d+)\s+/);
-      if (!updateMatches) { return; }
+      if (!updateMatches) {
+        return;
+      }
       updates.push({ name: updateMatches[1], fromVersion: updateMatches[2], toVersion: updateMatches[4] });
     });
     if (updates.length === 0) {
@@ -345,7 +380,12 @@ export class PluginService implements IPluginService {
 
   public async updatePlugins(pluginUpdates: PlguinUpdate[]) {
     this._loggerService.startLoadingAnimation('Updating plugins');
-    const success = await this._executionService.execute(`yarn add ${pluginUpdates.map(x => x.name).join(' ')} -D -E`, false, undefined, this._pluginFolder);
+    const success = await this._executionService.execute(
+      `yarn add ${pluginUpdates.map(x => x.name).join(' ')} -D -E`,
+      false,
+      undefined,
+      this._pluginFolder
+    );
     if (success) {
       this._loggerService.stopLoadingAnimation(false, true, 'Updated plugins');
     } else {
