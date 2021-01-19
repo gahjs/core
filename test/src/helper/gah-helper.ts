@@ -93,7 +93,7 @@ export class GahHelper {
       const actualFilePath = path.join(actualRoot, relativePath);
       const expectedContent = (await fs.promises.readFile(expectedFilePath)).toString().replace(/\s/g, '');
       const actualContent = (await fs.promises.readFile(actualFilePath)).toString().replace(/\s/g, '');
-      expectedContent.should.equal(actualContent);
+      actualContent.should.equal(expectedContent);
     }
   }
 
