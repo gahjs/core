@@ -1,4 +1,4 @@
-import { match, SinonSpy } from "sinon";
+import { match, SinonSpy } from 'sinon';
 require('should');
 
 export class Asserter {
@@ -8,10 +8,10 @@ export class Asserter {
   }
 
   public assertLog(expectedText: string | RegExp) {
-    this._assertLog(expectedText, true)
+    this._assertLog(expectedText, true);
   }
   public assertNoLog(expectedText: string | RegExp) {
-    this._assertLog(expectedText, false)
+    this._assertLog(expectedText, false);
   }
   private _assertLog(expectedText: string | RegExp, expected: boolean) {
     const regExp = typeof expectedText === 'string' ? new RegExp(`.*${expectedText}.*`) : expectedText;

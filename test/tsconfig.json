@@ -1,25 +1,15 @@
 {
-  "exclude": [
-    "**/resources/**",
-    "**/working-dir/**"
-  ],
+  "exclude": ["**/resources/**", "**/working-dir/**"],
   "compilerOptions": {
     "target": "ES2019",
     "module": "CommonJS",
     "baseUrl": "./",
-    "lib": [
-      "ES2019",
-      "ESNext"
-    ],
+    "lib": ["ES2019", "ESNext"],
     "declaration": true,
     "outDir": "lib",
     "rootDir": "./src",
     "strict": true,
-    "types": [
-      "node",
-      "mocha",
-      "should"
-    ],
+    "types": ["node", "mocha", "should"],
     "sourceMap": true,
     "esModuleInterop": true,
     "resolveJsonModule": true,

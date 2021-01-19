@@ -1,4 +1,4 @@
-@import "./references.scss";
+@import './references.scss';
 
 * {
   font-family: var(--fontMain);
@@ -29,7 +29,7 @@ body {
   outline-style: none;
 }
 
-input[type="submit"],
+input[type='submit'],
 .button {
   padding: 10px 25px;
   border: none;

@@ -9,9 +9,7 @@
       "dependencies": [
         {
           "path": "../core/gah-module.json",
-          "names": [
-            "core"
-          ]
+          "names": ["core"]
         }
       ],
       "config": {
@@ -22,10 +20,7 @@
             "settings": {
               "someSetting": "yee.json",
               "somePathSetting": "angular.json",
-              "someArraySetting": [
-                "Option1",
-                "Option2"
-              ]
+              "someArraySetting": ["Option1", "Option2"]
             }
           }
         ]

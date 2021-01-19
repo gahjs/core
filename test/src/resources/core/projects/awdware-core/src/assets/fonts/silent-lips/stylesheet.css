@@ -1,18 +1,15 @@
 @font-face {
-    font-family: 'Silent Lips';
-    src: url('Silent_Lips.woff2') format('woff2'),
-        url('Silent_Lips.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Silent Lips';
+  src: url('Silent_Lips.woff2') format('woff2'), url('Silent_Lips.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }
 
 @font-face {
-    font-family: 'Silent_Lips';
-    src: url('Silent_Lips-Bold.woff2') format('woff2'),
-        url('Silent_Lips-Bold.woff') format('woff');
-    font-weight: bold;
-    font-style: normal;
-    font-display: swap;
+  font-family: 'Silent_Lips';
+  src: url('Silent_Lips-Bold.woff2') format('woff2'), url('Silent_Lips-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
 }
-

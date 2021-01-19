@@ -37,13 +37,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "projects/awdware-core/tsconfig.lib.json",
-              "projects/awdware-core/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["projects/awdware-core/tsconfig.lib.json", "projects/awdware-core/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       }

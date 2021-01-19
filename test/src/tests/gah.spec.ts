@@ -1,9 +1,9 @@
 require('should');
 import { PromptMock } from '../helper/prompt';
 
-import { SinonSpy, spy } from "sinon";
-import { Asserter } from "../helper/asserter";
-import { GahHelper } from "../helper/gah-helper";
+import { SinonSpy, spy } from 'sinon';
+import { Asserter } from '../helper/asserter';
+import { GahHelper } from '../helper/gah-helper';
 
 describe('Basic Tests', () => {
   let gah: GahHelper;
@@ -26,7 +26,7 @@ describe('Basic Tests', () => {
 
   after(() => {
     process.cwd = originalCwdMethod;
-  })
+  });
 
   it('1_install-works', async () => {
     await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);

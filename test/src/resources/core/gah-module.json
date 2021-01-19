@@ -12,9 +12,7 @@
       "dependencies": [
         {
           "path": "../shared/gah-module.json",
-          "names": [
-            "shared"
-          ]
+          "names": ["shared"]
         }
       ],
       "config": {

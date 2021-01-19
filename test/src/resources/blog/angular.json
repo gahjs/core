@@ -13,7 +13,7 @@
           "builder": "@angular-devkit/build-angular:ng-packagr",
           "options": {
             "tsConfig": "projects/awdware-blog/tsconfig.lib.json",
-            "project": "projects/awdware-blog/ng-package.json",
+            "project": "projects/awdware-blog/ng-package.json"
           },
           "configurations": {
             "production": {
@@ -32,13 +32,8 @@
         "lint": {
           "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "tsConfig": [
-              "projects/awdware-blog/tsconfig.lib.json",
-              "projects/awdware-blog/tsconfig.spec.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "tsConfig": ["projects/awdware-blog/tsconfig.lib.json", "projects/awdware-blog/tsconfig.spec.json"],
+            "exclude": ["**/node_modules/**"]
           }
         }
       }

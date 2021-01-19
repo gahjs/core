@@ -10,9 +10,7 @@
       "dependencies": [
         {
           "path": "../core/gah-module.json",
-          "names": [
-            "core"
-          ]
+          "names": ["core"]
         }
       ]
     }

@@ -4,21 +4,15 @@
   "modules": [
     {
       "path": "../core/gah-module.json",
-      "names": [
-        "core"
-      ]
+      "names": ["core"]
     },
     {
       "path": "../led/gah-module.json",
-      "names": [
-        "led"
-      ]
+      "names": ["led"]
     },
     {
       "path": "../blog/gah-module.json",
-      "names": [
-        "blog"
-      ]
+      "names": ["blog"]
     }
   ],
   "htmlHeadContent": [

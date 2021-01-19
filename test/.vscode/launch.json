@@ -9,17 +9,11 @@
       "request": "launch",
       "name": "Mocha All",
       "program": "${workspaceFolder}/node_modules/mocha/bin/_mocha",
-      "args": [
-        "-p",
-        "tsconfig.json",
-        "${workspaceFolder}/src/**/*.spec.ts",
-      ],
+      "args": ["-p", "tsconfig.json", "${workspaceFolder}/src/**/*.spec.ts"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "protocol": "inspector",
-      "skipFiles": [
-        "<node_internals>/**"
-      ]
+      "skipFiles": ["<node_internals>/**"]
     }
   ]
 }

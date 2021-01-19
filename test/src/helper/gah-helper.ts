@@ -3,7 +3,6 @@ import { DIContainer as gahDiContainer } from '@gah/cli/lib/di-container';
 import { PromptService } from '@gah/cli/lib/services/prompt.service';
 import { MockPromptService } from '../mocks/prompt.service';
 
-
 import path from 'path';
 import fs from 'fs-extra';
 import { homedir, platform } from 'os';
@@ -42,15 +41,14 @@ export class GahHelper {
   }
 
   async runGah(dir: string, args: string[]) {
-    process.argv = [process.argv[0], path.resolve("../../../cli/lib/index.js"), ...args, '--useTestContext'];
+    process.argv = [process.argv[0], path.resolve('../../../cli/lib/index.js'), ...args, '--useTestContext'];
     const cwd = path.join(workingDir, dir);
     process.cwd = () => cwd;
     console.log('CWD: ' + cwd);
 
-    await gahMain.gahMain()
-      .catch((err: any) => {
-        console.error(err);
-      });
+    await gahMain.gahMain().catch((err: any) => {
+      console.error(err);
+    });
   }
 
   async runInstall(dir: string, skipPackageInstall = false) {
@@ -62,7 +60,9 @@ export class GahHelper {
   }
 
   async copyModules(moduleNames: string[]) {
-    const allModuleCopyTasks = moduleNames.map(moduleName => fs.copy(path.join(resourcesDir, moduleName), path.join(workingDir, moduleName)));
+    const allModuleCopyTasks = moduleNames.map(moduleName =>
+      fs.copy(path.join(resourcesDir, moduleName), path.join(workingDir, moduleName))
+    );
     await Promise.all(allModuleCopyTasks);
   }
 
@@ -99,14 +99,14 @@ export class GahHelper {
 
   private async getFiles(dir: string): Promise<string[] | string> {
     const dirents = await fs.promises.readdir(dir, { withFileTypes: true });
-    const files = await Promise.all(dirents.map((dirent) => {
-      const res = path.resolve(dir, dirent.name);
-      return dirent.isDirectory() ? this.getFiles(res) : res;
-    }));
+    const files = await Promise.all(
+      dirents.map(dirent => {
+        const res = path.resolve(dir, dirent.name);
+        return dirent.isDirectory() ? this.getFiles(res) : res;
+      })
+    );
     return Array.prototype.concat(...files);
   }
 
-  async initModule(moduleName: string, entry: boolean = false) {
-
-  }
+  async initModule(moduleName: string, entry: boolean = false) {}
 }

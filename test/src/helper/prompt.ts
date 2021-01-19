@@ -6,7 +6,7 @@ export class PromptMock {
   }
 
   public static addMock(mock: string | boolean | string[] | number) {
-    this.data.push(mock)
+    this.data.push(mock);
   }
 
   public static getMock(): string | boolean | string[] | number {
