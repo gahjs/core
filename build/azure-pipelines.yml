@@ -38,13 +38,6 @@ steps:
     projectDirectory: 'shared'
   displayName: "\U0001F503 link shared"
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    targetPath: '$(Build.SourcesDirectory)/shared'
-    artifact: 'gah-shared'
-    publishLocation: 'pipeline'
-  displayName: "\U0001F680 Publish shared"
-
 - task: Yarn@3
   inputs:
     arguments: 'link @gah/shared'
@@ -100,8 +93,18 @@ steps:
     testResultsFiles: '*.xml'
     searchFolder: '$(Build.SourcesDirectory)/test/results'
     testRunTitle: 'Gah tests'
+    publishRunAttachments: true
   displayName: "\U0001F680 Publish test results"
   condition: true
+
+
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.SourcesDirectory)/shared'
+    artifact: 'gah-shared'
+    publishLocation: 'pipeline'
+  displayName: "\U0001F680 Publish shared"
+
 
 - task: PublishPipelineArtifact@1
   inputs:
