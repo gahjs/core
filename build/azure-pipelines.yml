@@ -101,6 +101,7 @@ steps:
     searchFolder: '$(Build.SourcesDirectory)/test/results'
     testRunTitle: 'Gah tests'
   displayName: "\U0001F680 Publish test results"
+  enabled: true
 
 - task: PublishPipelineArtifact@1
   inputs:
