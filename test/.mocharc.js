@@ -8,7 +8,7 @@ module.exports = ({
   ],
   reporter: "mocha-junit-reporter",
   reporterOptions: [
-    'output=results/test-results.xml'
+    'mochaFile=./results/test-results.xml'
   ],
   fullStackTrace: true,
   retries: 0,
