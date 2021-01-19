@@ -49,12 +49,7 @@ export class TsConfigFile {
   }
 
   public async save() {
-    const oldData = await this._fileSystemService.parseFile<TsConfig>(this._path);
-
-    const equals = JSON.stringify(oldData) === JSON.stringify(this._tsConfig);
-    if (!equals) {
-      await this._fileSystemService.saveObjectToFile(this._path, this._tsConfig);
-    }
+    await this._fileSystemService.saveObjectToFile(this._path, this._tsConfig);
   }
 
   public addPathAlias(aliasName: string, path: string) {
