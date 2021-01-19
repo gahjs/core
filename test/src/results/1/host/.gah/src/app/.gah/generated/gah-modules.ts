@@ -1,4 +1,3 @@
-
 import * as core from '@awdware/core';
 
 import * as shared from '@awdware/shared';
@@ -9,28 +8,28 @@ import * as blog from '@awdware/blog';
 
 export const modulePackages = [
   {
-    moduleName: "core",
+    moduleName: 'core',
     module: core,
     isEntry: true,
     isLibraryOnly: false,
     parentGahModule: null
   },
   {
-    moduleName: "shared",
+    moduleName: 'shared',
     module: shared,
     isEntry: false,
     isLibraryOnly: false,
     parentGahModule: null
   },
   {
-    moduleName: "led",
+    moduleName: 'led',
     module: led,
     isEntry: false,
     isLibraryOnly: false,
     parentGahModule: null
   },
   {
-    moduleName: "blog",
+    moduleName: 'blog',
     module: blog,
     isEntry: false,
     isLibraryOnly: false,
@@ -38,9 +37,4 @@ export const modulePackages = [
   }
 ];
 
-export const gahModules = [
-  core.CoreModule,
-  shared.AwdwareCoreSharedModule,
-  led.LedLazyModule,
-  blog.AwdwareLazyBlogModule
-];
+export const gahModules = [core.CoreModule, shared.AwdwareCoreSharedModule, led.LedLazyModule, blog.AwdwareLazyBlogModule];
