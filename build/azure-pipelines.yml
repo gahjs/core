@@ -89,7 +89,7 @@ steps:
 
 - task: PublishTestResults@2
   inputs:
-    testResultsFormat: 'XUnit'
+    testResultsFormat: 'JUnit'
     testResultsFiles: '*.xml'
     searchFolder: '$(Build.SourcesDirectory)/test/results'
     testRunTitle: 'Gah tests'

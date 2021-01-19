@@ -6,10 +6,9 @@ module.exports = ({
   require: [
     "ts-node/register"
   ],
-  reporter: "xunit",
+  reporter: "mocha-junit-reporter",
   reporterOptions: [
-    'output=results/test-results.xml',
-    'suiteName=Gah tests'
+    'output=results/test-results.xml'
   ],
   fullStackTrace: true,
   retries: 0,
