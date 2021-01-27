@@ -217,14 +217,14 @@ export abstract class GahModuleBase {
 
   private loggerStateFromRes(res: InstallUnitReturn): AwesomeChecklistLoggerState {
     switch (res) {
-      case InstallUnitResult.failed:
-        return 'failed';
-      case InstallUnitResult.skipped:
-        return 'skipped';
-      case InstallUnitResult.warnings:
-        return 'partiallySucceeded';
-      default:
-        return 'succeeded';
+    case InstallUnitResult.failed:
+      return 'failed';
+    case InstallUnitResult.skipped:
+      return 'skipped';
+    case InstallUnitResult.warnings:
+      return 'partiallySucceeded';
+    default:
+      return 'succeeded';
     }
   }
 
@@ -241,7 +241,7 @@ export abstract class GahModuleBase {
     }
     const index = this._installUnits.findIndex(x => x.id === unit.id);
     unit.finished = true;
-    this.pluginService.triggerEvent(`AFTER_${unit.id}` as GahEventType, unit.eventPayload);
+    await this.pluginService.triggerEvent(`AFTER_${unit.id}` as GahEventType, unit.eventPayload);
     await this.checkUnitDependencies();
     this._progressLogger.changeState(index, this.loggerStateFromRes(res));
     if (!this._installUnits.some(x_1 => !x_1.finished)) {

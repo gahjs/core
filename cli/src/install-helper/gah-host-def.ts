@@ -279,7 +279,7 @@ export class GahHostDef extends GahModuleBase {
 
   private async generateFromTemplate() {
     for (const dep of this.allRecursiveDependencies) {
-      this.pluginService.triggerEvent('BEFORE_GENERATE_TEMPLATE_DATA', { module: await this.data() });
+      await this.pluginService.triggerEvent('BEFORE_GENERATE_TEMPLATE_DATA', { module: await this.data() });
       this.gahFolder.addGeneratedFileTemplateData(
         dep.moduleName!,
         dep.packageName!,
@@ -288,7 +288,7 @@ export class GahHostDef extends GahModuleBase {
         dep.parentGahModule
       );
     }
-    this.pluginService.triggerEvent('AFTER_GENERATE_TEMPLATE_DATA', { module: await this.data() });
+    await this.pluginService.triggerEvent('AFTER_GENERATE_TEMPLATE_DATA', { module: await this.data() });
 
     return this.gahFolder.generateFileFromTemplate();
   }
