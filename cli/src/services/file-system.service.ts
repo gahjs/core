@@ -185,6 +185,8 @@ export class FileSystemService implements IFileSystemService {
       const cmd = `mklink /j "${this.cwd(linkPath)}" "${this.cwd(realPath)}"`;
       await this._executionService.execute(cmd, false).then(success => {
         if (!success) {
+          this._loggerService.error('Error during mklink:');
+          this._loggerService.error(this._executionService.executionErrorResult);
           throw new Error(this._executionService.executionErrorResult);
         }
       });
