@@ -234,7 +234,8 @@ export abstract class GahModuleBase {
       res = await result;
     } catch (error) {
       this.loggerService.error(`Install failed during step: ${unit.id}`);
-      throw error;
+      this.loggerService.error(error);
+      process.exit(1);
     }
     const index = this._installUnits.findIndex(x => x.id === unit.id);
     unit.finished = true;
