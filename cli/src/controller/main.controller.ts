@@ -14,6 +14,7 @@ import { RunController } from './run.controller';
 import { WhyController } from './why.controller';
 import { TidyController } from './tidy.controler';
 import { GitService } from '../services/git.service';
+import { AwesomeLogger } from 'awesome-logging';
 
 export class MainController extends Controller {
   private readonly _initController: InitController;
@@ -67,6 +68,9 @@ export class MainController extends Controller {
     this._contextService.setContext({ debug: process.argv.some(x => x.toLowerCase() === '--debug') });
     this._contextService.setContext({ test: process.argv.some(x => x.toLowerCase() === '--usetestcontext') });
     this._contextService.setContext({ skipScripts: process.argv.some(x => x.toLowerCase() === '--skipscripts') });
+    if (process.argv.some(x => x.toLowerCase() === '--restrictedlogging')) {
+      AwesomeLogger.restrictedLogging = true;
+    }
 
     // Yarn timeout
     const yarnTimeoutIndex = process.argv.findIndex(x => x.toLowerCase() === '--yarntimeout');
@@ -118,6 +122,7 @@ export class MainController extends Controller {
     program
       .option('--yarnTimeout <ms>', 'Sets a different timeout for yarn network operations during install')
       .option('--debug', 'Enables verbose debug logging')
+      .option('--restrictedLogging', 'Enables restricted logging (for CI usage)')
       .option('--config <name>', 'The name of the configuration that should be used (gah-config.<name>.json)')
       .addOption(
         new Option('--useTestContext', 'enables the test context. Used in automated tests, never in production!').hideHelp()
