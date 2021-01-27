@@ -284,9 +284,11 @@ export class GahFile {
     for (const moduleRef of cfg.modules) {
       for (const moduleName of moduleRef.names) {
         const newModule = new GahModuleDef(moduleRef.path, moduleName, initializedModules, this._configs);
-        await newModule.init();
         this._modules.push(newModule);
       }
+    }
+    for (const module of this._modules) {
+      await module.init();
     }
 
     const newHost = new GahHostDef(cfgPath, initializedModules, this._configs);
@@ -298,9 +300,11 @@ export class GahFile {
   private async loadModule(cfg: GahModule, cfgPath: string, initializedModules: GahModuleBase[]) {
     for (const moduleDef of cfg.modules) {
       const newModule = new GahModuleDef(cfgPath, moduleDef.name, initializedModules, this._configs);
-      await newModule.init();
       this._rootModule = newModule;
       this._modules.push(newModule);
+    }
+    for (const module of this._modules) {
+      await module.init();
     }
   }
 
@@ -319,17 +323,16 @@ export class GahFile {
     let angularCoreVersion = entryPackageJson.dependencies?.['@angular/core']?.match(/(\d+)\.\d+\.\d+/)?.[1];
 
     switch (angularCoreVersion) {
-      case '8':
-        break;
-      case '9':
-        angularCoreVersion = '8';
-        break;
-      case '10':
-        angularCoreVersion = '10';
-        break;
-      default:
-        angularCoreVersion = '11';
-        break;
+    case '8':
+    case '9':
+      angularCoreVersion = '8';
+      break;
+    case '10':
+      angularCoreVersion = '10';
+      break;
+    default:
+      angularCoreVersion = '11';
+      break;
     }
 
     await CopyHost.copy(this._fileSystemService, this._workspaceService, this._loggerService, angularCoreVersion, true);
