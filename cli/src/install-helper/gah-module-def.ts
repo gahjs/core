@@ -104,13 +104,13 @@ export class GahModuleDef extends GahModuleBase {
     this.installed = true;
 
     this.addInstallUnit(
-      new InstallUnit('CLEAN_TS_CONFIG', { module: await this.data() }, undefined, 'Cleanup', () => {
+      new InstallUnit('CLEAN_TS_CONFIG', { module: await this.data() }, undefined, 'Cleaning Ts Config', () => {
         return this.tsConfigFile.clean();
       })
     );
 
     this.addInstallUnit(
-      new InstallUnit('CLEAN_GAH_FOLDER', { module: await this.data() }, undefined, 'Cleanup', () => {
+      new InstallUnit('CLEAN_GAH_FOLDER', { module: await this.data() }, undefined, 'Cleaning gah folder', () => {
         return Promise.all([
           this.gahFolder.cleanDependencyDirectory(),
           this.gahFolder.cleanStylesDirectory(),

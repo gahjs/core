@@ -537,7 +537,7 @@ export abstract class GahModuleBase {
       () => {
         return '';
       },
-      '.gah'
+      this.isHost ? '.gah' : undefined
     );
 
     if (success) {
