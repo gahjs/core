@@ -160,9 +160,15 @@ export class GahModuleDef extends GahModuleBase {
     );
 
     this.addInstallUnit(
-      new InstallUnit('INSTALL_PACKAGES', { module: await this.data() }, undefined, 'Installing packages', async () => {
-        return this.installPackages(skipPackageInstall);
-      })
+      new InstallUnit(
+        'INSTALL_PACKAGES',
+        { module: await this.data() },
+        ['GENERATE_SYMLINKS'],
+        'Installing packages',
+        async () => {
+          return this.installPackages(skipPackageInstall);
+        }
+      )
     );
 
     this.addInstallUnit(
