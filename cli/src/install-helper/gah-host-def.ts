@@ -88,6 +88,9 @@ export class GahHostDef extends GahModuleBase {
     if (this.installed) {
       return;
     }
+
+    await this.oneTimeCleanUp();
+
     await this.initTsConfigObject();
     await this.initAngularConfigObject();
     this.installed = true;

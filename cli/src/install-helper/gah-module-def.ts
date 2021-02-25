@@ -101,6 +101,8 @@ export class GahModuleDef extends GahModuleBase {
       return;
     }
 
+    await this.oneTimeCleanUp();
+
     this.installed = true;
 
     this.addInstallUnit(
