@@ -38,10 +38,12 @@ export class LoggerService implements ILoggerService {
     const textObj = new TextObject(' ■ ', 'RED');
     if (typeof text === 'string') {
       textObj.append(text);
-    } else {
+    } else if(text) {
       text.name && textObj.append(text.name);
       text.message && textObj.append(text.message);
       text.stack && textObj.append(text.stack);
+    } else {
+      textObj.append('Unknown error');
     }
     AwesomeLogger.interrupt('text', { text: textObj });
   }
