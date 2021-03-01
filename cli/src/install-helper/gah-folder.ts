@@ -89,7 +89,7 @@ export class GahFolder {
         fswin.setAttributes(
           this._fileSystemService.join(this._moduleBaseFolder, this._pathRelativeToModuleBaseFolder),
           { IS_HIDDEN: true },
-          (succeeded: boolean) => (succeeded ? resolve(null) : reject(null))
+          (succeeded: boolean) => (succeeded ? resolve(null) : reject(new Error('Could not hide folder.')))
         );
       });
     }

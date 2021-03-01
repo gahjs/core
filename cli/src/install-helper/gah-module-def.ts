@@ -112,13 +112,13 @@ export class GahModuleDef extends GahModuleBase {
     );
 
     this.addInstallUnit(
-      new InstallUnit('CLEAN_GAH_FOLDER', { module: await this.data() }, undefined, 'Cleaning gah folder', () => {
-        return Promise.all([
+      new InstallUnit('CLEAN_GAH_FOLDER', { module: await this.data() }, undefined, 'Cleaning gah folder', async () => {
+        await Promise.all([
           this.gahFolder.cleanDependencyDirectory(),
           this.gahFolder.cleanStylesDirectory(),
-          this.gahFolder.cleanPrecompiledFolder(),
-          this.gahFolder.tryHideGahFolder()
+          this.gahFolder.cleanPrecompiledFolder()
         ]);
+        await this.gahFolder.tryHideGahFolder();
       })
     );
 

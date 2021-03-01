@@ -108,7 +108,7 @@ export abstract class GahModuleBase {
     this._globalPackageStoreJsonPath = this.fileSystemService.join(this._globalPackageStorePath, 'package.json');
   }
 
-  protected async initBase(): Promise<void> {}
+  protected async initBase(): Promise<void> { }
 
   protected async oneTimeCleanUp() {
     if (!this.contextService.getContext().oneTimeClearDone) {
@@ -219,14 +219,14 @@ export abstract class GahModuleBase {
 
   private loggerStateFromRes(res: InstallUnitReturn): AwesomeChecklistLoggerState {
     switch (res) {
-      case InstallUnitResult.failed:
-        return 'failed';
-      case InstallUnitResult.skipped:
-        return 'skipped';
-      case InstallUnitResult.warnings:
-        return 'partiallySucceeded';
-      default:
-        return 'succeeded';
+    case InstallUnitResult.failed:
+      return 'failed';
+    case InstallUnitResult.skipped:
+      return 'skipped';
+    case InstallUnitResult.warnings:
+      return 'partiallySucceeded';
+    default:
+      return 'succeeded';
     }
   }
 
