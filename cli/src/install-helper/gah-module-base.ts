@@ -231,16 +231,13 @@ export abstract class GahModuleBase {
   }
 
   private async listenForFinishedUnit(unit: InstallUnit<any>, result: Promise<InstallUnitReturn>) {
-    let res: InstallUnitReturn;
-    try {
-      res = await result;
-    } catch (error) {
+    const res = await result.catch(error => {
       this.loggerService.error(`Install failed during step: ${unit.id}`);
       this.loggerService.error(error);
-      this.loggerService.error('This is the last execution error: (This did not necessarily create this error)');
-      this.loggerService.error(this.executionService.executionErrorResult);
+      this.loggerService.debug('This is the last execution error: (This did not necessarily create this error)');
+      this.loggerService.debug(this.executionService.executionErrorResult);
       process.exit(1);
-    }
+    });
     const index = this._installUnits.findIndex(x => x.id === unit.id);
     unit.finished = true;
     await this.pluginService.triggerEvent(`AFTER_${unit.id}` as GahEventType, unit.eventPayload);
