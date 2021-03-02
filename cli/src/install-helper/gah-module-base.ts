@@ -507,7 +507,7 @@ export abstract class GahModuleBase {
     }
     const scriptName = preinstall ? 'gah-preinstall' : 'gah-postinstall';
     if ((await this.getPackageJson()).scripts?.[scriptName]) {
-      this.loggerService.log(`Executing ${preinstall ? 'pre' : 'post'}-install script.`);
+      this.loggerService.log(`Executing ${preinstall ? 'pre' : 'post'}-install script for ${chalk.gray(this.moduleName ?? 'host')}`);
 
       const success = await this.executionService.execute(`yarn run ${scriptName}`, false, undefined, this.basePath);
 
@@ -515,7 +515,7 @@ export abstract class GahModuleBase {
         return;
       } else {
         this.loggerService.error(this.executionService.executionErrorResult);
-        throw new Error(`Error during ${preinstall ? 'pre' : 'post'}-install script.`);
+        throw new Error(`Error during ${preinstall ? 'pre' : 'post'}-install script for ${chalk.gray(this.moduleName ?? 'host')}`);
       }
     }
   }
