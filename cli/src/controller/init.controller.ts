@@ -40,7 +40,7 @@ export class InitController extends Controller {
 
       const publicApiPath = await this.askForPublicApiPath(isHost);
 
-      if (!publicApiPath && !isHost) {
+      if (!publicApiPath) {
         this._loggerService.warn('No public-api path provided...');
         return;
       }
@@ -108,7 +108,7 @@ export class InitController extends Controller {
 
   private async askBaseModuleName() {
     const guessedName = await this.tryGuessbaseModuleName();
-    return await this._promptService.input({
+    return this._promptService.input({
       msg: 'Enter the class name of the base NgModule for this GahModule (empty if there is none)',
       enabled: () => true,
       default: guessedName
@@ -180,7 +180,7 @@ export class InitController extends Controller {
 
   private async askForModuleOverwrite(newModuleName: string, packageName: string) {
     const module = await this._configService.getGahModule();
-    return await this._promptService.confirm({
+    return this._promptService.confirm({
       msg: 'A module with this name has already been added to this workspace, do you want to overwrite it?',
       enabled: () => {
         this.doesNameAndPackageExist(module, newModuleName, packageName);

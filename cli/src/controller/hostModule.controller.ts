@@ -74,7 +74,7 @@ export class HostModuleController extends Controller {
   private async doAdd(dependencyModuleNames: string[], cfg: GahHost) {
     const newDep = new ModuleReference();
     newDep.path = this._configService.externalConfigPath;
-    const selectedModules = this._configService.externalConfig.modules.filter(x => dependencyModuleNames!.includes(x.name));
+    const selectedModules = this._configService.externalConfig.modules.filter(x => dependencyModuleNames.includes(x.name));
     if (!selectedModules || selectedModules.length !== dependencyModuleNames.length) {
       throw new Error('Some dependencies could not be found');
     }
