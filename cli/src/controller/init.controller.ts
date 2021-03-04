@@ -19,13 +19,13 @@ export class InitController extends Controller {
       const packageJson = await this.getPackageJson();
 
       const newModuleName = await this.askModuleName(isHost, packageJson);
-      if (!newModuleName && !isHost) {
+      if (!newModuleName) {
         this._loggerService.warn('No module name provided...');
         return;
       }
 
       const packageName = await this.askPackageName(packageJson, isHost);
-      if (!packageName && !isHost) {
+      if (!packageName) {
         this._loggerService.warn('No package name provided...');
         return;
       }
