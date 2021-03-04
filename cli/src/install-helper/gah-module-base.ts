@@ -219,14 +219,14 @@ export abstract class GahModuleBase {
 
   private loggerStateFromRes(res: InstallUnitReturn): AwesomeChecklistLoggerState {
     switch (res) {
-      case InstallUnitResult.failed:
-        return 'failed';
-      case InstallUnitResult.skipped:
-        return 'skipped';
-      case InstallUnitResult.warnings:
-        return 'partiallySucceeded';
-      default:
-        return 'succeeded';
+    case InstallUnitResult.failed:
+      return 'failed';
+    case InstallUnitResult.skipped:
+      return 'skipped';
+    case InstallUnitResult.warnings:
+      return 'partiallySucceeded';
+    default:
+      return 'succeeded';
     }
   }
 
@@ -318,16 +318,33 @@ export abstract class GahModuleBase {
           const destPathPackageJson = this.fileSystemService.join(destPath, 'package.json');
           const destPkgJson = await this.fileSystemService.parseFile<PackageJson>(destPathPackageJson);
           const destDepKeys = Object.keys(destPkgJson.dependencies!);
-          const isGahSourceRegex = /gah\/([a-zA-Z0-9]+)\/precompiled/;
-          const getNameRegex = /.*gah\/[a-zA-Z0-9]+\/precompiled\/targz\/(.+)/;
           let didAdjustPath: boolean = false;
+          const allGahModuleNames = this.allRecursiveDependencies.map(x =>
+            x.packageName ? `@${x.packageName}/${x.moduleName}` : x.moduleName!
+          );
+          const allGahModuleAliasNames = this.allRecursiveDependencies
+            .map(x => {
+              return {
+                alias: x.aliasNames?.[0],
+                moduleName: x.packageName ? `@${x.packageName}/${x.moduleName}` : x.moduleName!
+              };
+            })
+            .filter(x => !!x.alias);
           destDepKeys.forEach(destDepKey => {
-            const destDep = destPkgJson.dependencies![destDepKey];
-            const prevPath = destDep;
-            if (isGahSourceRegex.test(destDep)) {
-              const packageName = destDep.match(getNameRegex)![1];
-              const adjustedPath = `file:${this.fileSystemService.join(this._globalPackageStoreArchivePath, packageName)}`;
+            let adjustedPath: string = '';
+            if (allGahModuleNames.includes(destDepKey)) {
+              adjustedPath = `file:${this.fileSystemService.join(this._globalPackageStoreArchivePath, destDepKey)}`;
+            }
+            if (allGahModuleAliasNames.map(x => x.alias.alias).includes(destDepKey)) {
+              adjustedPath = `file:${this.fileSystemService.join(
+                this._globalPackageStoreArchivePath,
+                allGahModuleAliasNames.find(x => x.alias.alias === destDepKey)!.moduleName
+              )}`;
+            }
+            if (adjustedPath) {
               destPkgJson.dependencies![destDepKey] = adjustedPath;
+              const destDep = destPkgJson.dependencies![destDepKey];
+              const prevPath = destDep;
               this.loggerService.debug(
                 `Adjusted precompiled dependency path: '${chalk.red(prevPath)}' --> '${chalk.green(
                   adjustedPath
@@ -374,7 +391,8 @@ export abstract class GahModuleBase {
         packageJson.dependencies![dep.fullName] = `file:${precompiledModulePath}`;
 
         if (dep.aliasNames) {
-          const aliasForThisModule = dep.aliasNames.find(x => x.forModule === this.moduleName || this.isHost);
+          // This is a workaround that assumes that all alias names are equal for one module.
+          const aliasForThisModule = dep.aliasNames[0];
           if (aliasForThisModule) {
             this.cleanupService.registerJsonFileTemporaryChange(
               this.packageJsonPath,
@@ -507,7 +525,9 @@ export abstract class GahModuleBase {
     }
     const scriptName = preinstall ? 'gah-preinstall' : 'gah-postinstall';
     if ((await this.getPackageJson()).scripts?.[scriptName]) {
-      this.loggerService.log(`Executing ${preinstall ? 'pre' : 'post'}-install script for ${chalk.gray(this.moduleName ?? 'host')}`);
+      this.loggerService.log(
+        `Executing ${preinstall ? 'pre' : 'post'}-install script for ${chalk.gray(this.moduleName ?? 'host')}`
+      );
 
       const success = await this.executionService.execute(`yarn run ${scriptName}`, false, undefined, this.basePath);
 
@@ -515,7 +535,9 @@ export abstract class GahModuleBase {
         return;
       } else {
         this.loggerService.error(this.executionService.executionErrorResult);
-        throw new Error(`Error during ${preinstall ? 'pre' : 'post'}-install script for ${chalk.gray(this.moduleName ?? 'host')}`);
+        throw new Error(
+          `Error during ${preinstall ? 'pre' : 'post'}-install script for ${chalk.gray(this.moduleName ?? 'host')}`
+        );
       }
     }
   }
