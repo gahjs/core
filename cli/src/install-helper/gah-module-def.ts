@@ -127,7 +127,7 @@ export class GahModuleDef extends GahModuleBase {
         'GENERATE_SYMLINKS',
         { module: await this.data() },
         ['CLEAN_GAH_FOLDER'],
-        'Cleaning and generating styles file',
+        'Linking Modules',
         () => {
           return this.createSymlinksToDependencies();
         }
