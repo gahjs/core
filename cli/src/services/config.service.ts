@@ -38,9 +38,18 @@ export class ConfigService implements IConfigurationService {
     this._contextService = contextService;
   }
 
-  private get gahConfigFileName() {
+  private async gahConfigFileName() {
     const cfgName = this._contextService.getContext().configName;
-    return cfgName ? `gah-config.${cfgName}.json` : 'gah-config.json';
+
+    if (cfgName) {
+      const exists = await this._fileSystemService.fileExists(cfgName);
+      if (!exists) {
+        throw new Error(`Cannot find config file with name ${cfgName}`);
+      }
+      return `gah-config.${cfgName}.json`;
+    }
+
+    return 'gah-config.json';
   }
 
   public async getGahModule(forceLoad?: boolean): Promise<GahModule> {
@@ -119,7 +128,7 @@ export class ConfigService implements IConfigurationService {
   }
 
   public async gahConfigExists(): Promise<boolean> {
-    return await this._fileSystemService.fileExists(this.gahConfigFileName);
+    return await this._fileSystemService.fileExists(await this.gahConfigFileName());
   }
 
   public async getGahConfig(): Promise<GahConfig> {
@@ -141,7 +150,7 @@ export class ConfigService implements IConfigurationService {
 
   private async getGlobalConfig(): Promise<GahConfig> {
     if (!this._globalCfg) {
-      const cfgPath = this._fileSystemService.ensureAbsolutePath(this.gahConfigFileName);
+      const cfgPath = this._fileSystemService.ensureAbsolutePath(await this.gahConfigFileName());
       const cfgs = new Array<GahConfig>();
 
       await this.loadConfigs(cfgPath, cfgs);
@@ -185,12 +194,12 @@ export class ConfigService implements IConfigurationService {
   public async getCurrentConfig() {
     if (this._isHost) {
       this._currentConfig = (await this.gahConfigExists())
-        ? await this._fileSystemService.parseFile<GahConfig>(this.gahConfigFileName)
+        ? await this._fileSystemService.parseFile<GahConfig>(await this.gahConfigFileName())
         : ({} as GahConfig);
     } else {
       this._currentConfig = {} as GahConfig;
       if (await this.gahConfigExists()) {
-        this._currentConfig = await this._fileSystemService.parseFile<GahConfig>(this.gahConfigFileName);
+        this._currentConfig = await this._fileSystemService.parseFile<GahConfig>(await this.gahConfigFileName());
       } else {
         if (!this._moduleCfg) {
           await this.loadGahModuleConfig((await this.getGahModuleType()) === GahModuleType.HOST);
@@ -204,7 +213,7 @@ export class ConfigService implements IConfigurationService {
 
   public async saveCurrentConfig() {
     if (this._isHost || (await this.gahConfigExists())) {
-      await this._fileSystemService.saveObjectToFile(this.gahConfigFileName, this._currentConfig);
+      await this._fileSystemService.saveObjectToFile(await this.gahConfigFileName(), this._currentConfig);
     } else {
       await this._fileSystemService.saveObjectToFile(gahModuleConfigFileName, this._moduleCfg);
     }
@@ -255,6 +264,6 @@ export class ConfigService implements IConfigurationService {
   }
 
   public async deleteGahConfig() {
-    await this._fileSystemService.deleteFile(this.gahConfigFileName);
+    await this._fileSystemService.deleteFile(await this.gahConfigFileName());
   }
 }
