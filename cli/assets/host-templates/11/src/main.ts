@@ -9,7 +9,7 @@ if (environment.production) {
   enableProdMode();
 }
 
-fetch('environment.json')
+fetch('environment.json', { cache: 'no-store' })
   .then(res => res.json())
   .then(async (env: GahEnvironment) => {
     if (!environment.production) {
