@@ -219,14 +219,14 @@ export abstract class GahModuleBase {
 
   private loggerStateFromRes(res: InstallUnitReturn): AwesomeChecklistLoggerState {
     switch (res) {
-    case InstallUnitResult.failed:
-      return 'failed';
-    case InstallUnitResult.skipped:
-      return 'skipped';
-    case InstallUnitResult.warnings:
-      return 'partiallySucceeded';
-    default:
-      return 'succeeded';
+      case InstallUnitResult.failed:
+        return 'failed';
+      case InstallUnitResult.skipped:
+        return 'skipped';
+      case InstallUnitResult.warnings:
+        return 'partiallySucceeded';
+      default:
+        return 'succeeded';
     }
   }
 
@@ -453,7 +453,7 @@ export abstract class GahModuleBase {
       );
 
       // In case the module is not precompiled a fake node_module with the styles will be created
-      if (!dep.preCompiled) {
+      if (!(await dep.preCompiled())) {
         // Find all styles in the source folder
         const sourceStyles = await this.fileSystemService.getFilesFromGlob(`${dep.basePath}/**/styles/**/*.scss`, ['**/dist/**']);
 
