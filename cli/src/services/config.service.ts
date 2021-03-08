@@ -42,11 +42,12 @@ export class ConfigService implements IConfigurationService {
     const cfgName = this._contextService.getContext().configName;
 
     if (cfgName) {
-      const exists = await this._fileSystemService.fileExists(cfgName);
+      const cfgFileName = `gah-config.${cfgName}.json`;
+      const exists = await this._fileSystemService.fileExists(cfgFileName);
       if (!exists) {
         throw new Error(`Cannot find config file with name ${cfgName}`);
       }
-      return `gah-config.${cfgName}.json`;
+      return cfgFileName;
     }
 
     return 'gah-config.json';
