@@ -224,7 +224,7 @@ export class GahHostDef extends GahModuleBase {
       new InstallUnit(
         'INSTALL_PACKAGES',
         { module: await this.data() },
-        ['PRE_INSTALL_SCRIPTS'],
+        ['PRE_INSTALL_SCRIPTS', 'GENERATE_SYMLINKS'],
         'Installing packages',
         async () => {
           return this.installPackages(skipPackageInstall);
