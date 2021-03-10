@@ -70,7 +70,7 @@ export class GahHostDef extends GahModuleBase {
         : [hostCfg.htmlHeadContent]
       : [];
 
-    this._browsersList = Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent.join('\n') : hostCfg.htmlHeadContent;
+    this._browsersList = Array.isArray(hostCfg.browsersList) ? hostCfg.browsersList.join('\n') : hostCfg.browsersList;
     this._title = hostCfg.title ?? '';
     this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`, this._gahCfgFolder);
     await this.initBase();
