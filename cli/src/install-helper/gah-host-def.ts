@@ -495,7 +495,10 @@ export class GahHostDef extends GahModuleBase {
 
     if (this._browsersList) {
       const browsersListPath = this.fileSystemService.join(this.basePath, '.browserslistrc');
-      this.fileSystemService.saveFile(browsersListPath, this._browsersList);
+      this.fileSystemService.saveFile(
+        browsersListPath,
+        `# Generated based on your gah-host.json settings\n\n${this._browsersList}`
+      );
     }
   }
 
