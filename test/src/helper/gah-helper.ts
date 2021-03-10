@@ -41,7 +41,13 @@ export class GahHelper {
   }
 
   async runGah(dir: string, args: string[]) {
-    process.argv = [process.argv[0], path.resolve('../../../cli/lib/index.js'), ...args, '--useTestContext'];
+    process.argv = [
+      process.argv[0],
+      path.resolve('../../../cli/lib/index.js'),
+      ...args,
+      '--useTestContext',
+      '--restrictedLogging'
+    ];
     const cwd = path.join(workingDir, dir);
     process.cwd = () => cwd;
     console.log('CWD: ' + cwd);
