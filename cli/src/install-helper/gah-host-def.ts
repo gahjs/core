@@ -13,6 +13,7 @@ export class GahHostDef extends GahModuleBase {
   private _ngCompilerOptions: GahAngularCompilerOptions;
   private _angularJson: any;
   private _ngJsonPath: string;
+  private _browsersList?: string;
 
   constructor(gahCfgPath: string, initializedModules: GahModuleBase[], gahConfigs: { moduleName: string; cfg: GahConfig }[]) {
     super(undefined, gahCfgPath);
@@ -68,6 +69,8 @@ export class GahHostDef extends GahModuleBase {
         ? hostCfg.htmlHeadContent
         : [hostCfg.htmlHeadContent]
       : [];
+
+    this._browsersList = Array.isArray(hostCfg.htmlHeadContent) ? hostCfg.htmlHeadContent.join('\n') : hostCfg.htmlHeadContent;
     this._title = hostCfg.title ?? '';
     this.gahFolder = new GahFolder(this.basePath, `${this.srcBasePath}/app`, this._gahCfgFolder);
     await this.initBase();
@@ -202,8 +205,8 @@ export class GahHostDef extends GahModuleBase {
     );
 
     this.addInstallUnit(
-      new InstallUnit('ADJUST_INDEX_HTML', { module: await this.data() }, undefined, 'Adjusting index.html', () => {
-        return this.adjustIndexHtml();
+      new InstallUnit('ADJUST_INDEX_HTML', { module: await this.data() }, undefined, 'Adjusting host files', () => {
+        return this.adjustHostFiles();
       })
     );
 
@@ -477,7 +480,7 @@ export class GahHostDef extends GahModuleBase {
     await this.fileSystemService.saveObjectToFile(this._ngJsonPath, this._angularJson, true);
   }
 
-  private async adjustIndexHtml() {
+  private async adjustHostFiles() {
     const indexHtmlPath = this.fileSystemService.join(this.basePath, this.srcBasePath, 'index.html');
     let htmlContent = await this.fileSystemService.readFile(indexHtmlPath);
 
@@ -489,6 +492,11 @@ export class GahHostDef extends GahModuleBase {
     htmlContent = htmlContent.replace('<!--[title]-->', `<title>${this._title}</title>`);
 
     this.fileSystemService.saveFile(indexHtmlPath, htmlContent);
+
+    if (this._browsersList) {
+      const browsersListPath = this.fileSystemService.join(this.basePath, '.browserslistrc');
+      this.fileSystemService.saveFile(browsersListPath, this._browsersList);
+    }
   }
 
   private async generateEnvFolderIfNeeded() {

@@ -33,6 +33,11 @@ export class GahHost {
    */
   public angularCompilerOptions?: GahAngularCompilerOptions;
 
+  /**
+   * browsersList entries
+   */
+  public browsersList?: string | string[];
+
   public get isHost() {
     return true;
   }
