@@ -43,6 +43,20 @@
       "description": "Some of the Angular compiler options",
       "$ref": "#/definitions/GahAngularCompilerOptions"
     },
+    "browsersList": {
+      "description": "browsersList entries",
+      "anyOf": [
+        {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        {
+          "type": "string"
+        }
+      ]
+    },
     "isHost": {
       "type": "boolean"
     }
