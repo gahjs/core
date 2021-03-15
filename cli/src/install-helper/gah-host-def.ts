@@ -411,18 +411,16 @@ export class GahHostDef extends GahModuleBase {
       // Get package.json from module to installed into host
       const externalPackageJson = await dep.getPackageJson();
 
-      // Getting (dev-)dependency objects from host and module
+      // Getting dependency objects from host and module
       const externalDeps = externalPackageJson!.dependencies!;
-      const externalDevDeps = externalPackageJson!.devDependencies!;
+      const externalDevDeps = externalPackageJson!.devDependencies;
 
+      // Filtering some unwanted packages
       const deps = Object.keys(externalDeps)
         .filter(x => blocklistPackages.indexOf(x) === -1)
         .filter(x => dep.excludedPackages.indexOf(x) === -1);
-      const devDeps = Object.keys(externalDevDeps)
-        .filter(x => blocklistPackages.indexOf(x) === -1)
-        .filter(x => dep.excludedPackages.indexOf(x) === -1);
 
-      // Merging module (dev-)dependencies into host
+      // Merging module dependencies into host
       deps.forEach(d => {
         const isNewer =
           !hostDeps[d] ||
@@ -433,16 +431,29 @@ export class GahHostDef extends GahModuleBase {
           hostDeps[d] = externalDeps[d];
         }
       });
-      devDeps.forEach(d => {
-        const isEntry = dep.isEntry;
-        const isNewer =
-          hostDevDeps[d] &&
-          compareVersions(hostDevDeps[d].replace('~', '').replace('^', ''), externalDevDeps[d].replace('~', '').replace('^', ''));
 
-        if (!hostDevDeps[d] || isEntry || (!isEntry && isNewer)) {
-          hostDevDeps[d] = externalDevDeps[d];
-        }
-      });
+      // check if the module has devDependencies
+      if (externalDevDeps) {
+        // Filtering some unwanted packages
+        const devDeps = Object.keys(externalDevDeps)
+          .filter(x => blocklistPackages.indexOf(x) === -1)
+          .filter(x => dep.excludedPackages.indexOf(x) === -1);
+
+        // Merging module devDependencies into host
+        devDeps.forEach(d => {
+          const isEntry = dep.isEntry;
+          const isNewer =
+            hostDevDeps[d] &&
+            compareVersions(
+              hostDevDeps[d].replace('~', '').replace('^', ''),
+              externalDevDeps[d].replace('~', '').replace('^', '')
+            );
+
+          if (!hostDevDeps[d] || isEntry || (!isEntry && isNewer)) {
+            hostDevDeps[d] = externalDevDeps[d];
+          }
+        });
+      }
     }
 
     // Override everything with dependencies from entry module
