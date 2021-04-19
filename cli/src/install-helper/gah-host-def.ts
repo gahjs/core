@@ -511,6 +511,11 @@ export class GahHostDef extends GahModuleBase {
         `# Generated based on your gah-host.json settings\n\n${this._browsersList}`
       );
     }
+    const webCfgPath = this.fileSystemService.join(this._gahCfgFolder, 'web.config');
+    if (await this.fileSystemService.fileExists(webCfgPath)) {
+      const webCfgDestPath = this.fileSystemService.join(this.basePath, this.srcBasePath);
+      await this.fileSystemService.copyFile(webCfgPath, webCfgDestPath);
+    }
   }
 
   private async generateEnvFolderIfNeeded() {
