@@ -2,7 +2,7 @@ import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptCon
 
 import { prompt } from 'enquirer';
 import { FileSystemService } from './file-system.service';
-
+import { AwesomeLogger } from 'awesome-logging';
 export class PromptService implements IPromptService {
   private readonly _fileSystemService: IFileSystemService;
 
@@ -11,14 +11,14 @@ export class PromptService implements IPromptService {
   }
 
   public async input(cfg: PromptConfig): Promise<string> {
-    return prompt({
-      type: 'input',
-      name: '_',
-      message: cfg.msg,
-      initial: cfg.default,
-      skip: !cfg.enabled(),
-      validate: cfg.validator
-    }).then((_: any) => _._);
+    if (!cfg.enabled()) {
+      return '';
+    }
+    return AwesomeLogger.prompt('text', {
+      text: cfg.msg,
+      default: cfg.default,
+      validator: cfg.validator
+    }).result;
   }
 
   public async confirm(cfg: PromptConfig): Promise<boolean> {
