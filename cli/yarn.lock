@@ -426,10 +426,10 @@ available-typed-arrays@^1.0.2:
   dependencies:
     array-filter "^1.0.0"
 
-awesome-logging@0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.0.1.tgz#14cbfd01f1a1426fb21d42172ab24d33da0d4ced"
-  integrity sha512-ujQPtOPanHWyapY5Z0rYHj18dGdSTeHpWKde7geQIJi+FAGEdK83uW+5zxexMhhqHYlhzPGDQEEEFWlwxJ7Ivg==
+awesome-logging@~0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.0.2.tgz#44f609a502e8affe90f07a92fa6e10572363ab55"
+  integrity sha512-iv5tgZayOjvFj5d7Qbi6E4LTQ2k6Dn46Ttn82GADP5WW6OaR5bzbv4r6daPSdYARZt2/yuZRLgMFj1o+JxkGQQ==
   dependencies:
     chalk "^4.1.0"
     cli-truncate "^2.1.0"
@@ -437,6 +437,7 @@ awesome-logging@0.0.1:
     slice-ansi "^4.0.0"
     string-width "^4.2.0"
     strip-ansi "^6.0.0"
+    window-size "^1.1.1"
 
 awilix@^4.3.1:
   version "4.3.1"
@@ -3341,6 +3342,14 @@ which@^2.0.1:
   integrity sha512-BLI3Tl1TW3Pvl70l3yq3Y64i+awpwXqsGBYWkkqMtnbXgrMD+yj7rhW0kuEDxzJaYXGjEW5ogapKNMEKNMjibA==
   dependencies:
     isexe "^2.0.0"
+
+window-size@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/window-size/-/window-size-1.1.1.tgz#9858586580ada78ab26ecd6978a6e03115c1af20"
+  integrity sha512-5D/9vujkmVQ7pSmc0SCBmHXbkv6eaHwXEx65MywhmUMsI8sGqJ972APq1lotfcwMKPFLuCFfL8xGHLIp7jaBmA==
+  dependencies:
+    define-property "^1.0.0"
+    is-number "^3.0.0"
 
 word-wrap@^1.2.3:
   version "1.2.3"
