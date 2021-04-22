@@ -12,7 +12,7 @@ export interface IConfigurationService {
   getCurrentConfig(): Promise<GahConfig>;
   getGahModule(forceLoad?: boolean): Promise<GahModule>;
   getGahHost(forceLoad?: boolean): Promise<GahHost>;
-  getGahModuleType(inFolder?: string): Promise<GahModuleType>;
+  getGahModuleType(inFolder?: string, optional?: boolean): Promise<GahModuleType>;
   getGahAnyType(inFolder: string): Promise<GahModule | GahHost>;
   saveCurrentConfig(): Promise<void>;
   saveGahModuleConfig(): Promise<void>;

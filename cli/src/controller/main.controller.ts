@@ -57,7 +57,7 @@ export class MainController extends Controller {
   }
 
   public async main() {
-    if ((await this._configService.getGahModuleType()) === GahModuleType.HOST) {
+    if ((await this._configService.getGahModuleType(undefined, true)) === GahModuleType.HOST) {
       this._contextService.setContext({ calledFromHostFolder: true });
       this._contextService.setContext({ currentBaseFolder: this._fileSystemService.join(process.cwd(), '.gah') });
     } else {

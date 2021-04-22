@@ -99,6 +99,9 @@ export class ConfigService implements IConfigurationService {
     if (hasHostCfg) {
       return GahModuleType.HOST;
     }
+    if(optional) {
+      return GahModuleType.UNKNOWN;
+    }
     throw new Error('Neither a gah-module.json nor a gah-host.json file was found');
   }
 
