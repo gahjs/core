@@ -57,6 +57,7 @@ export abstract class GahModuleBase {
   public assetsFolderRelativeToBasePaths?: string | string[];
   public stylesFilePathRelativeToBasePath?: string;
   public publicApiPathRelativeToBasePath: string;
+  public additionalPublicApiPathRelativeToBasePath?: { path: string; suffix: string }[];
   public baseNgModuleName?: string;
   public isHost: boolean;
   protected installed: boolean;
@@ -412,6 +413,27 @@ export abstract class GahModuleBase {
           dep.srcBasePath,
           true
         );
+
+        const alternativePublicApiPathRelativeToBaseSrcPath = dep.additionalPublicApiPathRelativeToBasePath?.map(
+          additionalPublicApiCfg =>
+            this.fileSystemService
+              .ensureRelativePath(additionalPublicApiCfg.path, dep.srcBasePath, true)
+              .then(additionalRelativePublicApiCfg =>
+                this.fileSystemService.join(
+                  this.gahFolder.dependencyPath,
+                  dep.moduleName!,
+                  additionalRelativePublicApiCfg.substr(0, additionalRelativePublicApiCfg.length - 3)
+                )
+              )
+              .then(additionalPublicApiCfgFinishedPath => {
+                const pathName = `@${dep.packageName}/${dep.moduleName!}/${additionalPublicApiCfg.suffix}`;
+                this.tsConfigFile.addPathAlias(pathName, additionalPublicApiCfgFinishedPath);
+              })
+        );
+        if (alternativePublicApiPathRelativeToBaseSrcPath) {
+          await Promise.all(alternativePublicApiPathRelativeToBaseSrcPath);
+        }
+
         const publicApiRelativePathWithoutExtention = publicApiPathRelativeToBaseSrcPath.substr(
           0,
           publicApiPathRelativeToBaseSrcPath.length - 3

@@ -46,4 +46,11 @@ export class ModuleDefinition {
    * Configure plugins and other settings for this module.
    */
   public config?: GahConfig;
+  /**
+   * Additional import alias names for certain files of a module. Useful for exporting files for testing purposes.
+   */
+  public additionalPublicApis?: {
+    path: string;
+    suffix: string;
+  }[];
 }

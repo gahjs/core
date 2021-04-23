@@ -45,6 +45,7 @@ export class GahModuleDef extends GahModuleBase {
     this.assetsFolderRelativeToBasePaths = moduleCfg.assetsPath;
     this.stylesFilePathRelativeToBasePath = moduleCfg.stylesPath;
     this.publicApiPathRelativeToBasePath = moduleCfg.publicApiPath;
+    this.additionalPublicApiPathRelativeToBasePath = moduleCfg.additionalPublicApis;
     this.baseNgModuleName = moduleCfg.baseNgModuleName;
     this.isEntry = moduleCfg.isEntry || false;
     this.parentGahModule = moduleCfg.parentGahModule;
@@ -123,15 +124,9 @@ export class GahModuleDef extends GahModuleBase {
     );
 
     this.addInstallUnit(
-      new InstallUnit(
-        'GENERATE_SYMLINKS',
-        { module: await this.data() },
-        ['CLEAN_GAH_FOLDER'],
-        'Linking Modules',
-        () => {
-          return this.createSymlinksToDependencies();
-        }
-      )
+      new InstallUnit('GENERATE_SYMLINKS', { module: await this.data() }, ['CLEAN_GAH_FOLDER'], 'Linking Modules', () => {
+        return this.createSymlinksToDependencies();
+      })
     );
 
     this.addInstallUnit(
