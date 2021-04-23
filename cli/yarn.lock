@@ -426,10 +426,10 @@ available-typed-arrays@^1.0.2:
   dependencies:
     array-filter "^1.0.0"
 
-awesome-logging@~0.0.2:
-  version "0.0.2"
-  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.0.2.tgz#44f609a502e8affe90f07a92fa6e10572363ab55"
-  integrity sha512-iv5tgZayOjvFj5d7Qbi6E4LTQ2k6Dn46Ttn82GADP5WW6OaR5bzbv4r6daPSdYARZt2/yuZRLgMFj1o+JxkGQQ==
+awesome-logging@~0.0.3:
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.0.3.tgz#47288bc75eaf6e704f0c2c9bf03399de3cbcd306"
+  integrity sha512-VlU5e66TkphuFMhwdgbd2AlMuWoD6ox125raHvvr74yASs0kvlwUYIWfV5jfHM0ccIhO8YcQqyvmNbHHJb2ovQ==
   dependencies:
     chalk "^4.1.0"
     cli-truncate "^2.1.0"
