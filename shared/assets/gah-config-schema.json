@@ -1,65 +1,66 @@
 {
-  "type": "object",
-  "properties": {
-    "$schema": {
-      "type": "string",
-      "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-config-schema.json"
-    },
-    "extends": {
-      "description": "The path to the config file which this config file extends",
-      "type": "string"
-    },
-    "plugins": {
-      "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/GahPluginDependencyConfig"
-      }
-    },
-    "precompiled": {
-      "description": "List of precompiled modules with a path to the tgz file (output from yarn pack command)",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "path": {
-            "type": "string"
-          }
-        }
-      }
-    }
-  },
-  "definitions": {
-    "GahPluginDependencyConfig": {
-      "description": "Describes a plugin dependency",
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "The name of the plugin that should be used. This has to be the name of a npm package.",
-          "type": "string"
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "default": "https://raw.githubusercontent.com/gahjs/core/master/shared/assets/gah-config-schema.json"
         },
-        "settings": {
-          "$ref": "#/definitions/GahPluginConfig",
-          "description": "The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available."
+        "extends": {
+            "description": "The path to the config file which this config file extends",
+            "type": "string"
         },
-        "version": {
-          "description": "The version of the plugin that should be used.",
-          "type": "string"
+        "plugins": {
+            "description": "The array of plugins used in this project. Often only used for the host, but also possible in 'normal' modules.",
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/GahPluginDependencyConfig"
+            }
+        },
+        "precompiled": {
+            "description": "List of precompiled modules with a path to the tgz file (output from yarn pack command)",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "path": {
+                        "type": "string"
+                    }
+                }
+            }
         }
-      }
     },
-    "GahPluginConfig": {
-      "additionalProperties": true,
-      "type": "object",
-      "properties": {
-        "enabled": {
-          "type": "boolean"
+    "definitions": {
+        "GahPluginDependencyConfig": {
+            "description": "Describes a plugin dependency",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "The name of the plugin that should be used. This has to be the name of a npm package.",
+                    "type": "string"
+                },
+                "settings": {
+                    "$ref": "#/definitions/GahPluginConfig",
+                    "description": "The configuration for the plugin. Plugins add their own properties, please look at the documentation for the used plugin to see which settings are available."
+                },
+                "version": {
+                    "description": "The version of the plugin that should be used.",
+                    "type": "string"
+                }
+            }
+        },
+        "GahPluginConfig": {
+            "additionalProperties": true,
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                }
+            }
         }
-      }
-    }
-  },
-  "$schema": "http://json-schema.org/draft-07/schema#"
+    },
+    "$schema": "http://json-schema.org/draft-07/schema#"
 }
+
