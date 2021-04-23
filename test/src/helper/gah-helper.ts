@@ -50,7 +50,6 @@ export class GahHelper {
     ];
     const cwd = path.join(workingDir, dir);
     process.cwd = () => cwd;
-    process.stdout.getWindowSize = () => [1000, 8];
     console.log('CWD: ' + cwd);
 
     await gahMain.gahMain().catch((err: any) => {
