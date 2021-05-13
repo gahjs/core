@@ -34,11 +34,11 @@ const initRoutes = () => {
   globalRouteCfg = new Array<GahRouteConfig>();
 
   modulePackages.forEach(m => {
-    const mod = m.module;
-    if (mod['routes']) {
+    const mod = m.module as any;
+    if (mod['routes'] as Routes) {
       const isEntry = m.isEntry;
       const parentGahModule = m.parentGahModule;
-      const routes = mod['routes'];
+      const routes = mod['routes'] as Routes;
       const name = m.moduleName;
       globalRouteCfg.push({
         isEntry,
@@ -76,6 +76,9 @@ const buildModuleRoutes = (routeCfg: GahRouteConfig[]) => {
       }
     } else {
       const parentModule = routeCfg.find(x => x.name === r.parentGahModule);
+      if (!parentModule) {
+        throw new Error(`Parent module '${r.parentGahModule}' cannot be found`);
+      }
       success = addToGahOutlet(parentModule.routes, r);
     }
     if (!success) {
@@ -88,9 +91,9 @@ const buildModuleRoutes = (routeCfg: GahRouteConfig[]) => {
   return entry.routes;
 };
 
-const addedRoutes = [];
+const addedRoutes: Routes = [];
 
-const addToGahOutlet = (parentRoutes: Routes, child: GahRouteConfig) => {
+const addToGahOutlet = (parentRoutes: Routes | undefined, child: GahRouteConfig) => {
   if (!parentRoutes) {
     return false;
   }
@@ -128,7 +131,7 @@ const fixGahOutlets = (routes: Routes) => {
 
       for (const a of x.children) {
         if (a.path === gahOutletName) {
-          x.children = [...x.children.filter(c => c.path !== gahOutletName), ...a.children];
+          x.children = [...x.children.filter(c => c.path !== gahOutletName), ...(a.children ?? [])];
         }
       }
     }
