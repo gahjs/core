@@ -29,7 +29,12 @@
             "assets": ["src/assets", "src/web.config", "src/environment.json"],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "preserveSymlinks": true
+            "preserveSymlinks": true,
+            "sourceMap": {
+              "scripts": true,
+              "styles": true,
+              "vendor": true
+            }
           },
           "configurations": {
             "production": {
@@ -68,15 +73,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "browserTarget": "ng12:build:production"
+              "browserTarget": "gah-host:build:production"
             },
             "development": {
-              "browserTarget": "ng12:build:development",
-              "sourceMap": {
-                "scripts": true,
-                "styles": true,
-                "vendor": true
-              }
+              "browserTarget": "gah-host:build:development"
             }
           },
           "defaultConfiguration": "development"
