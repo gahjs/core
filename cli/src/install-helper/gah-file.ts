@@ -323,16 +323,19 @@ export class GahFile {
     let angularCoreVersion = entryPackageJson.dependencies?.['@angular/core']?.match(/(\d+)\.\d+\.\d+/)?.[1];
 
     switch (angularCoreVersion) {
-    case '8':
-    case '9':
-      angularCoreVersion = '8';
-      break;
-    case '10':
-      angularCoreVersion = '10';
-      break;
-    default:
-      angularCoreVersion = '11';
-      break;
+      case '8':
+      case '9':
+        angularCoreVersion = '8';
+        break;
+      case '10':
+        angularCoreVersion = '10';
+        break;
+      case '11':
+        angularCoreVersion = '11';
+        break;
+      default:
+        angularCoreVersion = '12';
+        break;
     }
 
     await CopyHost.copy(this._fileSystemService, this._workspaceService, this._loggerService, angularCoreVersion, true);
