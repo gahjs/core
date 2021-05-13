@@ -55,8 +55,8 @@
     "yarn": "^1.22.10"
   },
   "devDependencies": {
-    "@awdware/eslint-config-nodejs": "^0.0.8",
     "@awdware/eslint-config-base": "^0.0.5",
+    "@awdware/eslint-config-nodejs": "^0.0.8",
     "@awdware/prettier-config": "^0.0.2",
     "@types/clear": "^0.1.1",
     "@types/decompress": "^4.2.3",
