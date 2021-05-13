@@ -23,8 +23,8 @@
   },
   "devDependencies": {
     "@angular/cli": "^11.0.7",
-    "@awdware/eslint-config-nodejs": "^0.0.8",
     "@awdware/eslint-config-base": "^0.0.5",
+    "@awdware/eslint-config-nodejs": "^0.0.8",
     "@awdware/prettier-config": "^0.0.2",
     "@types/fs-extra": "^9.0.6",
     "@types/mocha": "^8.2.0",
