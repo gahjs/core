@@ -281,9 +281,9 @@ export class PluginService implements IPluginService {
       if (handler.eventType === type) {
         this._loggerService.debug(`Calling handler '${handler.pluginName}'`);
         try {
-          const res = await handler.handler(payload);
-          if (typeof res === 'boolean') {
-            stopExecution = !res;
+          const success = await handler.handler(payload);
+          if (typeof success === 'boolean') {
+            stopExecution = !success;
           }
         } catch (error) {
           this._loggerService.error(`Error in plugin ${handler.pluginName}.\nCallstack from plugin:`);
