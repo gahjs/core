@@ -33,7 +33,7 @@ export abstract class GahPlugin {
 
   protected registerEventListener<T extends GahEventType>(
     type: T,
-    handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void
+    handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void | boolean> | void | boolean
   ): void {
     this.pluginService.registerEventHandler(this.name, type, handler);
   }

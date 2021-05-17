@@ -8,7 +8,7 @@ export interface IPluginService {
   registerEventHandler<T extends GahEventType>(
     pluginName: string,
     type: T,
-    handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void> | void
+    handler: (payload: ExtractEventPayload<GahEvent, T>) => Promise<void | boolean> | void | boolean
   ): void;
   installPlugin(pluginName: string): Promise<boolean>;
   removePlugin(pluginName: string): Promise<boolean>;
