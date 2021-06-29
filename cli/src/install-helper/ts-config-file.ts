@@ -39,6 +39,19 @@ export class TsConfigFile {
       }
     });
 
+    if (this._tsConfig.extends) {
+      const extendFromPath = this._fileSystemService.join(
+        this._fileSystemService.getDirectoryPathFromFilePath(this._path),
+        this._tsConfig.extends
+      );
+      const baseConfig = await this._fileSystemService.parseFile<TsConfig>(extendFromPath);
+      if (!baseConfig.compilerOptions?.baseUrl && !this._tsConfig.compilerOptions.baseUrl) {
+        this._tsConfig.compilerOptions.baseUrl = './';
+      }
+    } else if (!this._tsConfig.compilerOptions.baseUrl) {
+      this._tsConfig.compilerOptions.baseUrl = './';
+    }
+
     return this.save();
   }
 
@@ -51,15 +64,6 @@ export class TsConfigFile {
   public async init(): Promise<void> {
     this._tsConfig = await this._fileSystemService.parseFile<TsConfig>(this._path);
     this._tsConfig.compilerOptions ??= {} as TsConfigCompilerOptions;
-
-    if (this._tsConfig.extends) {
-      const baseConfig = await this._fileSystemService.parseFile<TsConfig>(this._tsConfig.extends);
-      if (baseConfig.compilerOptions?.baseUrl !== './' || this._tsConfig.compilerOptions.baseUrl !== './') {
-        this._tsConfig.compilerOptions.baseUrl = './';
-      }
-    } else {
-      this._tsConfig.compilerOptions.baseUrl = './';
-    }
   }
 
   public async save(): Promise<void> {
