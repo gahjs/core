@@ -1,6 +1,6 @@
 {
   "name": "@gah/shared",
-  "version": "0.7.0",
+  "version": "1.0.3",
   "description": "Provides types and interfaces for gah",
   "homepage": "https://github.com/gahjs/core",
   "repository": {
