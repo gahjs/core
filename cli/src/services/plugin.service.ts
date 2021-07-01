@@ -105,6 +105,7 @@ export class PluginService implements IPluginService {
   }
 
   private registerPlugin(plugin: GahPlugin, pluginDepCfg: GahPluginDependencyConfig) {
+    pluginDepCfg.settings ??= {};
     plugin.config = pluginDepCfg.settings;
     this.initPluginServices(plugin);
     if (plugin.config.enabled === undefined || plugin.config.enabled) {

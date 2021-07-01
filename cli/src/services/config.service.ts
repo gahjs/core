@@ -25,7 +25,7 @@ export class ConfigService implements IConfigurationService {
   private _isHost: boolean;
   private _moduleCfg: GahModule | GahHost;
   private _currentConfig: GahConfig;
-  private _fullCfg: GahConfig;
+  private _fullCfg?: GahConfig;
   private _tsCfg: TsConfig;
   public externalConfigPath: string;
   public externalConfig: GahModule;
@@ -99,7 +99,7 @@ export class ConfigService implements IConfigurationService {
     if (hasHostCfg) {
       return GahModuleType.HOST;
     }
-    if(optional) {
+    if (optional) {
       return GahModuleType.UNKNOWN;
     }
     throw new Error('Neither a gah-module.json nor a gah-host.json file was found');
@@ -139,7 +139,7 @@ export class ConfigService implements IConfigurationService {
     if (!this._fullCfg) {
       await this.loadGahConfig();
     }
-    return this._fullCfg;
+    return this._fullCfg!;
   }
 
   public async getPluginConfig(moduleName?: string) {
@@ -221,6 +221,7 @@ export class ConfigService implements IConfigurationService {
     } else {
       await this._fileSystemService.saveObjectToFile(gahModuleConfigFileName, this._moduleCfg);
     }
+    this._fullCfg = undefined;
   }
 
   public async saveGahModuleConfig(): Promise<void> {
