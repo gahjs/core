@@ -33,7 +33,7 @@
   "prettier": "@awdware/prettier-config",
   "dependencies": {
     "@gah/shared": "^1.0.3",
-    "awesome-logging": "0.2.4",
+    "awesome-logging": "0.2.6",
     "awilix": "^4.3.4",
     "chalk": "^4.1.1",
     "change-case": "^4.1.2",
