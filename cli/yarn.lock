@@ -440,10 +440,10 @@ available-typed-arrays@^1.0.2:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.4.tgz#9e0ae84ecff20caae6a94a1c3bc39b955649b7a9"
   integrity sha512-SA5mXJWrId1TaQjfxUYghbqQ/hYioKmLJvPJyDuYRtXXenFNMjj4hSSt1Cf1xsuXSXrtxrVC5Ot4eU6cOtBDdA==
 
-awesome-logging@0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.2.6.tgz#f20c5543041dccaa91a8c18dc639b2ea20a26678"
-  integrity sha512-UhgdDQETznFv4BKoLw8cjbsRT8K/mas6KK0Z9G6GOdNC3njrLOsHCykzqcSsoyajTzkWw7jkHaOz5ZYeolKh4g==
+awesome-logging@0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.2.7.tgz#a9d6e6da37abef5351b4494d216a810081698906"
+  integrity sha512-Ow4iXdjNlA1hS25mEjt5IbiZOd/HL49n+gwBSzfTgL3vrdEINeWIdsdktSbcY8NvkMao0q4uDMrHBteHbrg/0Q==
   dependencies:
     chalk "^4.1.1"
     cli-truncate "^2.1.0"
