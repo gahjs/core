@@ -4,9 +4,6 @@ import { LoggerService } from './logger.service';
 import chalk from 'chalk';
 import path from 'path';
 import fs from 'fs-extra';
-/**
- * TODO: Use loggerservice to ensure that this works with loading animations, but without any square before the msg
- */
 
 export class ExecutionService implements IExecutionService {
   public executionResult: string = '';
@@ -18,6 +15,7 @@ export class ExecutionService implements IExecutionService {
   }
 
   public execute(cmd: string, outPut: boolean, outPutCallback?: (out: string) => string, cwd?: string): Promise<boolean> {
+    let executionResult = '';
     return new Promise((resolve, reject) => {
       this.executionResult = '';
       this.executionErrorResult = '';
@@ -36,6 +34,7 @@ export class ExecutionService implements IExecutionService {
       }
 
       childProcess.stdout?.on('data', buffer => {
+        executionResult += buffer;
         this.executionResult += buffer;
         if (outPut) {
           if (outPutCallback) {
@@ -49,6 +48,7 @@ export class ExecutionService implements IExecutionService {
         }
       });
       childProcess.stderr?.on('data', buffer => {
+        executionResult += buffer;
         this.executionResult += buffer;
         this.executionErrorResult += buffer;
         if (outPut) {
@@ -64,9 +64,10 @@ export class ExecutionService implements IExecutionService {
       });
 
       childProcess.on('exit', code => {
-        this._loggerService.debug(chalk.magenta('--------------Execution Result--------------'));
-        this._loggerService.debug(chalk.cyan(this.executionResult.replace(/\s$/g, '')));
-        this._loggerService.debug(chalk.magenta('--------------################--------------\n'));
+        const execRes = `${chalk.magenta('--------------Execution Result--------------')}\n${chalk.cyan(
+          executionResult.replace(/[\s\r\n]+$/g, '')
+        )}\n${chalk.magenta('--------------################--------------\n')}`;
+        this._loggerService.debug(execRes, false);
         if (code !== 0) {
           setTimeout(() => {
             resolve(false);
