@@ -59,7 +59,7 @@ export class GahFile {
       try {
         hostCfg = await this._fileSystemService.parseFile<GahHost>(this._filePath);
       } catch (error) {
-        this._loggerService.error(`could not parse host file at ${this._filePath}`);
+        this._loggerService.error(`Could not parse host file at ${this._filePath}`);
         throw error;
       }
       await this.loadHost(hostCfg, this._filePath, initializedModules);
@@ -68,7 +68,7 @@ export class GahFile {
       try {
         moduleCfg = await this._fileSystemService.parseFile<GahModule>(this._filePath);
       } catch (error) {
-        this._loggerService.error(`could not parse module file at ${this._filePath}`);
+        this._loggerService.error(`Could not parse module file at ${this._filePath}`);
         throw error;
       }
       await this.loadModule(moduleCfg, this._filePath, initializedModules);

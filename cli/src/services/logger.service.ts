@@ -1,8 +1,8 @@
+import chalk from 'chalk';
+import { AwesomeLogger, AwesomeLoggerSpinnerControl } from 'awesome-logging';
+
 import { ILoggerService, IContextService } from '@gah/shared';
 import { ContextService } from './context-service';
-import { AwesomeLogger } from 'awesome-logging';
-import { TextObject } from 'awesome-logging/lib/models/text-object';
-import { AwesomeLoggerSpinnerControl } from 'awesome-logging/lib/logger/models/config/spinner';
 
 /**
  * TODO: Add logging to a file (error only or all)
@@ -24,48 +24,41 @@ export class LoggerService implements ILoggerService {
   }
 
   public log(text: string) {
-    const textObj = new TextObject(' ■ ', 'BLUE');
-    textObj.append(text);
-    AwesomeLogger.interrupt('text', { text: textObj });
+    AwesomeLogger.interrupt(` ${chalk.blue('■')} ${text}`);
   }
 
   public warn(text: string) {
-    const textObj = new TextObject(' ■ ', 'YELLOW');
-    textObj.append(text);
-    AwesomeLogger.interrupt('text', { text: textObj });
+    AwesomeLogger.interrupt(` ${chalk.yellow('■')} ${text}`);
   }
   public error(text: string | Error) {
-    const textObj = new TextObject(' ■ ', 'RED');
+    let errText = chalk.red(' ■ ');
     if (typeof text === 'string') {
-      textObj.append(text);
-    } else if(text) {
-      text.name && textObj.append(text.name);
-      text.message && textObj.append(text.message);
-      text.stack && textObj.append(text.stack);
+      errText += text;
+    } else if (text && (text.name || text.message || text.stack)) {
+      errText += text.name ?? '';
+      errText += text.message ?? '';
+      errText += text.stack ?? '';
     } else {
-      textObj.append('Unknown error');
+      errText += 'Unknown error';
     }
-    AwesomeLogger.interrupt('text', { text: textObj });
+    AwesomeLogger.interrupt(errText);
   }
-  public debug(text: string) {
+  public debug(text: string, prefx = true) {
     if (this.debugLoggingEnabled) {
-      const textObj = new TextObject(' ■ ', 'MAGENTA');
-      textObj.append(text);
-      AwesomeLogger.interrupt('text', { text: textObj });
+      if (prefx) {
+        AwesomeLogger.interrupt(` ${chalk.magenta('■')} ${text}`);
+      } else {
+        AwesomeLogger.interrupt(text);
+      }
     }
   }
   public success(text: string) {
-    const textObj = new TextObject(' ■ ', 'GREEN');
-    textObj.append(text);
-    AwesomeLogger.interrupt('text', { text: textObj });
+    AwesomeLogger.interrupt(` ${chalk.green('■')} ${text}`);
   }
 
   public startLoadingAnimation(text: string) {
-    const textObj = new TextObject(' ■ ', 'BLUE');
-    textObj.append(text);
     this._spinnerControl = AwesomeLogger.log('spinner', {
-      spinnerFrames: [' ▄', ' ■', ' ▀', ' ▀', ' ■'],
-      spinnerColor: 'BLUE',
+      spinnerFrames: [chalk.blue(' ▄'), chalk.blue(' ■'), chalk.blue(' ▀'), chalk.blue(' ▀'), chalk.blue(' ■')],
       spinnerDelay: 80,
       text
     });
