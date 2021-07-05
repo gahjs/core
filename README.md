@@ -1,6 +1,6 @@
 
 # Welcome to gah!
-[![npm version](https://badge.fury.io/js/%40gah%2Fcli.svg)](https://badge.fury.io/js/%40gah%2Fcli) [![Build Status](https://dev.azure.com/loaderb0t/gah/_apis/build/status/ci-gah?repoName=gahjs%2Fcore&branchName=main)](https://dev.azure.com/loaderb0t/gah/_build/latest?definitionId=27&repoName=gahjs%2Fcore&branchName=main) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=gahjs_core&metric=alert_status)](https://sonarcloud.io/dashboard?id=gahjs_core)
+![npm (scoped)](https://img.shields.io/npm/v/@gah/cli?style=for-the-badge) ![Azure DevOps builds](https://img.shields.io/azure-devops/build/loaderb0t/3ce5d05a-5c08-4670-964e-03d678d3bbd6/27?style=for-the-badge) ![Sonar Quality Gate](https://img.shields.io/sonar/alert_status/gahjs_core?server=https%3A%2F%2Fsonarcloud.io&sonarVersion=8.8&style=for-the-badge)
 
 `gah`provides tooling for working with decentralized, modular angular applications.
 
