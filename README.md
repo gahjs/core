@@ -2,6 +2,7 @@
 # Welcome to gah!
 [![npm (scoped)](https://img.shields.io/npm/v/@gah/cli?style=for-the-badge)](https://www.npmjs.com/package/@gah/cli)
 [![Azure DevOps builds](https://img.shields.io/azure-devops/build/loaderb0t/3ce5d05a-5c08-4670-964e-03d678d3bbd6/27?style=for-the-badge)](https://dev.azure.com/loaderb0t/gah/_build?definitionId=27)
+![Azure DevOps tests](https://img.shields.io/azure-devops/tests/loaderb0t/gah/27?style=for-the-badge)
 [![Sonar Quality Gate](https://img.shields.io/sonar/alert_status/gahjs_core?server=https%3A%2F%2Fsonarcloud.io&sonarVersion=8.8&style=for-the-badge)](https://sonarcloud.io/dashboard?id=gahjs_core)
 
 `gah`provides tooling for working with decentralized, modular angular applications.
