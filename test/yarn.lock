@@ -133,10 +133,15 @@
     globby "^11.0.4"
     simple-git "^2.40.0"
 
-"@gah/shared@1.0.4", "@gah/shared@^1.0.4":
+"@gah/shared@1.0.4":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@gah/shared/-/shared-1.0.4.tgz#c0f3a362033329409b78380a88a2f7822007320e"
   integrity sha512-lyb/omMPPxSFXocT4oE80YVvYXhgQZihUSO/ZgyYpyPlp9QQiEoOiRrDArqTkCpUQ/Aae+uPKZ10xn/d7VLthQ==
+
+"@gah/shared@^1.0.5":
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/@gah/shared/-/shared-1.0.5.tgz#e407a02a03762b570f06367091c2a3a31f34e86c"
+  integrity sha512-Mscgvrtwaq6bvCF1mP00D1VRy6P7RaI40f7jm7lu/hAgAcD/y+BWoOKvkf1UFV4yiWX20TfFqvHnuKguSJGkpQ==
 
 "@humanwhocodes/config-array@^0.5.0":
   version "0.5.0"
