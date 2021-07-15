@@ -22,7 +22,7 @@
     "awilix": "^4.3.4"
   },
   "devDependencies": {
-    "@angular/cli": "^11.0.7",
+    "@angular/cli": "^12.1.2",
     "@awdware/eslint-config-base": "^1.0.0",
     "@awdware/eslint-config-nodejs": "^1.0.0",
     "@awdware/prettier-config": "^0.0.2",
