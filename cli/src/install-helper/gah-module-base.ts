@@ -439,8 +439,15 @@ export abstract class GahModuleBase {
           publicApiPathRelativeToBaseSrcPath.length - 3
         );
 
+        const absoluteDepPath = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath);
+        const relativeDepPathToSrcFolder = await this.fileSystemService.ensureRelativePath(
+          absoluteDepPath,
+          this.fileSystemService.join(this.basePath, this.srcBasePath),
+          true
+        );
+
         const path = this.fileSystemService.join(
-          this.gahFolder.dependencyPath,
+          relativeDepPathToSrcFolder,
           dep.moduleName!,
           publicApiRelativePathWithoutExtention
         );
