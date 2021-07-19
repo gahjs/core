@@ -442,7 +442,7 @@ export abstract class GahModuleBase {
         const absoluteDepPath = this.fileSystemService.join(this.basePath, this.gahFolder.dependencyPath);
         const relativeDepPathToSrcFolder = await this.fileSystemService.ensureRelativePath(
           absoluteDepPath,
-          this.fileSystemService.join(this.basePath, this.srcBasePath),
+          this.fileSystemService.join(this.basePath, this.tsConfigFile.getFileContents().compilerOptions.baseUrl ?? './'),
           true
         );
 
