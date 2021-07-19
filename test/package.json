@@ -33,7 +33,7 @@
     "@typescript-eslint/eslint-plugin": "^4.28.4",
     "@typescript-eslint/parser": "^4.28.4",
     "comment-json": "^4.1.0",
-    "eslint": "^7.30.0",
+    "eslint": "^7.31.0",
     "fs-extra": "^10.0.0",
     "mocha": "^7.0.0",
     "mocha-junit-reporter": "^2.0.0",
