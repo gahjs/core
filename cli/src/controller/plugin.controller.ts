@@ -1,4 +1,5 @@
 import { GahPluginDependencyConfig, PlguinUpdate } from '@gah/shared';
+import chalk from 'chalk';
 import { Controller } from './controller';
 
 export class PluginController extends Controller {
@@ -74,7 +75,11 @@ export class PluginController extends Controller {
   public async run(command: string[]) {
     const cmd = command.splice(0, 1)[0];
     const args = command;
-    await this._pluginService.run(cmd, args);
+    const success = await this._pluginService.run(cmd, args);
+    if (!success) {
+      this._loggerService.error(`Running command ${chalk.gray(`"gah run ${command}"`)} failed`);
+      process.exit(1);
+    }
   }
 
   private async askForInstalledPlugin(msg: string, pluginName?: string): Promise<string | null> {
