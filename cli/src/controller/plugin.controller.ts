@@ -73,11 +73,12 @@ export class PluginController extends Controller {
   }
 
   public async run(command: string[]) {
+    const originalCmd = command;
     const cmd = command.splice(0, 1)[0];
     const args = command;
     const success = await this._pluginService.run(cmd, args);
     if (!success) {
-      this._loggerService.error(`Running command ${chalk.gray(`"gah run ${command}"`)} failed`);
+      this._loggerService.error(`Running command ${chalk.gray(`"gah run ${originalCmd}"`)} failed`);
       process.exit(1);
     }
   }
