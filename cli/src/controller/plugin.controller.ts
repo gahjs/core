@@ -73,7 +73,7 @@ export class PluginController extends Controller {
   }
 
   public async run(command: string[]) {
-    const originalCmd = command;
+    const originalCmd = command.join(' ');
     const cmd = command.splice(0, 1)[0];
     const args = command;
     const success = await this._pluginService.run(cmd, args);
