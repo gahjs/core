@@ -23,12 +23,20 @@ export class LoggerService implements ILoggerService {
     return this._contextService.getContext().debug ?? false;
   }
 
+  private logText(text: string) {
+    if (AwesomeLogger.currentLoggerType !== 'text') {
+      AwesomeLogger.interrupt(text);
+    } else {
+      AwesomeLogger.log(text);
+    }
+  }
+
   public log(text: string) {
-    AwesomeLogger.interrupt(` ${chalk.blue('■')} ${text}`);
+    this.logText(` ${chalk.blue('■')} ${text}`);
   }
 
   public warn(text: string) {
-    AwesomeLogger.interrupt(` ${chalk.yellow('■')} ${text}`);
+    this.logText(` ${chalk.yellow('■')} ${text}`);
   }
   public error(text: string | Error) {
     let errText = chalk.red(' ■ ');
@@ -41,19 +49,19 @@ export class LoggerService implements ILoggerService {
     } else {
       errText += 'Unknown error';
     }
-    AwesomeLogger.interrupt(errText);
+    this.logText(errText);
   }
   public debug(text: string, prefx = true) {
     if (this.debugLoggingEnabled) {
       if (prefx) {
-        AwesomeLogger.interrupt(` ${chalk.magenta('■')} ${text}`);
+        this.logText(` ${chalk.magenta('■')} ${text}`);
       } else {
-        AwesomeLogger.interrupt(text);
+        this.logText(text);
       }
     }
   }
   public success(text: string) {
-    AwesomeLogger.interrupt(` ${chalk.green('■')} ${text}`);
+    this.logText(` ${chalk.green('■')} ${text}`);
   }
 
   public startLoadingAnimation(text: string) {
