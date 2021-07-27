@@ -15,7 +15,9 @@ import {
   PlguinUpdate,
   GahEventType,
   ExtractEventPayload,
-  PackageJson
+  PackageJson,
+  GahModuleType,
+  GahFileData
 } from '@gah/shared';
 
 import { FileSystemService } from './file-system.service';
@@ -26,6 +28,7 @@ import { PromptService } from './prompt.service';
 import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
 import chalk from 'chalk';
+import { GahFile } from '../install-helper/gah-file';
 
 export class PluginService implements IPluginService {
   private readonly _plugins = new Array<GahPlugin>();
@@ -423,7 +426,19 @@ export class PluginService implements IPluginService {
       return false;
     }
     this._loggerService.debug(`executing command '${chalk.yellow(cmd)}' from '${chalk.yellow(cmdHandler.pluginName)}'`);
-    return cmdHandler.handler(args);
+
+    let gahFile: GahFileData | undefined = undefined;
+    const moduleType = await this._configService.getGahModuleType();
+    if (moduleType !== GahModuleType.UNKNOWN) {
+      const isHost = moduleType === GahModuleType.HOST;
+      const fileName = isHost ? 'gah-host.json' : 'gah-module.json';
+
+      const gahFileObj = new GahFile(fileName);
+      await gahFileObj.init();
+      gahFile = await gahFileObj.data();
+    }
+
+    return cmdHandler.handler(args, gahFile);
   }
 
   public storeData<T>(pluginName: string, key: string, data: T): void {
