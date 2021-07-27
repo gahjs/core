@@ -474,16 +474,14 @@ available-typed-arrays@^1.0.2:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.4.tgz#9e0ae84ecff20caae6a94a1c3bc39b955649b7a9"
   integrity sha512-SA5mXJWrId1TaQjfxUYghbqQ/hYioKmLJvPJyDuYRtXXenFNMjj4hSSt1Cf1xsuXSXrtxrVC5Ot4eU6cOtBDdA==
 
-awesome-logging@0.2.8:
-  version "0.2.8"
-  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.2.8.tgz#0dbadfcd5792a0abf6c37b99f9b5fe450bf39b98"
-  integrity sha512-taU7avy+GqJR41ggMI58cXFM1EgSEQEvYfWtXb//BLWmuTZoy3uXDANX5r4GrblsUWhtdtl3zvxg1t0UPS7JZg==
+awesome-logging@0.2.11:
+  version "0.2.11"
+  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.2.11.tgz#c18100354516dac55ede3323a4bdc4a6b705fdaa"
+  integrity sha512-dYjf5+UUhbEH3bcPL2gzu4iPyZf2DeCQJW/vzUhQNve9vGFV7RNYqan2KA1nO/55DPWsrKtcGs20kTyIGl05bA==
   dependencies:
     chalk "^4.1.1"
-    cli-truncate "^2.1.0"
     restore-cursor "^3.1.0"
     slice-ansi "^4.0.0"
-    string-width "^4.2.0"
     strip-ansi "^6.0.0"
 
 awilix@^4.3.4:
@@ -720,14 +718,6 @@ clean-stack@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.2.0.tgz#ee8472dbb129e727b31e8a10a427dee9dfe4008b"
   integrity sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==
-
-cli-truncate@^2.1.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/cli-truncate/-/cli-truncate-2.1.0.tgz#c39e28bf05edcde5be3b98992a22deed5a2b93c7"
-  integrity sha512-n8fOixwDD6b/ObinzTrp1ZKFzbgvKZvuz/TvejnLn1aQfC6r52XEx85FmuC+3HI+JM7coBRXUvNqEU2PHVrHpg==
-  dependencies:
-    slice-ansi "^3.0.0"
-    string-width "^4.2.0"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -2934,15 +2924,6 @@ slash@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
-
-slice-ansi@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/slice-ansi/-/slice-ansi-3.0.0.tgz#31ddc10930a1b7e0b67b08c96c2f49b77a789787"
-  integrity sha512-pSyv7bSTC7ig9Dcgbw9AuRNUb5k5V6oDudjZoMBSr13qpLBG7tB+zgCkARjq7xIUgdz5P1Qe8u+rSGdouOOIyQ==
-  dependencies:
-    ansi-styles "^4.0.0"
-    astral-regex "^2.0.0"
-    is-fullwidth-code-point "^3.0.0"
 
 slice-ansi@^4.0.0:
   version "4.0.0"
