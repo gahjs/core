@@ -8,6 +8,7 @@ import { IPluginService } from '../services/plugin.service';
 import { GahEvent, ExtractEventPayload, GahEventType } from './gah-event';
 import { GahPluginConfig } from './gah-plugin-config';
 import { IExecutionService } from '../services/execution.service';
+import { GahFileData } from './install-helper/gah-file-data';
 
 export abstract class GahPlugin {
   protected readonly name: string;
@@ -38,7 +39,10 @@ export abstract class GahPlugin {
     this.pluginService.registerEventHandler(this.name, type, handler);
   }
 
-  protected registerCommandHandler(commandName: string, handler: (args: string[]) => Promise<boolean> | boolean): void {
+  protected registerCommandHandler(
+    commandName: string,
+    handler: (args: string[], gahFile?: GahFileData) => Promise<boolean> | boolean
+  ): void {
     this.pluginService.registerCommandHandler(this.name, commandName, handler);
   }
 

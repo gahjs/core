@@ -1,4 +1,5 @@
 import { GahEvent, GahEventType, ExtractEventPayload } from '../models/gah-event';
+import { GahFileData } from '../models/install-helper/gah-file-data';
 import { PlguinUpdate } from '../models/plugin-update';
 
 export interface IPluginService {
@@ -15,7 +16,11 @@ export interface IPluginService {
   getUpdateablePlugins(pluginName?: string): Promise<PlguinUpdate[] | null>;
   updatePlugins(pluginUpdates: PlguinUpdate[]): Promise<void>;
   isPluginConfigured(pluginName: string): Promise<boolean>;
-  registerCommandHandler(pluginName: string, commandName: string, handler: (args: string[]) => Promise<boolean> | boolean): void;
+  registerCommandHandler(
+    pluginName: string,
+    commandName: string,
+    handler: (args: string[], gahFile?: GahFileData) => Promise<boolean> | boolean
+  ): void;
   run(cmd: string, args: string[]): Promise<boolean>;
   storeData<T>(pluginName: string, key: string, data: T): void;
   readData<T>(pluginName: string, key: string): T;

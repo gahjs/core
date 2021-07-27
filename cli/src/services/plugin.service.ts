@@ -411,7 +411,11 @@ export class PluginService implements IPluginService {
     await this._configService.saveCurrentConfig();
   }
 
-  registerCommandHandler(pluginName: string, commandName: string, handler: (args: string[]) => Promise<boolean>): void {
+  registerCommandHandler(
+    pluginName: string,
+    commandName: string,
+    handler: (args: string[], gahFile?: GahFileData) => Promise<boolean>
+  ): void {
     const newHandler = new GahCommandHandler();
     newHandler.pluginName = pluginName;
     newHandler.command = commandName;
