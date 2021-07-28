@@ -12,10 +12,14 @@ export class GitService implements IGitService {
   }
 
   public async init(): Promise<void> {
-    const rootDir = await this.getRootDir();
-    await git.cwd(rootDir).catch(() => {
-      this._loggerService.debug('Git Service could not be initialized.');
-    });
+    if (await this.isGitRepo()) {
+      const rootDir = await this.getRootDir();
+      await git.cwd(rootDir).catch(() => {
+        this._loggerService.debug('Git Service could not be initialized.');
+      });
+    } else {
+      this._loggerService.debug('This is not a git repo folder.');
+    }
   }
 
   public async getRootDir(): Promise<string> {

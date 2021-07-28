@@ -17,7 +17,8 @@ import {
   ExtractEventPayload,
   PackageJson,
   GahModuleType,
-  GahFileData
+  GahFileData,
+  IGitService
 } from '@gah/shared';
 
 import { FileSystemService } from './file-system.service';
@@ -29,6 +30,7 @@ import { WorkspaceService } from './workspace.service';
 import { ExecutionService } from './execution.service';
 import chalk from 'chalk';
 import { GahFile } from '../install-helper/gah-file';
+import { GitService } from './git.service';
 
 export class PluginService implements IPluginService {
   private readonly _plugins = new Array<GahPlugin>();
@@ -46,6 +48,7 @@ export class PluginService implements IPluginService {
   private readonly _promptService: IPromptService;
   private readonly _workspaceService: IWorkspaceService;
   private readonly _executionService: IExecutionService;
+  private readonly _gitService: IGitService;
   private readonly _pluginData: { [pluginName: string]: { [key: string]: any } } = {};
 
   constructor(
@@ -55,7 +58,8 @@ export class PluginService implements IPluginService {
     templateService: TemplateService,
     promptService: PromptService,
     workspaceService: WorkspaceService,
-    executionService: ExecutionService
+    executionService: ExecutionService,
+    gitService: GitService
   ) {
     this._fileSystemService = fileSystemService;
     this._loggerService = loggerService;
@@ -64,6 +68,7 @@ export class PluginService implements IPluginService {
     this._promptService = promptService;
     this._workspaceService = workspaceService;
     this._executionService = executionService;
+    this._gitService = gitService;
   }
 
   public async init(): Promise<void> {
@@ -93,6 +98,7 @@ export class PluginService implements IPluginService {
     plugin['promptService'] = this._promptService;
     plugin['workspaceService'] = this._workspaceService;
     plugin['executionService'] = this._executionService;
+    plugin['gitService'] = this._gitService;
     plugin['pluginService'] = this;
   }
 
