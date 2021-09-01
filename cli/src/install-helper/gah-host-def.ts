@@ -478,6 +478,7 @@ export class GahHostDef extends GahModuleBase {
   private async adjustAngularJsonConfig() {
     if (!this._ngOptions.aot) {
       this._angularJson.projects['gah-host'].architect.build.options.aot = false;
+      this._angularJson.projects['gah-host'].architect.build.options.buildOptimizer = false;
 
       const configs = this._angularJson.projects['gah-host'].architect.build.configurations;
       const keys = Object.keys(configs);
