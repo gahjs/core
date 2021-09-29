@@ -1,0 +1,12 @@
+// process.env.DEBUG = "mocha*"
+
+{
+  "timeout": 999999,
+  "color": true,
+  "require": ["ts-node/register"],
+  "reporter": "cypress-junit-reporter",
+  "reporterOptions": ["mochaFile=./results/test-results.xml"],
+  "fullStackTrace": true,
+  "retries": 0,
+  "parallel": false
+}
