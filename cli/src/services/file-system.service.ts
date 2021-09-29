@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path_ from 'path';
 import { IFileSystemService, ILoggerService, IExecutionService, FileSystemType } from '@gah/shared';
-import globby from 'globby';
+import { globby } from 'globby';
 import { platform } from 'os';
 import { ExecutionService } from './execution.service';
 import { LoggerService } from './logger.service';

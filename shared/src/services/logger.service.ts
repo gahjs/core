@@ -1,7 +1,7 @@
 export interface ILoggerService {
   log(text: string): void;
   warn(text: string): void;
-  error(text: string | Error): void;
+  error(text: string | Error | unknown): void;
   debug(text: string): void;
   success(text: string): void;
   startLoadingAnimation(text: string): void;

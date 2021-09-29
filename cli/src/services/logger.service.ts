@@ -38,11 +38,11 @@ export class LoggerService implements ILoggerService {
   public warn(text: string) {
     this.logText(` ${chalk.yellow('■')} ${text}`);
   }
-  public error(text: string | Error) {
+  public error(text: string | Error | unknown) {
     let errText = chalk.red(' ■ ');
     if (typeof text === 'string') {
       errText += text;
-    } else if (text && (text.name || text.message || text.stack)) {
+    } else if (text instanceof Error) {
       errText += text.name ?? '';
       errText += text.message ?? '';
       errText += text.stack ?? '';

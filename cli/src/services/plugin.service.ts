@@ -185,7 +185,7 @@ export class PluginService implements IPluginService {
       return { plugin: plugin as GahPlugin, version: actualPluginVersion };
     } catch (error) {
       this._loggerService.error('Plugin package folder exists, but import failed');
-      this._loggerService.error(error);
+      this._loggerService.error(error as Error);
       return undefined;
     }
   }
@@ -297,8 +297,7 @@ export class PluginService implements IPluginService {
           }
         } catch (error) {
           this._loggerService.error(`Error in plugin ${handler.pluginName}.\nCallstack from plugin:`);
-          this._loggerService.error(error.message);
-          this._loggerService.error(error.stack);
+          this._loggerService.error(error);
           this._loggerService.log('--------------------------------------------------------------------------------');
           this._loggerService.log('Trying to continue with execution...\n');
           return;
