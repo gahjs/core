@@ -38,8 +38,8 @@ export class LoggerService implements ILoggerService {
   public warn(text: string) {
     this.logText(` ${chalk.yellow('■')} ${text}`);
   }
-  public error(text: string | Error | unknown) {
-    let errText = chalk.red(' ■ ');
+  public error(text: string | Error | unknown, debug = false) {
+    let errText = '';
     if (typeof text === 'string') {
       errText += text;
     } else if (text instanceof Error) {
@@ -49,7 +49,13 @@ export class LoggerService implements ILoggerService {
     } else {
       errText += 'Unknown error';
     }
-    this.logText(errText);
+    if (!debug) {
+      this.logText(` ${chalk.red('■')} ${errText}`);
+      return;
+    }
+    if (this.debugLoggingEnabled) {
+      this.logText(` ${chalk.magenta('■')} ${errText}`);
+    }
   }
   public debug(text: string, prefx = true) {
     if (this.debugLoggingEnabled) {
