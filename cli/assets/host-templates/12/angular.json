@@ -29,12 +29,7 @@
             "assets": ["src/assets", "src/web.config", "src/environment.json"],
             "styles": ["src/styles.scss"],
             "scripts": [],
-            "preserveSymlinks": true,
-            "sourceMap": {
-              "scripts": true,
-              "styles": true,
-              "vendor": true
-            }
+            "preserveSymlinks": true
           },
           "configurations": {
             "production": {
@@ -63,7 +58,11 @@
               "optimization": false,
               "vendorChunk": true,
               "extractLicenses": false,
-              "sourceMap": true,
+              "sourceMap": {
+                "scripts": true,
+                "styles": true,
+                "vendor": true
+              },
               "namedChunks": true
             }
           },
