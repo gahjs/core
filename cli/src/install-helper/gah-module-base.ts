@@ -576,6 +576,12 @@ export abstract class GahModuleBase {
       return InstallUnitResult.skipped;
     }
 
+    const yarnLockPath = this.fileSystemService.join(this.basePath, 'yarn.lock');
+    if (this.contextService.getContext().calledFromHostFolder && (await this.fileSystemService.fileExists(yarnLockPath))) {
+      this.loggerService.log('Copying lockfile');
+      await this.fileSystemService.copyFile(yarnLockPath, this.fileSystemService.join(this.basePath, '.gah', 'yarn.lock'));
+    }
+
     this.loggerService.log('Installing yarn packages');
 
     const yarnTimeout = this.contextService.getContext().yarnTimeout;
@@ -591,6 +597,10 @@ export abstract class GahModuleBase {
 
     if (success) {
       this.loggerService.success('Packages installed successfully');
+      if (this.contextService.getContext().calledFromHostFolder) {
+        this.loggerService.log('Saving lockfile');
+        await this.fileSystemService.copyFile(this.fileSystemService.join(this.basePath, '.gah', 'yarn.lock'), yarnLockPath);
+      }
     } else {
       this.loggerService.error(this.executionService.executionErrorResult);
       throw new Error('Installing packages failed');

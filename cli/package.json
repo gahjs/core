@@ -32,7 +32,7 @@
   "private": false,
   "prettier": "@awdware/prettier-config",
   "dependencies": {
-    "@gah/shared": "^1.0.8",
+    "@gah/shared": "^1.0.9",
     "awesome-logging": "^0.3.0",
     "awilix": "^5.0.1",
     "chalk": "^4.1.2",
