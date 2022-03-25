@@ -19,7 +19,7 @@
     "prebuild": "del-cli lib",
     "postbuild": "cpy src/templates lib/templates && cpy ../README.md ./",
     "start": "yarn run build && yarn run global",
-    "global": "yarn global add file:D:/git/@gahjs/core/cli",
+    "global": "yarn global add file:C:/git_repos/@gah/core/cli",
     "lint": "yarn eslint src/**/*.ts",
     "build": "yarn run prebuild && tsc -p . && yarn run postbuild",
     "format": "prettier -w . --ignore-path .gitignore"
