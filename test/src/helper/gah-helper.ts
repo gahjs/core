@@ -37,7 +37,9 @@ export class GahHelper {
     } else {
       globalPath = path.join(homedir(), 'gah-test');
     }
-    await fs.promises.rmdir(globalPath, { recursive: true });
+    if (fs.existsSync(globalPath)) {
+      await fs.promises.rmdir(globalPath, { recursive: true });
+    }
   }
 
   async runGah(dir: string, args: string[]) {

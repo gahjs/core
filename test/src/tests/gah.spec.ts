@@ -28,25 +28,25 @@ describe('Basic Tests', () => {
     process.cwd = originalCwdMethod;
   });
 
-  // it('1_install-works', async () => {
-  //   await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
-  //   await gah.runInstall('host', true);
+  it('1_install-works', async () => {
+    await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
+    await gah.runInstall('host', true);
 
-  //   await gah.compareHost();
-  // });
+    await gah.compareHost();
+  });
 
-  // it('2_check-plugin-updates-none-installed', async () => {
-  //   await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
-  //   await gah.runPluginUpdate('host');
-  //   asserter.assertLog('No plugins installed!');
-  // });
+  it('2_check-plugin-updates-none-installed', async () => {
+    await gah.copyModules(['core', 'host', 'shared', 'led', 'blog']);
+    await gah.runPluginUpdate('host');
+    asserter.assertLog('No plugins installed!');
+  });
 
-  // it('3_check-plugin-updates-no-updates', async () => {
-  //   await gah.copyModules(['core', 'shared', 'led']);
-  //   await gah.runPluginUpdate('led');
-  //   asserter.assertNoLog('No plugins installed!');
-  //   asserter.assertLog('No plugins can be updated.');
-  // });
+  it('3_check-plugin-updates-no-updates', async () => {
+    await gah.copyModules(['core', 'shared', 'led']);
+    await gah.runPluginUpdate('led');
+    asserter.assertNoLog('No plugins installed!');
+    asserter.assertLog('No plugins can be updated.');
+  });
 
   it('4_check-plugin-updates-found-updates', async () => {
     await gah.copyModules(['core', 'shared', 'led']);
