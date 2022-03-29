@@ -17,7 +17,7 @@
   },
   "scripts": {
     "prebuild": "del-cli lib",
-    "postbuild": "cpy src/templates lib/templates && cpy ../README.md ./",
+    "postbuild": "cpy src/templates lib/templates --flat && cpy ../README.md ./",
     "start": "yarn run build && yarn run global",
     "global": "yarn global add file:D:/git/@gahjs/core/cli",
     "lint": "yarn eslint src/**/*.ts",
