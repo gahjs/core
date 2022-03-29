@@ -65,7 +65,7 @@ export class FileSystemService implements IFileSystemService {
 
     const str = await this.readFile(absolutePath);
     try {
-      const res = parse(str) as T;
+      const res = parse(str) as any as T;
       if (!this._objectStore[absolutePath]) {
         this._objectStore[absolutePath] = res;
       } else {
