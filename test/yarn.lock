@@ -119,31 +119,35 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
-"@gah/cli@^1.0.18":
-  version "1.0.22"
-  resolved "https://registry.yarnpkg.com/@gah/cli/-/cli-1.0.22.tgz#d50060a94a56680f4c4958e59c2a40131b32df6c"
-  integrity sha512-hXOKCdlNxx/zznI4WIUKZnLb1EvsW49k19dW+skxnwBfcwmWWt3bBdOBLH5dPx+qOW1XO/zZDscJKoSgc/+q7Q==
+"@gah/cli@^1.0.23":
+  version "1.0.23"
+  resolved "https://registry.yarnpkg.com/@gah/cli/-/cli-1.0.23.tgz#4bb258f7e3ca0ba75366a43e99177f7036037f65"
+  integrity sha512-8LILCxJ8P+sNMvAIV7tvQCo0MFHFFR2kPYVv622WZn6Go1ZRMWezvH1hwOj3svLqnL/4F3jPfLUlqh8b3rf2cg==
   dependencies:
-    "@gah/shared" "1.0.10"
-    awesome-logging "^0.3.0"
+    "@gah/shared" "1.0.11"
+    awesome-logging "^0.5.1"
     awilix "^5.0.1"
     chalk "^4.1.2"
     change-case "^4.1.2"
-    commander "^8.2.0"
-    comment-json "^4.1.1"
-    compare-versions "^3.6.0"
+    commander "^9.1.0"
+    comment-json "^4.2.2"
+    compare-versions "^4.1.3"
     decompress "^4.2.1"
     decompress-targz "^4.1.1"
     deep-equal "^2.0.5"
     ejs "^3.1.6"
-    enquirer "^2.3.6"
     figlet "^1.5.2"
     fs-extra "^10.0.0"
     fswin "^3.21.929"
     globby "^11.0.0"
-    simple-git "^2.46.0"
+    simple-git "^3.5.0"
 
-"@gah/shared@1.0.10", "@gah/shared@^1.0.8":
+"@gah/shared@1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@gah/shared/-/shared-1.0.11.tgz#77338cd91a5ad30f73672c9e51b730133bae0ea8"
+  integrity sha512-NuNgNC7T6Hkv9VZaYiOxfu0oejspKqL5hG8OaqP/rdR05+rnCLLIXoI5/kL4yup42Ggzktbj+ahzMnfvkfO6wA==
+
+"@gah/shared@^1.0.8":
   version "1.0.10"
   resolved "https://registry.yarnpkg.com/@gah/shared/-/shared-1.0.10.tgz#6080d5c9b09e050a57c0f19ff4d50805a9f36d04"
   integrity sha512-JU0qllMLh590z0D2AKgXgQBdI89NZbecGZGbEjqdfE4CmOVVpivu1FSunc0RiPXntuIPmzVi0Q5V0CewjXHf8Q==
@@ -642,15 +646,15 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
-awesome-logging@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.3.0.tgz#2075066c28d9d23918805f99afc8c0a0ee4ec92a"
-  integrity sha512-adxfnorJoDBKrC5Vci2CYcFlc1P6lkXutshaPzcljdrEYFHsDntJX5ximPpYTRVxXTI2LjMA2VJLoJWLMcjnWQ==
+awesome-logging@^0.5.1:
+  version "0.5.1"
+  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.5.1.tgz#8197d139909a09b422b8dbdb43d8784c25855976"
+  integrity sha512-Qcu327W5f7bhAOhTH3gJH/4h/mj7iu9hFZx1U0TDDDTPJ6ye1WrmN1uDbUrVqkWLYcCA4RuJteH/dM4I6jOeHg==
   dependencies:
-    chalk "^4.1.1"
+    chalk "^4.1.2"
     restore-cursor "^3.1.0"
     slice-ansi "^4.0.0"
-    strip-ansi "^6.0.0"
+    strip-ansi "^6.0.1"
 
 awilix@^5.0.1:
   version "5.0.1"
@@ -947,12 +951,12 @@ commander@^2.8.1:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
-commander@^8.2.0:
-  version "8.3.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-8.3.0.tgz#4837ea1b2da67b9c616a67afbb0fafee567bca66"
-  integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
+commander@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-9.1.0.tgz#a6b263b2327f2e188c6402c42623327909f2dbec"
+  integrity sha512-i0/MaqBtdbnJ4XQs4Pmyb+oFQl+q0lsAmokVUH92SlSw4fkeAcG3bVon+Qt7hmtF+u3Het6o4VgrcY3qAoEB6w==
 
-comment-json@^4.1.1:
+comment-json@^4.1.1, comment-json@^4.2.2:
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/comment-json/-/comment-json-4.2.2.tgz#5fae70a94e0c8f84a077bd31df5aa5269252f293"
   integrity sha512-H8T+kl3nZesZu41zO2oNXIJWojNeK3mHxCLrsBNu6feksBXsgb+PtYz5daP5P86A0F3sz3840KVYehr04enISQ==
@@ -963,10 +967,10 @@ comment-json@^4.1.1:
     has-own-prop "^2.0.0"
     repeat-string "^1.6.1"
 
-compare-versions@^3.6.0:
-  version "3.6.0"
-  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-3.6.0.tgz#1a5689913685e5a87637b8d3ffca75514ec41d62"
-  integrity sha512-W6Af2Iw1z4CB7q4uU4hv646dW9GQuBM+YpC0UvUCWSD8w90SJjp+ujJuXaEMtAXBtSqGfMPuFOVn4/+FlaqfBA==
+compare-versions@^4.1.3:
+  version "4.1.3"
+  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-4.1.3.tgz#8f7b8966aef7dc4282b45dfa6be98434fc18a1a4"
+  integrity sha512-WQfnbDcrYnGr55UwbxKiQKASnTtNnaAWVi8jZyy8NTpVAXWACSne8lMD1iaIo9AiU6mnuLvSVshCzewVuWxHUg==
 
 concat-map@0.0.1:
   version "0.0.1"
@@ -1022,7 +1026,7 @@ cypress-junit-reporter@^1.3.1:
     strip-ansi "^4.0.0"
     xml "^1.0.0"
 
-debug@4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.2:
+debug@4, debug@^4.0.1, debug@^4.1.0, debug@^4.1.1, debug@^4.3.1, debug@^4.3.3:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"
   integrity sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ==
@@ -1226,7 +1230,7 @@ end-of-stream@^1.0.0:
   dependencies:
     once "^1.4.0"
 
-enquirer@^2.3.5, enquirer@^2.3.6:
+enquirer@^2.3.5:
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/enquirer/-/enquirer-2.3.6.tgz#2a7fe5dd634a1e4125a975ec994ff5456dc3734d"
   integrity sha512-yjNnPr315/FjS4zIsUxYguYUPP2e1NK4d7E7ZOLiyYCcbFBiTMyID+2wvm2w6+pZ/odMA7cRkjhsPbltwBOrLg==
@@ -3120,14 +3124,14 @@ signal-exit@^3.0.2, signal-exit@^3.0.7:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.7.tgz#a9a1767f8af84155114eaabd73f99273c8f59ad9"
   integrity sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==
 
-simple-git@^2.46.0:
-  version "2.48.0"
-  resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-2.48.0.tgz#87c262dba8f84d7b96bb3a713e9e34701c1f6e3b"
-  integrity sha512-z4qtrRuaAFJS4PUd0g+xy7aN4y+RvEt/QTJpR184lhJguBA1S/LsVlvE/CM95RsYMOFJG3NGGDjqFCzKU19S/A==
+simple-git@^3.5.0:
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/simple-git/-/simple-git-3.5.0.tgz#3c3538f4d7a1b3c8f3904412b12740bdcad9c8b1"
+  integrity sha512-fZsaq5nzdxQRhMNs6ESGLpMUHoL5GRP+boWPhq9pMYMKwOGZV2jHOxi8AbFFA2Y/6u4kR99HoULizSbpzaODkA==
   dependencies:
     "@kwsites/file-exists" "^1.1.1"
     "@kwsites/promise-deferred" "^1.1.1"
-    debug "^4.3.2"
+    debug "^4.3.3"
 
 sinon@^11.1.2:
   version "11.1.2"

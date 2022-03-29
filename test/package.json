@@ -17,7 +17,7 @@
   },
   "prettier": "@awdware/prettier-config",
   "dependencies": {
-    "@gah/cli": "^1.0.18",
+    "@gah/cli": "^1.0.23",
     "@gah/shared": "^1.0.8",
     "awilix": "^5.0.1"
   },
