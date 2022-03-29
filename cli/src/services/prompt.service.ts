@@ -1,6 +1,5 @@
 import { IPromptService, PromptConfig, FuzzyPathPromptConfig, SelectionPromptConfig, IFileSystemService } from '@gah/shared';
 
-import { prompt } from 'enquirer';
 import { FileSystemService } from './file-system.service';
 import { AwesomeLogger } from 'awesome-logging';
 export class PromptService implements IPromptService {
@@ -22,13 +21,13 @@ export class PromptService implements IPromptService {
   }
 
   public async confirm(cfg: PromptConfig): Promise<boolean> {
-    return prompt({
-      type: 'confirm',
-      name: '_',
-      message: cfg.msg,
-      initial: cfg.default ?? false,
-      skip: !cfg.enabled()
-    }).then((_: any) => _._);
+    if (!cfg.enabled()) {
+      return cfg.default ?? false;
+    }
+    return AwesomeLogger.prompt('confirm', {
+      text: cfg.msg,
+      default: cfg.default ? (cfg.default ? 'yes' : 'no') : undefined
+    }).result;
   }
 
   public async fuzzyPath(cfg: FuzzyPathPromptConfig): Promise<string> {
@@ -42,52 +41,44 @@ export class PromptService implements IPromptService {
 
     const filteredFiles = (cfg.exclude ? allFiles.filter(x => !cfg.exclude!(x)) : allFiles).map(x => x.replace(/\\/g, '/'));
 
-    const defaultIndex = filteredFiles.findIndex(x => x === cfg.default?.replace(/\\/g, '/'));
+    // const defaultIndex = filteredFiles.findIndex(x => x === cfg.default?.replace(/\\/g, '/'));
 
-    const def = cfg.optional ? 0 : (cfg.default && defaultIndex) || undefined;
+    // const def = cfg.optional ? 0 : (cfg.default && defaultIndex) || undefined;
 
     if (filteredFiles.length === 0) {
       return '';
     }
 
-    if (cfg.optional) {
-      filteredFiles.splice(0, 0, filteredFiles.splice(defaultIndex, 1)[0]);
-      filteredFiles.splice(0, 0, '');
-    }
+    // if (cfg.optional) {
+    //   filteredFiles.splice(0, 0, filteredFiles.splice(defaultIndex, 1)[0]);
+    //   filteredFiles.splice(0, 0, '');
+    // }
 
-    return prompt({
-      type: 'autocomplete',
-      name: '_',
-      message: cfg.msg,
-      limit: 8,
-      choices: filteredFiles,
-      initial: def === -1 ? 0 : def ?? 0,
-      skip: !cfg.enabled()
-    } as any).then((_: any) => _._);
+    return AwesomeLogger.prompt('text', {
+      text: cfg.msg,
+      allowOnlyHints: true,
+      hints: filteredFiles,
+      fuzzyAutoComplete: true,
+      caseInsensitive: true
+    }).result;
   }
 
   public async list(cfg: SelectionPromptConfig): Promise<string> {
-    return prompt({
-      type: 'select',
-      name: '_',
-      message: cfg.msg,
-      choices: cfg.choices(),
-      skip: !cfg.enabled()
-    }).then((_: any) => _._);
+    return AwesomeLogger.prompt('choice', {
+      options: cfg.choices(),
+      text: cfg.msg
+    }).result;
   }
 
   public async checkbox(cfg: SelectionPromptConfig): Promise<string[]> {
     // Workaround for https://github.com/enquirer/enquirer/issues/298
     if (!cfg.enabled()) {
-      return (undefined as any) as string[];
+      return undefined as any as string[];
     }
 
-    return prompt({
-      type: 'multiselect',
-      name: '_',
-      message: cfg.msg,
-      choices: cfg.choices(),
-      skip: !cfg.enabled()
-    }).then((_: any) => _._);
+    return AwesomeLogger.prompt('toggle', {
+      options: cfg.choices(),
+      text: cfg.msg
+    }).result;
   }
 }
