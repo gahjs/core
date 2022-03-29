@@ -79,7 +79,7 @@ export class GahHelper {
 
   async modifyJsonConfig(filePath: string, configPropertyChain: string, newValue: any) {
     const config = parse((await fs.promises.readFile(filePath)).toString());
-    let currentStep = config;
+    let currentStep = config as any;
     const propertyChain = configPropertyChain.split('.');
     const lastChainKey = propertyChain.pop()!;
     propertyChain.forEach(propChainKey => {
