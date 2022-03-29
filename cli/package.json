@@ -48,7 +48,7 @@
     "fs-extra": "^10.0.0",
     "fswin": "^3.21.929",
     "globby": "^11.0.0",
-    "simple-git": "^2.46.0"
+    "simple-git": "^3.5.0"
   },
   "devDependencies": {
     "@awdware/eslint-config-base": "^1.0.0",
