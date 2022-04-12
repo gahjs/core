@@ -19,7 +19,10 @@
   "engines": {
     "node": ">=12.0"
   },
-  "author": "LoaderB0T",
+  "author": {
+    "name": "Janik Schumacher (LoaderB0T)",
+    "url": "https://awdware.de"
+  },
   "license": "MIT",
   "private": false,
   "prettier": "@awdware/prettier-config",
