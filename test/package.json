@@ -8,7 +8,10 @@
     "url": "https://github.com/gahjs/core.git"
   },
   "main": "index.js",
-  "author": "LoaderB0T",
+  "author": {
+    "name": "Janik Schumacher (LoaderB0T)",
+    "url": "https://awdware.de"
+  },
   "license": "MIT",
   "private": false,
   "scripts": {
