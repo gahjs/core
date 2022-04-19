@@ -38,12 +38,12 @@ export type GahEventDefinitions =
 // A extends { type:B } -> false
 // A extends { type:C } -> false
 // A extends { type:D } -> true
-export type GahEventFull<A extends GahEventDefinitions, T> = A extends { name: T }
+export type GahEventFull<A extends GahEventDefinitions> = A extends { name: string }
   ? ({ type: `BEFORE_${A['name']}` } & Omit<A, 'name'>) | ({ type: `AFTER_${A['name']}` } & Omit<A, 'name'>)
   : never;
 
 // This uses said type to actually create the new type
-export type GahEvent = GahEventFull<GahEventDefinitions, any>;
+export type GahEvent = GahEventFull<GahEventDefinitions>;
 
 // This extracts all the new genereated types into an own type
 export type GahEventType = GahEvent['type'];

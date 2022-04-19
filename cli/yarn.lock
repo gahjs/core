@@ -415,10 +415,10 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
-awesome-logging@^0.5.1:
-  version "0.5.1"
-  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-0.5.1.tgz#8197d139909a09b422b8dbdb43d8784c25855976"
-  integrity sha512-Qcu327W5f7bhAOhTH3gJH/4h/mj7iu9hFZx1U0TDDDTPJ6ye1WrmN1uDbUrVqkWLYcCA4RuJteH/dM4I6jOeHg==
+awesome-logging@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/awesome-logging/-/awesome-logging-1.0.0.tgz#6e1b72224de6e2e2e4a9bda11b0d72602fbf85a1"
+  integrity sha512-//8KdA/nVxJch2FbalieKzpPFQ2AnCdrO4FjEp0gsFxjW0Oi6MwpVadDUfNlRe0IOeLCESiwa6y+GfSgZqGAOQ==
   dependencies:
     chalk "^4.1.2"
     restore-cursor "^3.1.0"
@@ -2507,10 +2507,10 @@ type-fest@^1.0.1, type-fest@^1.2.1, type-fest@^1.2.2:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-1.4.0.tgz#e9fb813fe3bf1744ec359d55d1affefa76f14be1"
   integrity sha512-yGSza74xk0UG8k+pLh5oeoYirvIiWo5t0/o3zHHAO2tRDiZcxWP7fywNlXhqb6/r6sWvwi+RsyQMWhVLe4BVuA==
 
-typescript@^4.4.3:
-  version "4.4.3"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.4.3.tgz#bdc5407caa2b109efd4f82fe130656f977a29324"
-  integrity sha512-4xfscpisVgqqDfPaJo5vkd+Qd/ItkoagnHpufr+i2QCHBsNYp+G7UAoyFl8aPtx879u38wPV65rZ8qbGZijalA==
+typescript@^4.6.0:
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.6.3.tgz#eefeafa6afdd31d725584c67a0eaba80f6fc6c6c"
+  integrity sha512-yNIatDa5iaofVozS/uQJEl3JRWLKKGJKh6Yaiv0GLGSuhpFJe7P3SbHZ8/yjAHRQwKRoA6YZqlfjXWmVzoVSMw==
 
 unbox-primitive@^1.0.1:
   version "1.0.1"
