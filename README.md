@@ -1,3 +1,10 @@
+# This repo is deprecated and unmaintained.
+# Consider using [Nx](https://nx.dev/).
+
+
+<br><br><br>
+
+
 
 # Welcome to gah!
 [![npm (scoped)](https://img.shields.io/npm/v/@gah/cli?style=for-the-badge)](https://www.npmjs.com/package/@gah/cli)
