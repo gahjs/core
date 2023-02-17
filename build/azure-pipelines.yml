@@ -12,7 +12,7 @@ pool:
 steps:
 - task: NodeTool@0
   inputs:
-    versionSpec: '12.x'
+    versionSpec: '14.x'
   displayName: "\U0001F4E5 Install Node.js"
 
 - task: YarnInstaller@3

@@ -25,7 +25,7 @@
     "format": "prettier -w . --ignore-path .gitignore"
   },
   "engines": {
-    "node": ">=12.0"
+    "node": ">=14.0"
   },
   "author": {
     "name": "Janik Schumacher (LoaderB0T)",
@@ -51,7 +51,7 @@
     "fs-extra": "^10.0.0",
     "fswin": "^3.21.929",
     "globby": "^11.0.0",
-    "simple-git": "^3.5.0"
+    "simple-git": "^3.16.1"
   },
   "devDependencies": {
     "@awdware/eslint-config-base": "^1.0.0",
@@ -62,7 +62,7 @@
     "@types/ejs": "^3.1.0",
     "@types/figlet": "^1.5.4",
     "@types/fs-extra": "^9.0.13",
-    "@types/node": "^12.0.0",
+    "@types/node": "^14.0.0",
     "@types/rimraf": "^3.0.2",
     "@typescript-eslint/eslint-plugin": "4.28.1",
     "@typescript-eslint/parser": "4.28.1",
