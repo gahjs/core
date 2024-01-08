@@ -16,7 +16,14 @@ export class PromptService implements IPromptService {
     return AwesomeLogger.prompt('text', {
       text: cfg.msg,
       default: cfg.default,
-      validator: cfg.validator
+      validators: cfg.validator
+        ? [
+            {
+              description: 'Invalid input',
+              validator: cfg.validator
+            }
+          ]
+        : undefined
     }).result;
   }
 
